@@ -1,0 +1,659 @@
+# Annotierte Funksprüche für Modul 3 (Am Boden & Bodencrew) – ENTWURF, Modul ist noch „planned“.
+# Platzhalter und Rollen: siehe content/README.md
+
+# ------------------------------------------------------------ Lektion 1: ATIS
+- id: m3-atis
+  title: Eine ATIS-Ausgabe
+  context: >-
+    Bevor du Ground rufst, hörst du die ATIS: eine automatische Ansage in Endlosschleife mit allem,
+    was du über Wetter und Betrieb am Platz wissen musst. {airfield.name} liegt auf der Karte {airfield.map}, dort
+    gilt die {airfield.phraseology.here}: Sicht und Luftdruck hörst du in dieser Form. Wolken und die Bitte am Schluss
+    spricht die App überall in der US-Form.
+  freq: "ATIS → Ground {airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+    t: { number: time }
+    wx: { weather: true, airfield: airfield }
+  transmissions:
+    - speaker: "{airfield.name} ATIS"
+      segments:
+        - text: "{airfield.name} information {atis}"
+          role: info
+          note: Platz und Kennbuchstabe dieser Ausgabe. Den Buchstaben brauchst du gleich beim Erstanruf.
+        - text: "{t|spoken} Zulu"
+          role: value
+          note: Uhrzeit der letzten Wetterbeobachtung in UTC (nicht der Aufnahme). Ist sie alt, kommt bald eine neue Ausgabe mit dem nächsten Buchstaben.
+        - text: "wind {wx.wind|spoken}"
+          role: value
+          note: >-
+            Der Wind: Richtung, aus der er kommt, und Stärke in Knoten – hier {wx.wind}. Bei sehr
+            schwachem Wind heißt es „calm“.
+        - text: "{wx.visibility|spoken}"
+          role: value
+          note: >-
+            Sicht, hier {wx.vis} {wx.vis.unit}. In der US-Form (FAA) in Meilen ohne Einheit, nach ICAO in Kilometern
+            bzw. Metern.
+        - text: "{wx.clouds|spoken}"
+          role: info
+          note: Bewölkung und ihre Untergrenze in Fuß über Grund.
+        - text: "temperature {wx.temp|spoken}, dew point {wx.dew|spoken}"
+          role: value
+          note: Temperatur und Taupunkt in °C. Liegen beide nah beieinander, droht Nebel.
+        - text: "{wx.pressure.word} {wx.pressure|spoken}"
+          role: value
+          note: >-
+            Der Luftdruck für deinen Höhenmesser, hier {wx.pressure} {wx.pressure.unit}. In der US-Form (FAA) heißt er
+            „altimeter“ (inHg), nach ICAO „QNH“ (Hektopascal).
+        - text: "runway {wx.runway|spoken} in use"
+          role: info
+          note: >-
+            Die aktive Startbahn. Sie richtet sich nach dem Wind ({wx.wind}) – gestartet und gelandet
+            wird gegen den Wind.
+        - text: "advise on initial contact you have information {atis}"
+          role: instruction
+          note: Die Bitte, beim ersten Anruf den Buchstaben zu nennen. Daran sieht Ground, dass du aktuell bist.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Ground"
+          role: addressee
+          alt: ["{airfield.alias} Ground"]
+          note: Dein Erstanruf – jetzt auf der Ground-Frequenz, nicht mehr auf der ATIS.
+        - text: "{callsign|spoken}"
+          role: callsign
+        - text: "information {atis}"
+          role: info
+          free: true
+          alt: ["with {atis}", "with information {atis}"]
+          note: Genau das, worum die ATIS gebeten hat. In den USA oft kürzer „with {atis}“.
+        - text: request startup
+          role: request
+          alt: ["request start up"]
+
+- id: m3-atis-update
+  title: Neue ATIS während des Rollens
+  context: >-
+    Das Wetter ändert sich, und die ATIS bekommt einen neuen Buchstaben. Ground sagt es dir – und
+    erwartet, dass du die neuen Werte übernimmst.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    atis2: { letter: true }
+    altim: { number: pressure, airfield: airfield }
+  transmissions:
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "information {atis2} now current"
+          role: info
+          note: Die ATIS hat einen neuen Buchstaben. Die alten Werte gelten nicht mehr.
+        - text: "{altim.word} {altim|spoken}"
+          role: value
+          note: >-
+            Ground gibt dir gleich den wichtigsten neuen Wert mit: den Luftdruck, hier {altim} {altim.unit}
+            ({airfield.phraseology.form}).
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{altim.word} {altim|spoken}"
+          role: value
+          weak: ["{altim.other} {altim|spoken}"]
+          weakNote: "In der {airfield.phraseology.form} heißt der Luftdruck „{altim.word}“"
+          note: Den Höhenmesser liest du zurück und stellst ihn sofort ein.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+# ------------------------------------------------------------ Lektion 2: Crew Chief
+- id: m3-crew-chief-start
+  title: Anlassen mit dem Crew Chief
+  layer: community
+  context: >-
+    Der Crew Chief steht vorn links am Flugzeug und ist per Kabel mit deinem Intercom verbunden. Der
+    Ablauf (Bereich frei, Brandwache, Bremsklötze, Startfreigabe) ist überall gleich, der genaue
+    Wortlaut unterscheidet sich je nach Einheit.
+  transmissions:
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+          note: Kurz und direkt – auf dem Kabel-Intercom seid ihr zu zweit.
+        - text: intercom check
+          role: request
+          note: Hörst du mich? Erst danach geht es los.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: loud and clear
+          role: info
+          note: Die Verbindung steht.
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: ready for engine start
+          role: request
+          note: Du bist mit deinen Checks durch und willst anlassen.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: clear fore and aft
+          role: info
+          note: Vor dem Einlauf und hinter der Düse ist niemand. Beides kann tödlich sein.
+        - text: fire guard posted
+          role: info
+          note: Ein Helfer steht mit dem Feuerlöscher bereit.
+        - text: chocks in place
+          role: info
+          note: Die Bremsklötze liegen – das Flugzeug kann nicht losrollen.
+        - text: clear to start
+          role: instruction
+          note: Die Freigabe zum Anlassen.
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: starting engine
+          role: intent
+          note: Du kündigst an, was du tust. Der Crew Chief beobachtet von außen und meldet sich sofort, wenn etwas nicht stimmt.
+
+- id: m3-crew-chief-chocks
+  title: Bremsklötze weg, Kabel ab
+  layer: community
+  context: >-
+    Alle Checks sind durch. Bevor du rollen kannst, müssen die Bremsklötze weg – und der Crew Chief
+    muss sein Kabel abziehen. Danach geht es nur noch per Handzeichen weiter.
+  transmissions:
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: pull chocks
+          role: request
+          note: Oft zeigt der Pilot das zusätzlich per Handzeichen – bei laufendem Triebwerk ist Sicht oft sicherer als Ton.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: chocks removed
+          role: info
+          note: Die Bremsklötze sind weg. Ab jetzt hält nur noch deine Bremse das Flugzeug.
+        - text: disconnecting
+          role: intent
+          note: >-
+            Der Crew Chief zieht das Intercom-Kabel ab und tritt zur Seite. Ab jetzt verständigt ihr
+            euch nur noch mit Handzeichen – bis er dich aus der Parkposition winkt.
+
+- id: m3-crew-chief-checks
+  title: EPU-Check und Steuerflächen mit dem Crew Chief
+  layer: community
+  context: >-
+    Das Triebwerk läuft, die Verbindung steht. Jetzt kommen die Checks, bei denen der Crew Chief
+    mitarbeiten muss: EPU, Steuerflächen, Bremsen. Belegt ist die Reihenfolge (AFMAN 11-2F-16 V3,
+    Abs. 3.2 und 3.3.4; Korea-BEM), der Wortlaut ist verbreitete Praxis in Sim-Staffeln.
+  transmissions:
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: EPU switch off, lights out, clear to pull the pin
+          role: instruction
+          note: >-
+            Du hast den EPU-Schalter ausgeschaltet und geprüft, dass keine EPU-Lampe leuchtet. Erst jetzt
+            gibst du dem Chief die Freigabe, den Sicherungsstift zu ziehen.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: pin pulled, standing clear
+          role: info
+          note: Der Stift ist gezogen, der Chief tritt aus dem Gefahrenbereich.
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: starting EPU check
+          role: intent
+          note: Du kündigst an, was du tust, bevor du den Schalter bewegst.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: copy, area clear
+          role: info
+          note: Die Quittung. Ohne sie bewegst du nichts, was ihn gefährden könnte.
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: EPU check complete, safe to approach
+          role: info
+          note: >-
+            Erst nach dem EPU-Check darf Wartungspersonal ans Flugzeug. Belegt ist, dass du das per
+            Intercom oder mit „Daumen hoch“ freigibst.
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: flight controls, are you clear
+          role: request
+          note: Bevor du den Stick bewegst, brauchst du die Quittung. Niemand soll an den Steuerflächen stehen.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: clear, go ahead
+          role: instruction
+          note: Jetzt darfst du Steuerflächen, Speedbrake und Bremsen bewegen. Er sieht von außen, ob alles ausschlägt.
+
+# ------------------------------------------------------------ Lektion 4: EOR
+- id: m3-eor-intercom
+  title: Am Bahnende – Gespräch mit der EOR-Crew
+  layer: community
+  context: >-
+    Du stehst am Bahnende, die EOR-Crew kommt zum Flugzeug. Belegt ist nur der Ablauf (AFMAN 11-2F-16 V3,
+    Abs. 3.2 und 3.4; Korea-BEM): Intercom oder Sichtzeichen, Waffenschalter safe, Hände in Sicht,
+    die Crew prüft und bewaffnet. Der Wortlaut ist verbreitete Praxis in Sim-Staffeln.
+  transmissions:
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Chief
+          role: addressee
+        - text: weapons switches safe, hands in sight
+          role: info
+          note: >-
+            Du sagst, was du getan hast, und hältst die Hände sichtbar (hier: die Regel der F-16-Vorschrift).
+            Ab jetzt bewegst du keinen Schalter, solange jemand unter dem Flugzeug ist.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: copy, starting quick check
+          role: info
+          note: Die Quittung. Dann prüft die Crew Lecks, lose Teile und Reifen.
+        - text: arming now, keep your hands up
+          role: instruction
+          note: Jetzt zieht die Crew die Sicherungsstifte an den Waffen. Deine Hände bleiben, wo sie sind.
+    - speaker: Crew Chief
+      channel: intercom
+      segments:
+        - text: quick check complete, pins out, you're good to go
+          role: info
+          note: >-
+            Die Crew ist fertig und tritt zurück. Jetzt kommt deine Before-Takeoff-Checkliste. Danach rufst
+            du den Tower.
+
+# ------------------------------------------------------------ Lektion 3: Ground
+- id: m3-ifr-clearance
+  title: IFR-Freigabe bei Clearance Delivery
+  context: >-
+    Bevor der Flight rollt, holt der Lead die Streckenfreigabe für einen Flug nach Instrumentenflugregeln.
+    An großen Plätzen ist dafür Clearance Delivery zuständig, an kleineren Ground. Die Freigabe selbst übt die App
+    an jedem Platz in der US-Form (FAA).
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    dest: { pool: airfields, sameMap: airfield, distinctFrom: [airfield] }
+    atis: { letter: true }
+    # Mindestens 2.000 ft über dem Platz (E3-01)
+    alt: { number: altitude, range: [4000, 9000], step: 1000, above: { airfield: airfield, add: 2000 } }
+    sq: { number: squawk }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Clearance"
+          role: addressee
+          alt: ["{airfield.name} Clearance Delivery", "{airfield.name} Delivery", "{airfield.name} Ground", "{airfield.alias} Clearance", "{airfield.alias} Ground"]
+          note: >-
+            Clearance Delivery, kurz „Clearance“ (USA) oder „Delivery“ (Europa). Gibt es die Stelle nicht,
+            fragst du Ground.
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+        - text: "flight of {flightSize|spoken}"
+          role: info
+          optional: true
+          note: Der Lead holt die Freigabe für den ganzen Flight.
+        - text: "information {atis}"
+          role: info
+          alt: ["with {atis}"]
+          free: true
+          note: Auch hier zeigst du, dass du die aktuelle ATIS kennst.
+        - text: "request IFR clearance to {dest.name}"
+          role: request
+          alt: ["IFR to {dest.name}, request clearance", "request clearance to {dest.name}"]
+          note: Dein Anliegen mit dem Ziel aus dem Flugplan.
+    - speaker: "{airfield.name} Clearance"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "cleared to {dest.name} airport"
+          role: instruction
+          note: >-
+            Die Freigabegrenze – bis wohin die Freigabe reicht. Ist es ein Flugplatz, hängt die FAA das Wort
+            „airport“ an.
+        - text: as filed
+          role: instruction
+          note: >-
+            Die Route wie im Flugplan. Nach ICAO heißt das „flight planned route“; oft kommt stattdessen eine
+            Abflugroute (SID).
+        - text: "maintain {alt|spoken}"
+          role: instruction
+          note: Die Höhe, die du bis zu einer neuen Freigabe hältst.
+        - text: "departure frequency {airfield.dep|spoken}"
+          role: value
+          note: Hierhin wechselst du nach dem Start.
+        - text: "squawk {sq|spoken}"
+          role: value
+          note: Der Transpondercode für den Flug. In der Formation squawkt ihn nur der Lead.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "cleared to {dest.name} airport"
+          role: instruction
+          critical: true
+          alt: ["cleared to {dest.name}"]
+          note: Die ganze Freigabe wird zurückgelesen – Streckenfreigaben gehören zur Readback-Pflicht.
+        - text: as filed
+          role: instruction
+          alt: ["flight planned route"]
+        - text: "maintain {alt|spoken}"
+          role: instruction
+          critical: true
+          alt: ["{airfield.climb} {alt|spoken}", "maintaining {alt|spoken}"]
+          weak: ["{airfield.climb.other} {alt|spoken}"]
+          weakNote: "In der {airfield.phraseology.form} heißt es „{airfield.climb}“"
+        - text: "departure frequency {airfield.dep|spoken}"
+          role: value
+          alt: ["departure {airfield.dep|spoken}"]
+        - text: "squawk {sq|spoken}"
+          role: value
+          critical: true
+          alt: ["squawking {sq|spoken}", "{sq|spoken}"]
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+    - speaker: "{airfield.name} Clearance"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: readback correct
+          role: info
+          note: Der Lotse hat zugehört und bestätigt. Erst jetzt rufst du Ground zum Rollen.
+
+- id: m3-progressive-taxi
+  title: Fremder Platz – progressive taxi
+  context: >-
+    Du bist zum ersten Mal auf diesem Platz und kennst die Rollwege nicht. Statt zu raten, bittest
+    du Ground, dich Schritt für Schritt zu führen.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+    twA: { oneOf: [Alfa, Bravo, Charlie, Delta] }
+    turn: { oneOf: [left, right] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Ground"
+          role: addressee
+          alt: ["{airfield.alias} Ground"]
+        - text: "{callsign|spoken}"
+          role: callsign
+        - text: "information {atis}"
+          role: info
+          free: true
+          alt: ["with {atis}", "with information {atis}"]
+        - text: unfamiliar with the field
+          role: info
+          note: Ehrlich sagen, dass du dich nicht auskennst. Das spart allen später Ärger.
+        - text: request progressive taxi
+          role: request
+          note: „Führ mich bitte Abschnitt für Abschnitt.“ Ground sagt dir an jeder Kreuzung, wohin es geht.
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+        - text: "turn {turn} on {twA}"
+          role: instruction
+          note: Der erste Abschnitt. Die nächste Anweisung kommt, bevor du die nächste Kreuzung erreichst.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+        - text: "{turn} on {twA}"
+          role: instruction
+        - text: "{callsign|spoken}"
+          role: callsign
+
+- id: m3-hold-position
+  title: Sofort anhalten – hold position
+  context: Während du rollst, muss Ground dich stoppen – vielleicht kreuzt gleich ein anderes Flugzeug vor dir.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+  transmissions:
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: hold position
+          role: instruction
+          note: Sofort anhalten, wo du gerade bist. Nicht bis zur nächsten Kreuzung weiterrollen.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: holding position
+          role: instruction
+          note: Zurücklesen in der „-ing“-Form. Daran hört Ground, dass du stehst.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+- id: m3-give-way
+  title: Vorfahrt lassen – give way
+  context: An einer Kreuzung kommt ein anderes Flugzeug. Ground regelt, wer zuerst fährt.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    other: { oneOf: [tanker, C-130, two-ship of Eagles, Hornet] }
+    side: { oneOf: [from the left, from the right] }
+  transmissions:
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "give way to the {other} {side}"
+          role: instruction
+          note: Lass das andere Flugzeug zuerst vorbei. Typ und Richtung helfen dir, es zu finden.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "giving way to the {other}"
+          role: instruction
+          note: Zurücklesen, damit Ground weiß, dass du das richtige Flugzeug meinst.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+# ------------------------------------------------------------ Lektion 5: Tower
+- id: m3-ready-departure
+  title: Am Rollhalt – ready for departure
+  context: >-
+    Dein Flight steht am Rollhalt vor der Bahn, alle Checks sind durch. Jetzt wechselst du zum Tower
+    und meldest dich abflugbereit.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Tower"
+          role: addressee
+          alt: ["{airfield.alias} Tower"]
+          note: Ab dem Rollhalt ist der Tower zuständig – er kontrolliert die Bahn.
+        - text: "{callsign|spoken}"
+          role: callsign
+        - text: "flight of {flightSize|spoken}"
+          role: info
+          note: Der Tower muss wissen, wie viele Flugzeuge gleich auf die Bahn wollen.
+        - text: "holding short runway {airfield.runway|spoken}"
+          role: position
+          note: Wo du stehst. Wichtig, wenn ein Platz mehrere Rollhalte hat.
+        - text: ready for departure
+          role: request
+          note: >-
+            Abflugbereit. Seit Teneriffa 1977 vermeidet man hier das Wort „takeoff“ – es gehört nur
+            in die Startfreigabe selbst.
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+        - text: line up and wait
+          role: instruction
+          note: Auf die Bahn rollen, ausrichten – und WARTEN. Das ist keine Startfreigabe!
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+        - text: line up and wait
+          role: instruction
+          alt: ["position and hold"]
+          note: >-
+            Wörtlich zurücklesen. Wer auf eine Bahn rollt, liest die Bahn immer mit. „Position and hold“ ist
+            die alte FAA-Form (bis 2010) – so spricht noch die ATC in Falcon BMS.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+- id: m3-takeoff-clearance
+  title: Die Startfreigabe
+  context: Du stehst ausgerichtet auf der Bahn. Jetzt kommt das eine Wort, auf das du gewartet hast.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+    wx: { weather: true, airfield: airfield }
+  transmissions:
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Tower ruft dich – und meint deinen ganzen Flight.
+        - text: "wind {wx.wind|spoken}"
+          role: value
+          note: Der aktuelle Wind, damit du ihn beim Start berücksichtigen kannst.
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+          note: Die Bahn steht in der Freigabe, damit niemand auf der falschen startet.
+        - text: cleared for takeoff
+          role: instruction
+          note: Die Startfreigabe. Nur mit diesen Worten darfst du starten.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+        - text: cleared for takeoff
+          role: instruction
+          note: Bahn und Freigabe zurücklesen. Den Wind musst du nicht wiederholen.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+# ------------------------------------------------------------ Lektion 6: Departure
+- id: m3-departure-checkin
+  title: Erstanruf bei Departure
+  context: >-
+    Der Tower hat dich zu Departure geschickt. Du bist im Steigflug und meldest dich mit deiner
+    aktuellen und deiner freigegebenen Höhe.
+  freq: "{airfield.dep} {airfield.dep.band}"
+  vars:
+    airfield: { pool: airfields }
+    # Höhen in Tausend Fuß über dem Platz (E3-01): leaving mindestens 1.000 ft, freigegeben mindestens
+    # 4.000 ft über Platzhöhe – an Creech (3.126 ft) also leaving 5.000–7.000, climbing to 8.000–11.000.
+    altA: { int: [2, 4], above: { airfield: airfield, add: 1000, unit: 1000 } }
+    altB: { int: [6, 9], above: { airfield: airfield, add: 4000, unit: 1000 } }
+    fl: { int: [18, 28] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Departure"
+          role: addressee
+          alt: ["{airfield.alias} Departure"]
+          note: Die Radar-Abflugkontrolle.
+        - text: "{callsign|spoken}"
+          role: callsign
+        - text: "leaving {altA|spoken} thousand"
+          role: value
+          alt: ["passing {altA|spoken} thousand", "leaving {altA}000", "passing {altA}000"]
+          note: >-
+            Die Höhe, die du gerade verlässt, auf hundert Fuß genau. Damit prüft der Lotse, ob sein Radar
+            deine Höhe richtig anzeigt. „Leaving“ ist die FAA-Form, in Europa hörst du „passing“.
+        - text: "climbing to {altB|spoken} thousand"
+          role: value
+          alt:
+            - "climbing {altB|spoken} thousand"
+            - "for {altB|spoken} thousand"
+            - "climbing to {altB}000"
+            - "climbing {altB}000"
+            - "for {altB}000"
+          note: >-
+            Die Höhe, die du freigegeben bekommen hast. So weiß er, wohin du steigst. In Sim-Staffeln hört
+            man oft kurz „passing … for …“ – verständlich, aber in den Vorschriften steht „climbing to“.
+    - speaker: "{airfield.name} Departure"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: radar contact
+          role: info
+          note: Der Lotse sieht dich auf dem Radar und hat dich identifiziert. Ab jetzt führt er dich.
+        - text: "{airfield.climb} flight level {fl|spoken} zero"
+          role: instruction
+          note: >-
+            Über der Übergangshöhe zählen Flight Levels: Höhe bei Standard-Luftdruck in Hundert Fuß.
+            Flight Level {fl}0 entspricht {fl}.000 ft bei 29.92 inHg bzw. 1013 hPa. „Climb and maintain“ ist die
+            US-Form (FAA), nach ICAO heißt es „climb to“.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.climb} flight level {fl|spoken} zero"
+          role: instruction
+          critical: true
+          alt:
+            - "{airfield.climb} FL{fl}0"
+            - "{airfield.climb} FL {fl}0"
+            - "{airfield.climb.ing} flight level {fl|spoken} zero"
+            - "{airfield.climb.ing} FL{fl}0"
+            - "{airfield.climb.ing} FL {fl}0"
+            - "climbing flight level {fl|spoken} zero"
+            - "climbing FL{fl}0"
+            - "climbing FL {fl}0"
+            - "flight level {fl|spoken} zero"
+            - "FL{fl}0"
+            - "FL {fl}0"
+          weak:
+            - "{airfield.climb.other} flight level {fl|spoken} zero"
+            - "{airfield.climb.other} FL{fl}0"
+            - "{airfield.climb.other} FL {fl}0"
+            - "{airfield.climb.otherIng} flight level {fl|spoken} zero"
+          weakNote: "In der {airfield.phraseology.form} heißt es „{airfield.climb}“"
+          note: Die neue Höhe wird wörtlich zurückgelesen – „flight level“ oder kurz „FL“.
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true

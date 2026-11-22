@@ -1,0 +1,279 @@
+# Szenario S2 (Modul 3): Vom Rollantrag bis zum Erstanruf bei Departure – mit Störungen am Boden.
+# Gewürfelt: Flugplatz, Wetter (Runway gegen den Wind), ATIS-Buchstabe, Comm Plan, Rollwege, anderer
+# Verkehr, Höhen, Rufzeichen und Flight-Größe.
+id: m3-s2-taxi-departure
+title: Rollen und Abflug in {af.name}
+summary: Rollfreigabe und Readback, give way, hold position, fremde Freigaben überhören, Startfreigabe, Departure.
+vars:
+  af: { pool: airfields }
+  wx: { weather: true, airfield: af, sky: vmc }
+  info: { letter: true }
+  cp: { commplan: true, airfield: af }
+  twA: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel] }
+  twB: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel], distinctFrom: [twA] }
+  other: { oneOf: [C-130, tanker, two-ship of Eagles, Hornet] }
+  side: { oneOf: [from the left, from the right] }
+  oc: { pool: callsigns.attack }
+  ocn: { int: [2, 8] }
+  # Höhen in Tausend Fuß: so ergibt "{altA}000" die Ziffernform zum Eintippen (siehe format-wuensche SZ1).
+  # Über dem Platz (E3-01): leaving mindestens 1.000 ft, freigegeben mindestens 4.000 ft über Platzhöhe.
+  altA: { int: [2, 4], above: { airfield: af, add: 1000, unit: 1000 } }
+  altB: { int: [6, 9], above: { airfield: af, add: 4000, unit: 1000 } }
+  fl: { int: [18, 26] }
+sketch: { airfield: af, weather: wx }
+kneeboard:
+  title: "Comm Card {af.name}"
+  commplan: cp
+  stations: [atis, ground, tower, departure]
+  airfield: af
+  rows:
+    - { label: Flight, value: "{flight} – {flightSize} Flugzeuge, du bist Lead" }
+  where:
+    dcs: "Missionsbriefing bzw. Comm Card im Kneeboard. Die Tower-Frequenz zeigt auch das Flugplatzfenster der F10-Karte; ATIS, Ground und Departure kommen hier aus der Comm Card der Mission."
+    bms: "Comm Plan im Briefing bzw. Line-up-Card im Kneeboard. Am Startplatz: UHF-Preset 2 Ground, 3 Tower, 4 Departure/Approach; die ATIS liegt auf VHF 2 – so auch die Comm Card hier."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Werte kommen aus Briefing oder Comm Card."
+sources:
+  - title: "FAA JO 7110.65 – 3-7 Taxi and Ground Movement, 3-9 Departure Procedures"
+    url: https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap3_section_7.html
+  - title: "ICAO Doc 4444 (PANS-ATM), Kapitel 12 – Phraseologie (give way, ready for departure)"
+  - title: "SKYbrary: Tenerife 1977 (Wort „takeoff“)"
+    url: https://skybrary.aero/accidents-and-incidents/b742-b741-tenerife-canary-islands-spain-1977
+steps:
+  - stage: Ground
+    pos: parking
+    tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
+    situation: >-
+      Dein Flight ({flightSize} Flugzeuge) steht angelassen auf dem Vorfeld von **{af.name}**. Die ATIS
+      hast du gehört: Information **{info}**, Runway **{wx.runway}**. Bitte um die Rollfreigabe.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – Anzahl – ATIS – Anfrage
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Ground", role: addressee, alt: ["{af.alias} Ground"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "flight of {flightSize|spoken}", role: info, optional: true }
+          - { text: "information {info}", role: info, optional: true, free: true, alt: ["with {info}", "with information {info}"] }
+          - { text: request taxi, role: request, critical: true, alt: ["ready to taxi"] }
+    reply:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: "taxi via {twA}, {twB}", role: instruction, note: "Die Reihenfolge ist der Weg: erst {twA}, dann {twB}." }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction }
+
+  - stage: Ground
+    pos: parking
+    situation: Lies die Rollfreigabe zurück.
+    you:
+      mode: type
+      hint: Runway – Rollweg – hold short – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "via {twA}, {twB}", role: instruction, alt: ["taxi via {twA}, {twB}"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Runway und „hold short“ mit der Bahn sind Pflicht – ein „hold short“ ohne Bahn reicht nicht. Den Rollweg
+      liest du mit, damit Ground einen Fehler sofort hört.
+
+  - stage: Rollen
+    pos: taxi
+    situation: Du rollst. An einer Kreuzung meldet sich Ground.
+    hear:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "give way to the {other} {side}", role: instruction }
+    you:
+      mode: build
+      distractors: [roger, wilco, "holding position"]
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "giving way to the {other}", role: instruction }
+          - { text: "{callsign|spoken}", role: callsign }
+    explain: Zurücklesen statt „roger“ – so zeigst du, dass du das richtige Flugzeug gefunden hast.
+
+  - stage: Rollen
+    pos: taxi
+    situation: Kurz darauf, noch vor dem Rollhalt.
+    hear:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: hold position, role: instruction, note: "Sofort stehen bleiben – nicht erst an der nächsten Kreuzung." }
+    you:
+      mode: type
+      hint: „-ing“-Form, dann Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: holding position, role: instruction, critical: true, alt: ["holding"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    reply:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: continue taxi, role: instruction, note: "Weiterrollen auf der freigegebenen Route." }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, note: "Wieder ein „hold short“ – das liest du zurück." }
+
+  - stage: Rollen
+    pos: taxi
+    situation: Ground lässt dich weiterrollen. Lies die Anweisung zurück.
+    you:
+      mode: type
+      hint: (continue taxi) – hold short – Runway – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: continue taxi, role: instruction, optional: true, alt: ["continuing taxi"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      „hold short“ liest du immer zurück – mit der Bahn. Ein überhörtes „hold short“ ist eine der
+      häufigsten Ursachen dafür, dass jemand ungewollt auf eine aktive Bahn rollt.
+
+  - stage: EOR
+    pos: holdshort
+    freq: "Intercom · EOR-Crew"
+    situation: >-
+      Du bist am Bahnende angekommen und hältst an. Die EOR-Crew kommt zum Flugzeug. Du hast die
+      Waffenschalter auf safe und die Hände sichtbar.
+    hear:
+      - speaker: EOR-Crew
+        channel: intercom
+        segments:
+          - { text: "copy, starting quick check", role: info, note: "Die Crew prüft Lecks, lose Teile, Reifen und macht gegebenenfalls scharf. Dein Teil: Hände sichtbar, keine Eingaben." }
+          - { text: "quick check complete, you're good to go", role: info }
+    explain: >-
+      Am Bahnende gibt es keinen eigenen Funkspruch. Belegt sind: Intercom oder Sichtzeichen, Hände sichtbar
+      und die Before-Takeoff-Checkliste danach (AFMAN 11-2F-16 V3, Abs. 3.4; Wortlaut hier verbreitete Praxis in Sim-Staffeln).
+      Erst jetzt wechselst du zum Tower.
+
+  - stage: Tower
+    pos: holdshort
+    tune: { name: "{af.name} Tower", freq: "{cp.tower.freq}", channel: "{cp.tower.channel}" }
+    situation: >-
+      Du stehst am Rollhalt und wechselst zum Tower. Auf der Frequenz läuft gerade ein anderer Funkspruch.
+    hear:
+      - speaker: "{af.name} Tower"
+        segments:
+          - { text: "{oc} {ocn|spoken} one", role: addressee, note: "Nicht du – ein anderer Flight." }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: cleared for takeoff, role: instruction }
+    silence: true
+    explain: >-
+      Nichts sagen und nicht losrollen. Die Startfreigabe gilt {oc} {ocn}-1, nicht dir. Wer bei einer
+      fremden Freigabe antwortet oder rollt, verursacht genau die Verwechslungen, aus denen nach Teneriffa
+      1977 die strengen Regeln entstanden.
+
+  - stage: Tower
+    pos: holdshort
+    situation: Die Frequenz ist frei, {oc} {ocn}-1 ist gestartet. Melde dich abflugbereit.
+    you:
+      mode: choice
+      wrong:
+        - "{af.name} Tower, {callsign|spoken}, flight of {flightSize|spoken}, holding short runway {wx.runway|spoken}, ready for takeoff"
+        - "{af.name} Ground, {callsign|spoken}, flight of {flightSize|spoken}, holding short runway {wx.runway|spoken}, ready for departure"
+        - "{af.name} Tower, {callsign|spoken}, flight of {flightSize|spoken}, lined up runway {wx.runway|spoken}, ready for departure"
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Tower", role: addressee }
+          - { text: "{callsign|spoken}", role: callsign }
+          - { text: "flight of {flightSize|spoken}", role: info }
+          - { text: "holding short runway {wx.runway|spoken}", role: position }
+          - { text: ready for departure, role: request }
+    reply:
+      - speaker: "{af.name} Tower"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: line up and wait, role: instruction, note: "Auf die Bahn und warten – noch keine Startfreigabe." }
+    explain: >-
+      Abflugbereit meldest du dich beim **Tower**, nicht bei Ground. Du stehst noch **am Rollhalt** – auf die
+      Bahn darfst du erst mit Freigabe. Und es heißt „ready for departure“: Das Wort „takeoff“ fällt nur in
+      der Startfreigabe selbst.
+
+  - stage: Tower
+    pos: holdshort
+    situation: Lies „line up and wait“ zurück.
+    you:
+      mode: type
+      hint: Runway – Anweisung – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: line up and wait, role: instruction, critical: true, alt: ["position and hold"], note: "„position and hold“ ist die alte FAA-Form – so spricht die ATC in Falcon BMS. Es zählt auch." }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+
+  - stage: Start
+    pos: runway
+    situation: Du stehst ausgerichtet auf der Bahn.
+    hear:
+      - speaker: "{af.name} Tower"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "wind {wx.wind|spoken}", role: value }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: cleared for takeoff, role: instruction }
+    you:
+      mode: type
+      hint: Runway – Freigabe – Rufzeichen (den Wind musst du nicht zurücklesen)
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: cleared for takeoff, role: instruction, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: Erst jetzt darfst du starten. Bahn und Freigabe zurücklesen, dann Gas.
+
+  - stage: Departure
+    pos: airborne
+    situation: Du bist in der Luft. Der Tower schickt dich weiter.
+    hear:
+      - speaker: "{af.name} Tower"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "contact departure {cp.departure.freq|spoken}", role: instruction }
+    you:
+      mode: type
+      hint: Stelle und Frequenz – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "departure {cp.departure.freq|spoken}", role: value, critical: true, alt: ["contact departure {cp.departure.freq|spoken}", "{cp.departure.freq|spoken}"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: Auf deiner Comm Card steht Departure auf Kanal {cp.departure.channel}.
+
+  - stage: Departure
+    pos: airborne
+    tune: { name: "{af.name} Departure", freq: "{cp.departure.freq}", channel: "{cp.departure.channel}" }
+    situation: >-
+      Schalte auf Departure. Du steigst gerade durch **{altA}.000** ft, freigegeben bist du auf
+      **{altB}.000** ft. Dann mach deinen Erstanruf.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – aktuelle Höhe – freigegebene Höhe
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Departure", role: addressee, alt: ["Departure", "{af.alias} Departure"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "leaving {altA|spoken} thousand", role: value, critical: true, alt: ["passing {altA|spoken} thousand", "leaving {altA}000", "passing {altA}000"] }
+          - { text: "climbing to {altB|spoken} thousand", role: value, critical: true, alt: ["climbing {altB|spoken} thousand", "for {altB|spoken} thousand", "climbing to {altB}000", "climbing {altB}000", "for {altB}000"] }
+    reply:
+      - speaker: "{af.name} Departure"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: radar contact, role: info }
+          - { text: "{af.climb} flight level {fl|spoken} zero", role: instruction, note: "Die neue Höhe – {af.phraseology.form}: „{af.climb}“." }
+    explain: >-
+      Mit „radar contact“ führt dich Departure. Von der Parkposition bis hierher hast du Ground, Tower und
+      Departure sauber bedient – das ist der Kern jedes Abflugs.

@@ -1,0 +1,12 @@
+node_modules
+dist
+*.local
+.vite
+coverage
+.DS_Store
+
+# Worktrees paralleler Sessions
+.claude/worktrees/
+
+# Spracherkennung: whisper.cpp und Modelle (npm run fetch-asr)
+.asr/

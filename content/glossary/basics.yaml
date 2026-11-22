@@ -1,0 +1,633 @@
+# Grundbegriffe: was man kennen muss, um Lektionen und Funk zu verstehen – keine Brevity-Codes,
+# keine Standardwörter. Felder wie prowords.yaml, dazu optional see (Verweise) und aliases.
+- word: Flight
+  meaning: Verband aus meist zwei oder vier Flugzeugen unter einem gemeinsamen Rufzeichen, z. B. „Viper 1“.
+  aliases: [Flights]
+  note: >-
+    Nicht zu verwechseln mit der Staffel (englisch squadron). Das ist die Einheit, zu der mehrere Flights gehören, und mehrere
+    Staffeln bilden ein Geschwader. Für den eigenen Flight steht in den Warbird-Lektionen auch „Rotte“ (zwei Flugzeuge) bzw.
+    „Schwarm“ (vier).
+  see: [Lead, Wingman, Element]
+- word: Lead
+  meaning: Führer des Flights, die Nummer 1. Er spricht für den ganzen Flight mit Bodenstellen und AWACS.
+  aliases: [flight lead]
+  see: [Flight, Wingman]
+- word: Wingman
+  meaning: Flügelmann – im Zweier-Flight die Nummer 2, im Vierer auch die Nummer 4. Folgt dem Lead und antwortet im Flight nur mit seiner Nummer („Two“).
+  see: [Lead, Element]
+- word: Element
+  meaning: Zweierpaar innerhalb eines Vierer-Flights – 1 und 2 sowie 3 und 4. Die Nummer 3 führt das zweite Element (Element Lead).
+  see: [Flight, Lead]
+- word: Position
+  meaning: Platz im Flight, die letzte Ziffer im Rufzeichen. „Viper 1-2“ ist Flight 1, Position 2 – also der Wingman, nicht ein Ort.
+  see: [Flight, Rufzeichen, DASH]
+- word: Rufzeichen
+  meaning: >-
+    Der Name, mit dem sich eine Station im Funk meldet und gerufen wird – z. B. „Viper 1-1“, „Darkstar“ oder „Nellis
+    Tower“. Er steht in jedem Funkspruch: erst wen du rufst, dann wer du bist.
+  aliases: [callsign, call sign, callsigns, Funkrufname]
+  note: >-
+    Ein Flugzeug kann mehrere haben: das taktische Rufzeichen aus dem Einsatzbefehl (Flight-Rufzeichen „Viper 1“,
+    Einzelrufzeichen „Viper 1-2“), das ATC-Rufzeichen aus dem Flugplan und am Träger die Side Number. Wer von sich aus
+    funkt, beginnt mit dem vollen Rufzeichen; im eigenen Flight genügt als Antwort auf den Lead die Nummer (AFMAN
+    11-2F-16 V3, Abs. 3.30). Mehr in Modul 1, Lektion 4.
+  see: [Flight, Position, Side Number, DASH]
+- word: Side Number
+  meaning: >-
+    Die dreistellige Nummer, die bei Navy und Marines groß auf jedem Flugzeug steht (auch Modex). In der Landephase am
+    Träger meldet sich jedes Flugzeug einzeln damit – bei Marshal, Tower und im Ball Call beim LSO.
+  aliases: [Modex, side numbers]
+  note: >-
+    In DCS Supercarrier beginnen alle Funksprüche mit Marshal, Tower und LSO mit der Side Number („205, Hornet ball,
+    5.6“), gesprochen Ziffer für Ziffer. Mehr in Modul 1, Lektion 4.
+  see: [LSO, Marshal, Rufzeichen]
+- word: LSO
+  meaning: >-
+    Landing Signal Officer – der Landeoffizier am Träger, Rufname „Paddles“. Er beobachtet jeden Endanflug, gibt per Funk
+    Korrekturen und kann den Anflug mit „wave off“ abbrechen. Der Ball Call geht an ihn.
+  aliases: [Landing Signal Officer, Paddles]
+  note: >-
+    Der Rufname erinnert an die Kellen (paddles), mit denen LSOs früher einwiesen. DCS Supercarrier bildet die
+    LSO-Station nach (Supercarrier Operations Guide, Abschnitt LSO); Navy P-1211 beschreibt Ball Call und LSO-Calls.
+  see: [Side Number, Marshal]
+- word: AWACS
+  meaning: Fliegende Radar- und Leitstelle (z. B. E-3). Gibt das Lagebild, warnt vor Gegnern und leitet Jäger. Rufzeichen z. B. Darkstar, Magic, Overlord.
+  see: [GCI, PICTURE, BOGEY DOPE]
+- word: GCI
+  meaning: Ground Controlled Interception – Jägerleitstelle am Boden. Gleiche Aufgabe wie der AWACS, aber mit Bodenradar.
+  see: [AWACS]
+- word: Tanker
+  meaning: Luftbetankungsflugzeug (z. B. KC-135). Du hängst dich dahinter und tankst im Flug nach. Rufzeichen z. B. Texaco, Arco, Shell.
+  aliases: [Tankflugzeug]
+- word: JTAC
+  meaning: Joint Terminal Attack Controller – Fliegerleitoffizier am Boden. Weist Flugzeugen bei der Luftnahunterstützung (CAS) Ziele zu und gibt den Angriff frei.
+  see: [CLEARED HOT, ABORT, FAC(A)]
+- word: FAC(A)
+  meaning: >-
+    Forward Air Controller (Airborne) – Fliegerleitoffizier in der Luft. Er hat dieselbe Rolle wie der JTAC am Boden:
+    Er führt Flugzeuge bei der Luftnahunterstützung ans Ziel und gibt den Angriff frei (CLEARED HOT, CLEARED TO ENGAGE).
+  aliases: [Forward Air Controller (Airborne), AFAC]
+  note: >-
+    In der ATP 1-02.1 (2020/21) geben JTAC und FAC(A) gleichermaßen die Freigaben (CLEARED TO ENGAGE, S. 24). Das
+    DCS-A-10C-Handbuch und manche NATO-Texte schreiben AFAC.
+  topic: jtac-und-luftnahunterstuetzung
+  see: [JTAC, CAS, CLEARED HOT, CLEARED TO ENGAGE]
+- word: ASOC
+  meaning: >-
+    Air Support Operations Center – Leitstelle der US Air Force beim Heer. Sie kontrolliert den Luftraum für
+    Lufteinsätze diesseits der Feuerunterstützungs-Koordinierungslinie (FSCL) und unterhalb einer festgelegten Höhe.
+  aliases: [Air Support Operations Center]
+  note: >-
+    ATP 3-52.4 (2021), S. 1 und 3. Im CAS-Einsatz kommt von dort oft die Übergabe auf das Netz des JTAC. Das
+    Gegenstück bei den Marines ist das DASC.
+  topic: jtac-und-luftnahunterstuetzung
+  see: [DASC, JTAC, CAS]
+- word: DASC
+  meaning: >-
+    Direct Air Support Center – die Leitstelle des US Marine Corps für die Luftunterstützung. Sie kontrolliert wie das
+    ASOC den Luftraum für Lufteinsätze diesseits der FSCL und unterhalb einer festgelegten Höhe, hier für die Marine
+    Air-Ground Task Force.
+  aliases: [Direct Air Support Center]
+  note: ATP 3-52.4 (2021), S. 1 und 3. Bei Heer und Luftwaffe der USA heißt die entsprechende Stelle ASOC.
+  topic: jtac-und-luftnahunterstuetzung
+  see: [ASOC, JTAC, CAS]
+- word: ATIS
+  meaning: Automatic Terminal Information Service – Endlosansage eines Flugplatzes mit Wetter, aktiver Bahn, Höhenmessereinstellung und Kennbuchstaben (Information Alpha, Bravo …).
+  see: [ATC]
+- word: ATC
+  meaning: Air Traffic Control – die Flugsicherung. Am Platz meist Ground (Rollen), Tower (Start und Landung), Departure und Approach (Ab- und Anflug).
+  see: [ATIS]
+- word: Marshal
+  meaning: Anflugkontrolle des Flugzeugträgers für die Rückkehr. Sie weist dir Warteraum, Höhe, Höhenmessereinstellung und Anflugzeit zu und gibt dich dann zum Anflug an Approach oder den Tower ab.
+  note: >-
+    Nicht verwechseln mit dem Einweiser, der Flugzeuge am Boden mit Handzeichen führt. In der Jägerführung heißt
+    MARSHAL(LING) etwas anderes – Kräfte an einem festgelegten Punkt in Stellung bringen, meist vor einem Angriff
+    (ATP 1-02.1). Die Phase davor nennt die ATP 3-52.4 „pre-COMMIT or MARSHAL“.
+  see: [ATC]
+- word: Tower
+  meaning: Die Stelle, die die Bahn besitzt und den Luftraum direkt um den Platz. Erteilt Aufrollen, Start und Landung („line up and wait“, „cleared for takeoff“, „cleared to land“).
+  aliases: [Tower Control, Local Control]
+  topic: atc-stellen
+  see: [Ground, Departure, ATC]
+- word: Ground
+  meaning: Bodenkontrolle des Flugplatzes. Gibt Anlass- und Rollfreigaben und führt dich über die Rollwege bis vor die Bahn („hold short“). Die Bahn selbst gehört dem Tower.
+  aliases: [Ground Control]
+  topic: atc-stellen
+  see: [Tower, Clearance Delivery, ATC]
+- word: Approach
+  meaning: Radarstelle für den Anflug. Übernimmt dich vom Center, führt dich mit Kursen und Höhen („vectors“) zum Endanflug und übergibt dann an den Tower.
+  aliases: [Approach Control, Arrival]
+  topic: atc-stellen
+  see: [Departure, Center, Tower, ATC]
+- word: Departure
+  meaning: Radarstelle für den Abflug. Übernimmt dich nach dem Start vom Tower, führt dich aus der Platzzone und gibt dich weiter. Oft dieselbe Stelle wie Approach.
+  aliases: [Departure Control]
+  topic: atc-stellen
+  see: [Approach, Tower, ATC]
+- word: Center
+  meaning: Streckenkontrolle – die ATC-Stelle für IFR-Verkehr zwischen den Plätzen. Du erreichst sie nach Departure, bevor Approach übernimmt.
+  aliases: [Centre, Area Control]
+  topic: atc-stellen
+  see: [Departure, Approach, ATC]
+- word: Clearance Delivery
+  meaning: "Die Stelle, die vor dem Rollen die Streckenfreigabe gibt: Ziel, Route, Höhe, Abflugfrequenz und Squawk. Gibt es sie nicht, übernimmt Ground."
+  aliases: [Delivery, Clearance]
+  topic: atc-stellen
+  see: [Ground, Transponder, ATC]
+- word: Transponder
+  meaning: Gerät im Flugzeug, das auf die Abfrage eines Radars automatisch mit einem vierstelligen Code antwortet, dem Squawk, und meist mit der Höhe. Das Militär nutzt dasselbe Gerät mit zusätzlichen IFF-Modes.
+  topic: squawk-transponder-iff
+  see: [SQUAWK, IFF, STRANGLE]
+- word: PTT
+  meaning: Push to Talk – die Sendetaste. Solange du sie drückst, sendest du und hörst nichts; erst denken, dann drücken.
+- word: HOTAS
+  meaning: Hands On Throttle And Stick – Cockpit-Bauweise, bei der die wichtigsten Schalter (auch Funkwahl und Sendetaste) an Gashebel und Steuerknüppel sitzen. Die Hände bleiben dort.
+  see: [PTT]
+- word: Kneeboard
+  meaning: Notizblock am Oberschenkel – in der Sim eine Seite mit Comm Card, Karten und Notizen, die man im Cockpit aufruft.
+  see: [Comm Card]
+- word: Comm Card
+  meaning: Karte mit allen Funknetzen der Mission – Stelle, Kanal und Frequenz. Die wichtigste Quelle für Frequenzen.
+  see: [Comm Plan, Kneeboard, Kanal, Comm Ladder]
+- word: Comm Ladder
+  meaning: >-
+    So heißt in Falcon BMS die Comm Card – ein Abschnitt im Briefing mit allen Frequenzen und Presets deines Flugs. Der
+    DTC lädt sie als Presets ins Cockpit.
+  aliases: [Commladder]
+  layer: sim
+  topic: comm-plan-und-missionsunterlagen
+  note: Falcon BMS 4.38 User Manual (Briefing, „Comm Ladder“) und Comms & Nav Book (Abschnitt 2, Comm Plan).
+  see: [Comm Card, DTC, Preset]
+- word: Line-up-Card
+  meaning: Karte mit den Eckdaten deines Einsatzes – Funkblock mit Netzen und Frequenzen, Push-Zeit, Joker und Bingo, Missionsnummer. Anders als die Comm Card enthält sie nicht nur den Funk.
+  aliases: [Lineup Card]
+  see: [Comm Card, Kneeboard]
+- word: Comm Plan
+  meaning: Festlegung, welche Stelle auf welcher Frequenz bzw. welchem Kanal arbeitet. Steht im Briefing und auf der Comm Card.
+  see: [Comm Card]
+- word: Netz
+  meaning: Funknetz – alle Stationen, die auf derselben Frequenz (bzw. demselben Kanal) zusammen funken und sich gegenseitig hören, z. B. das Netz deines Flights oder des Tankers.
+  aliases: [Funknetz]
+  see: [Comm Plan, Kanal, Flight]
+- word: Preset
+  meaning: Im Funkgerät gespeicherte Frequenz, die man über eine Nummer abruft. Moderne Geräte haben meist 20 davon. Wer „push button 5“ hört, schaltet auf das fünfte Preset.
+  aliases: [Presets]
+  see: [Kanal, PUSH, Comm Plan]
+- word: Kanal
+  meaning: Die Nummer eines Presets, wie man sie im Funk nennt („channel 4“, „button 4“, „preset 4“). Welche Frequenz dahinter liegt, steht im Comm Plan.
+  aliases: [channel, button]
+  see: [Preset, PUSH, Comm Card]
+- word: Guard
+  meaning: Notfrequenz, die viele Funkgeräte immer mithören – 243.0 MHz (UHF) und 121.5 MHz (VHF).
+  see: [mayday, pan pan]
+- word: GRCV
+  meaning: Guard Receiver – Taste am UFC der F/A-18C, die den Guard-Empfänger zuschaltet. Das Funkgerät hört dann neben deinem Kanal auch Guard (243.0 bzw. 121.5 MHz) mit.
+  layer: sim
+  see: [Guard, Preset]
+- word: Squelch
+  meaning: Rauschsperre – hält den Empfänger stumm, bis ein Signal stark genug ist. Ohne sie hörst du dauernd Rauschen.
+  aliases: [Rauschsperre]
+  note: >-
+    Steht sie zu hoch, schneidet sie schwache Stationen weg. Hörst du eine schwache Station nicht oder kommt beim Radio
+    Check nichts an, öffne den Squelch kurz. Am UFC der F/A-18C heißt die Taste SQCH.
+  topic: funkgeraet-bedienen
+  see: [SQCH, radio check]
+- word: SQCH
+  meaning: Taste am UFC der F/A-18C, die die Rauschsperre (Squelch) ein- und ausschaltet. Ist sie an, bleibt der Empfänger still, bis ein Signal anliegt.
+  layer: sim
+  see: [Squelch, GRCV]
+- word: UFC
+  meaning: Up Front Controller – Tastenfeld mit Anzeige vorn im Cockpit (F/A-18C, A-10C), über das du u. a. Funkgeräte, Kanäle und Navigation einstellst. In der F-16 besteht er aus ICP (Tastenfeld) und DED (Data Entry Display, der kleinen Anzeige).
+  aliases: [ICP, DED]
+  layer: sim
+  see: [GRCV, SQCH]
+- word: UHF
+  meaning: Ultra High Frequency – das militärische Hauptband des Flugfunks, rund 225 bis 400 MHz, Modulation AM. Dort liegen u. a. die Militärflugplätze und die Notfrequenz Guard (243.0).
+  see: [VHF, AM, UNIFORM, Guard]
+- word: VHF
+  meaning: Very High Frequency – das Band der zivilen Luftfahrt (zivile Flugplätze und Lotsen), Modulation AM. Dazu kommt VHF-FM für den Heeresfunk, also Bodentruppen und JTAC.
+  see: [UHF, AM, FM, VICTOR, FOX MIKE]
+- word: AM
+  meaning: Amplitudenmodulation – die Stimme verändert die Stärke der Funkwelle. Üblich im Flugfunk auf UHF und VHF.
+  note: Ein Empfänger versteht nur die Modulation, auf die er eingestellt ist. Gleiche Frequenz, aber AM gegen FM heißt „kein Kontakt“.
+  see: [FM, UHF, VHF]
+- word: FM
+  meaning: Frequenzmodulation – die Stimme verändert die Frequenz der Funkwelle. Im Flugfunk nutzt man sie für den Heeresfunk (VHF-FM), z. B. für den Kontakt zum JTAC.
+  see: [AM, VHF, JTAC]
+- word: Intercom
+  meaning: Bordsprechanlage. Die Besatzung (Pilot und Rücksitz) spricht darüber miteinander, ohne dass jemand im Funk mithört. Auch das Bodenpersonal kann sich per Kabel einstecken.
+  aliases: [ICS]
+  see: [PTT, RIO, WSO, Crew Chief]
+- word: RIO
+  meaning: Radar Intercept Officer – Besatzungsmitglied im Rücksitz der F-14 (und der F-4 der US Navy). Bedient Radar und Waffensysteme und hat in der F-14 ein eigenes Funkgerät.
+  aliases: [Radar Intercept Officer]
+  see: [WSO, Intercom]
+- word: WSO
+  meaning: Weapon Systems Officer – Besatzungsmitglied im Rücksitz, z. B. in F-4E, F-15E und F/A-18F. Bedient Radar und Waffen; in der Navy-F-14 und -F-4 heißt dieselbe Rolle RIO.
+  aliases: [Weapon Systems Officer]
+  see: [RIO, Intercom]
+- word: SRS
+  meaning: SimpleRadio Standalone – Funk-Software für den DCS-Mehrspieler. Bildet die Funkgeräte des Flugzeugs mit echten Frequenzen nach.
+  see: [IVC]
+- word: IVC
+  meaning: >-
+    Integrated Voice Communications – der eingebaute Sprechfunk von Falcon BMS, das Gegenstück zu SRS. Gehört wirst du
+    nur auf derselben Frequenz; gesendet wird über die Funkgeräte im Cockpit (UHF und VHF).
+  aliases: [Integrated Voice Communications, Integrated Voice Comms]
+  layer: sim
+  note: >-
+    Vor dem Flug, in der Oberfläche, funkt die Taste F1 auf UHF-Preset 14 („Advisory“), F2 erreicht nur, wer gerade
+    ebenfalls in der Oberfläche ist. Falcon BMS 4.38 User Manual (Einstellung „IVC Enabled“) und Comms & Nav Book, S. 45.
+  see: [SRS, Advisory, Comm Ladder]
+- word: Advisory
+  meaning: >-
+    In Falcon BMS das gemeinsame UHF-Preset 14 („UHF Common“, immer 339.75), auf dem alle Spieler erreichbar sind. Das
+    VHF-Gegenstück ist VHF-Preset 14 („Common“, immer 123.5).
+  aliases: [UHF Common, VHF Common]
+  layer: sim
+  note: Falcon BMS 4.38 Comms & Nav Book, S. 31 (VHF) und S. 45 (UHF). In der Oberfläche vor dem Flug funkt die IVC-Taste F1 auf Advisory.
+  see: [IVC, Preset, Comm Ladder]
+- word: IFF
+  meaning: Identification Friend or Foe – Freund-Feind-Kennung. Der Transponder antwortet auf Abfragen mit eingestellten Codes.
+  see: [SQUAWK, SPADES]
+- word: RWR
+  meaning: Radar Warning Receiver – Radarwarnempfänger. Zeigt, welches Radar dich erfasst oder verfolgt.
+  see: [SPIKED, NAKED, MUD]
+- word: TACAN
+  meaning: Militärische Funknavigation – zeigt Richtung und Entfernung zu einer Station, z. B. „TACAN 67X“.
+- word: ILS
+  meaning: Instrumentenlandesystem – führt seitlich und in der Höhe auf die Landebahn, auch ohne Sicht.
+- word: IFR
+  meaning: Instrument Flight Rules – Instrumentenflugregeln. Du fliegst nach Instrumenten auf einer freigegebenen Route und Höhe, die Flugsicherung hält dich auf Abstand zu anderem Verkehr – auch ohne Sicht.
+  note: Vor dem Start holst du dafür die IFR-Freigabe (clearance) ein.
+  see: [VFR, ATC]
+- word: VFR
+  meaning: Visual Flight Rules – Sichtflugregeln. Du fliegst nach Sicht und hältst selbst Abstand zu Wolken und anderem Verkehr. Freigabe oder Funkkontakt ist nur in bestimmten kontrollierten Lufträumen vorgeschrieben.
+  see: [IFR, ATC]
+- word: QNH
+  meaning: Auf Meereshöhe umgerechneter Luftdruck in Hektopascal (hPa), z. B. 1013. Stellst du ihn am Höhenmesser ein, zeigt der die Höhe über dem Meer – am Boden also die Höhe des Platzes.
+  note: Das US-Gegenstück ist das „altimeter“ in inHg (z. B. 29.92). Daneben gibt es QFE, den Druck am Platz selbst; der Höhenmesser zeigt dann am Boden 0.
+  see: [Übergangshöhe, Flight Level]
+- word: Übergangshöhe
+  meaning: Höhe, ab der du den Höhenmesser nicht mehr auf den Luftdruck des Platzes (QNH) stellst, sondern auf den Standarddruck 1013 hPa. Darüber fliegst du Flight Levels, darunter Höhen in Fuß.
+  aliases: [Transition Altitude, Transition Level]
+  note: >-
+    In den USA liegt sie einheitlich bei 18.000 ft MSL (14 CFR 91.121), in Europa ist sie je Platz fest und in den Karten
+    veröffentlicht. Genau genommen sind es zwei Werte – die Transition Altitude (unten, in Fuß) und der Transition Level,
+    das niedrigste Flight Level darüber. Er schwankt mit dem QNH: Je niedriger der Druck, desto höher liegt er. In Europa
+    richtet sich die Einstellung meist nach der Freigabe – auf ein Flight Level gestiegen heißt Standarddruck, auf eine
+    Höhe gesunken heißt QNH.
+  see: [QNH, Flight Level]
+- word: Flight Level
+  meaning: Höhe in Hundertern Fuß, bezogen auf den Standarddruck 1013 hPa (29.92 inHg), z. B. Flight Level 250 für rund 25.000 ft. Gilt oberhalb der Übergangshöhe, damit alle Flugzeuge denselben Bezug haben.
+  aliases: [FL, Flugfläche]
+  see: [QNH, Übergangshöhe]
+- word: ATO
+  meaning: Air Tasking Order – der Einsatzbefehl für alle Flüge eines Tages. Der Teil für deinen Flight heißt „Frag“.
+  aliases: [frag]
+  see: [AS FRAGGED]
+- word: SPINS
+  meaning: Special Instructions – besondere Anweisungen zu einem Einsatz oder Event, etwa Funkverfahren, Frequenzen, Luftraum und Ablauf. Wird zusammen mit dem Einsatzbefehl (ATO) herausgegeben.
+  aliases: [Special Instructions]
+  note: Sim-Gruppen verwenden den Namen oft auch für ihr Regelwerk zu einem Event.
+  see: [ATO, SOP]
+- word: SOP
+  meaning: Standard Operating Procedures – die Hausregeln eines Platzes oder Verbands. Sie legen fest, wie dort üblicherweise abgeflogen, gefunkt und verfahren wird.
+  aliases: [SOPs, Standard Operating Procedures]
+  see: [SPINS]
+- word: Ops Check
+  meaning: Kurzer Systemcheck im Flight – je nach Anlass prüft jeder Triebwerksanzeigen, Treibstoffmenge und -balance, G-Anzug, Sauerstoff und Kabinenhöhe und meldet das dem Lead.
+  layer: core
+  note: >-
+    Kein Brevity-Code der ATP 1-02.1, aber ein offizieller USAF-Verfahrensbegriff für die F-16 (AFMAN 11-2F-16 V3, Abs. 3.30.4).
+    Pflicht ist er im Steigflug oder Level-off nach dem Start, wenn Zusatztanks leer sind, vor jedem
+    Engagement bzw. Abfangen sowie vor und nach dem Range-Einflug. Der Flight Lead startet den Check per Funk oder Sichtzeichen,
+    die anderen antworten ebenso. Mit Außentanks meldet jeder zusätzlich „Tank(s) feeding/dry“, bis sie leer sind.
+    Datalink-Kraftstoffdaten ersetzen den Check nicht. Der Wortlaut der Antwort ist nicht festgelegt – in Staffeln üblich
+    ist der Treibstoff in tausend Pfund; was gemeldet wird, regelt das Briefing.
+  example: "Viper, ops check. – Two, 5.8, tiger."
+  see: [WHAT STATE, JOKER, BINGO]
+- word: Brevity
+  meaning: Brevity-Codes sind Kurzwörter wie „tally“ oder „bogey dope“, die eine taktische Lage oder Handlung eindeutig in einem Wort sagen – kein Geheimcode, sondern gesparte Funkzeit. Anders als Standardwörter (roger, say again), die das Gespräch steuern, beschreiben sie, was im Einsatz passiert.
+  aliases: [Brevity-Code, Brevity-Codes, Brevity-Wort]
+  note: Maßgeblich ist die ATP 1-02.1 (Multi-Service Brevity Codes).
+  see: [TALLY, BOGEY DOPE, roger, say again]
+- word: LAST CHANCE
+  meaning: Bereich am Pistenende (End of Runway, EOR), in dem unmittelbar vor dem Start die letzten Prüfungen laufen – Waffen bewaffnen, Sichtkontrolle durch die Crew.
+  layer: core
+  note: >-
+    Als Ortsbezeichnung („end of runway (last chance)“) im Korea-BEM (2005), dem Einsatzhandbuch der koreanischen Luftwaffe für die F-16.
+    Die Prüfung läuft meist über Intercom mit dem Crew Chief, nicht über Funk; erst danach kommen Before-Takeoff-Checkliste
+    und Tower. Einen festen Funkspruch dafür gibt es nicht. Ablauf: AFMAN 11-2F-16 V3, Abs. 3.2 und 3.4.
+  see: [ABORT]
+- word: Crew Chief
+  meaning: Techniker, der für dein Flugzeug am Boden verantwortlich ist. Er hat es vorbereitet, schickt es los und sieht beim Anlassen und bei den Funktionschecks von außen zu – oft per Kabel-Intercom mit dir verbunden.
+  note: Bei der US Navy heißt dieselbe Rolle Plane Captain.
+  see: [Intercom, LAST CHANCE]
+- word: Overhead
+  meaning: Militärisches Einflugverfahren in die Platzrunde. Du fliegst zuerst eine gerade Strecke auf die Bahn zu (Initial), beginnst am festgelegten Break-Punkt eine erste Kurve von etwa 180 Grad zum Gegenanflug (Break) und landest nach einer zweiten 180-Grad-Kurve.
+  aliases: [Overhead Break, Overhead Maneuver]
+  note: >-
+    Die FAA nennt es „overhead maneuver“ – festgelegte Manöver, oft im Verband, für den Einflug in die Platzrunde. Üblich
+    sind ein Initial von 3 bis 5 Meilen, zwei 180-Grad-Kurven und eine Höhe von mindestens 500 ft über der normalen
+    Platzrunde (FAA Pilot/Controller Glossary). Es ist ein Sichtflugverfahren; ein IFR-Flugplan endet am Initial Point
+    (AFMAN 11-202 V3, 15.39.5). Dieser „Break“ ist der Beginn der Platzrunde, nicht die Luftkampfkurve. Genaue Höhen,
+    Geschwindigkeiten und Abstände legen die Vorschrift des Musters und die Platzverfahren fest.
+  see: [BREAK, SOP]
+- word: LOST WINGMAN
+  meaning: "Verfahren, wenn ein Wingman im engen Verband (meist in Wolken) die Sicht zum Lead verliert: erst sicherer Abstand zu anderen Flugzeugen (englisch separation), gleichzeitig auf Instrumente gehen und den Lead informieren, der Fluglage, Kurs, Höhe und Geschwindigkeit durchgibt."
+  layer: core
+  note: >-
+    Wiederanschluss nur mit Freigabe des Leads. Im Zweier-Flight im Geradeausflug etwa 15° Querlage für 15 Sekunden
+    wegdrehen, dann Kurs halten; im Vierer geht Nummer 4 davon aus, dass Nummer 3 ebenfalls getrennt ist. Den Funkruf selbst
+    legt die Vorschrift nicht wörtlich fest. Wer in taktischer Formation (mit größerem Abstand) die Sicht verliert, meldet
+    dagegen BLIND. AFMAN 11-2F-16 V3, Abs. 7.9 und 3.12.2; Korea-BEM (2005).
+  see: [BLIND, PADLOCKED, NORDO]
+- word: NORDO
+  meaning: No Radio – Funkausfall. Der Verband verständigt sich dann über Sicht- und Lichtzeichen.
+  layer: core
+  note: >-
+    Im engen Verband manövriert der Pilot innerhalb der Positionsgrenzen (close/route), bis ein Partner aufmerksam wird,
+    und gibt dann Sichtzeichen; die Mission endet, die NORDO-Maschine wird geführt. Außerhalb enger Formation nähert sie
+    sich auf etwa 500 ft und hält Abstand, bis das andere Flugzeug mit den Flächen wippt (Wingrock) – das ist die
+    Freigabe für die NORDO-Maschine, anzuschließen. Haken senken (im Verband) oder blinkendes Landelicht (allein) heißt: Fangseil am
+    Pistenende gewünscht. Die Tageszeichen stehen in AFPAM 11-205 und sind hier nicht ausgewertet. AFMAN 11-2F-16 V3, Abs. 7.6;
+    Verfahren immer nach Briefing. Squawk 7600 zeigt den Funkausfall an.
+  see: [SQUAWK, LOST WINGMAN]
+- word: monitor (Flugsicherung)
+  meaning: Anweisung der Flugsicherung, auf die genannte Frequenz zu wechseln und dort nur zuzuhören, bis man gerufen wird. Bei „contact“ meldest du dich dagegen sofort selbst.
+  layer: core
+  note: >-
+    Die US-Flugsicherung nutzt „monitor“ nur am Boden, etwa „monitor tower“ (FAA JO 7110.65, 2-1-17); in Europa hört man es
+    auch in der Luft. Verwandt: „remain this frequency“ (bleiben) und „change to my frequency“ (derselbe Lotse, andere
+    Frequenz). Im eigenen Flight heißt der Frequenzwechsel dagegen PUSH. Das Brevity-Wort MONITOR hat einen anderen Sinn
+    (Sensor-Aufmerksamkeit auf eine Gruppe).
+  example: "Viper 1-1, monitor tower."
+  see: [PUSH, MONITOR]
+- word: Readback
+  meaning: Du wiederholst die wichtigen Teile einer Anweisung (Bahn, Höhe, Frequenz, Code …) mit deinem Rufzeichen. Der Lotse hört zu (Hearback) und merkt, wenn du dich verhört hast.
+  aliases: [Hearback]
+  note: Nicht dasselbe wie das Standardwort „read back“, mit dem jemand dich auffordert, seine Nachricht zurückzusprechen.
+  see: [read back, roger]
+- word: Lima Charlie
+  meaning: Slang für „loud and clear“ – laut und klar, also beste Verständlichkeit. Lima und Charlie sind die Buchstaben L und C im Buchstabieralphabet.
+  aliases: [five by five]
+  layer: community
+  note: >-
+    Ebenso verbreitet ist „five by five“ (Lesbarkeit 5, Signalstärke 5). Beides ist Militär- und Community-Slang. Die
+    ICAO-Antwort ist die Lesbarkeitsskala („read you five“), „loud and clear“ stammt aus dem militärischen
+    Fernmeldeverfahren (siehe radio check).
+  see: [radio check, NATO-Alphabet]
+- word: Steuerkurs
+  meaning: Die Richtung, in die die Flugzeugnase zeigt, in Grad (magnetisch) – im Funk „heading“. Bei „heading two seven zero“ zeigt deine Kursanzeige 270.
+  aliases: [heading]
+  note: >-
+    Nicht dasselbe wie der Kurs über Grund (englisch track): Bei Seitenwind weicht er um den Vorhaltewinkel vom
+    Steuerkurs ab. Im Funk heißt „fly heading“ deshalb nur: Nase auf diese Zahl. Im Lagebild meint TRACK die
+    Flugrichtung einer Gruppe. ICAO Doc 4444, Kap. 1 (Begriffe Heading und Track).
+  see: [TRACK, VECTOR, CHECK]
+- word: Platzrunde
+  meaning: >-
+    Das festgelegte Rechteck um die Bahn, auf dem du zur Landung anfliegst: Steigflug in Startrichtung (upwind),
+    Querabflug (crosswind), Gegenanflug parallel zur Bahn (downwind), Queranflug (base) und Endanflug (final) auf die
+    Bahn zu.
+  aliases: [traffic pattern, pattern, upwind, crosswind, downwind, base, final, Gegenanflug, Queranflug, Endanflug]
+  note: >-
+    Positionsmeldungen nennen den Teil, auf dem du bist („report base“, „on final“). Militärplätze nutzen dazu den
+    Overhead mit Initial und Break. FAA AIM 4-3-3 (Traffic Patterns). Mehr in Modul 3.
+  see: [Overhead, Tower]
+- word: Standard-Formation
+  meaning: Formation, in der jeder Wingman höchstens 1 NM seitlich oder längs und 100 ft in der Höhe vom Lead bleibt. Für die Flugsicherung ist sie ein einziger Verkehr.
+  layer: core
+  note: >-
+    Nur der Lead spricht mit der Flugsicherung und squawkt den zugewiesenen Code, alle anderen schalten den Transponder auf
+    standby. Eigene Codes und Freigaben gibt es erst beim Aufteilen. Andere Abstände sind eine „nonstandard formation“ und
+    brauchen eine Genehmigung. FAA Pilot/Controller Glossary „Formation Flight“; FAA JO 7110.65, 2-1-13. Für zivile
+    Formationen in Europa nennt SERA.3135 höchstens 1 km und 100 ft.
+  see: [Flight, Lead, SQUAWK]
+- word: MARSA
+  meaning: Military Authority Assumes Responsibility for Separation of Aircraft – Militärflugzeuge staffeln sich untereinander selbst, etwa beim Anschluss an den Tanker. Gegen anderen Verkehr staffelt weiter die Flugsicherung.
+  layer: core
+  note: >-
+    MARSA ist eine Entscheidung der militärischen Führung und muss vorher vereinbart sein. Die Flugsicherung erteilt oder
+    verweigert es nicht (FAA JO 7110.65, 2-1-11). Ein ziviles ICAO-Gegenstück gibt es nicht.
+- word: OAT
+  meaning: Operational Air Traffic – Flüge nach nationalen militärischen Regeln statt nach den zivilen ICAO-Regeln, z. B. Übungen in reservierten Lufträumen.
+  layer: core
+  note: >-
+    Der Gegenbegriff ist GAT. Ein Flug kann zwischen beiden wechseln, das steht dann im Flugplan. Begriffe aus dem
+    europäischen Luftraummanagement (EUROCONTROL), keine ICAO-Begriffe.
+  see: [GAT]
+- word: GAT
+  meaning: General Air Traffic – alle Flüge nach den zivilen ICAO-Regeln, auch militärische, etwa ein Überführungsflug auf Luftstraßen.
+  layer: core
+  see: [OAT]
+- word: CAS
+  meaning: Close Air Support, Luftnahunterstützung – Flugzeuge greifen Ziele nahe an den eigenen Truppen an, geführt von einem JTAC am Boden.
+  aliases: [Close Air Support, Luftnahunterstützung]
+  topic: jtac-und-luftnahunterstuetzung
+  see: [JTAC, CLEARED HOT]
+- word: DME
+  meaning: Entfernungsmessung zu einer Funkstation, als Schrägentfernung in Seemeilen. Die TACAN hat sie eingebaut.
+  topic: navigationshilfen
+  see: [TACAN, VOR]
+- word: DTC
+  meaning: Data Transfer Cartridge – in Falcon BMS der Datenträger, der Presets, Steuerpunkte sowie IFF-Modes und -Codes der Mission ins Cockpit lädt. Im Reiter COMMS steht der Comm Plan.
+  layer: sim
+  topic: comm-plan-und-missionsunterlagen
+  see: [Comm Plan, Comm Card]
+- word: ELT
+  meaning: Emergency Locator Transmitter – Notsender, der nach einem Absturz ein Signal funkt, auf 121.5, 243.0 oder 406 MHz. Das Satellitensystem wertet seit 2009 nur noch 406 MHz aus.
+  topic: guard-und-notfunk
+  see: [SAR, Guard]
+- word: FAA
+  meaning: Federal Aviation Administration – die US-Luftfahrtbehörde. Ihre Phraseologie (JO 7110.65, AIM) ist der Maßstab der US-Flugsicherung und der Sims.
+  topic: regelwerke-icao-faa-atp
+  see: [ICAO]
+- word: HF
+  meaning: Kurzwelle – trägt weit über den Horizont und wird über Ozeanen und in abgelegenen Gebieten genutzt. In den Sims spielt sie kaum eine Rolle.
+  aliases: [Kurzwelle]
+  topic: frequenzbaender-und-reichweite
+  see: [UHF, VHF]
+- word: ICAO
+  meaning: International Civil Aviation Organization – die UN-Organisation der zivilen Luftfahrt. Ihre Standards (Annex 10, Doc 4444) sind die internationale Grundlage der Funkphraseologie, in Europa der Maßstab.
+  topic: regelwerke-icao-faa-atp
+  see: [FAA]
+- word: NATO-Alphabet
+  meaning: Das Buchstabieralphabet der Luftfahrt (Alfa, Bravo, Charlie …), offiziell International Radiotelephony Spelling Alphabet. Jeder Buchstabe hat ein eigenes Wort, damit er über rauschenden Funk nicht verwechselt wird.
+  aliases: [ICAO-Alphabet, Buchstabieralphabet, phonetisches Alphabet]
+  topic: nato-alphabet
+  see: [Zulu]
+- word: NDB
+  meaning: Ungerichtetes Funkfeuer im Langwellen- und Mittelwellenband. Die Nadel des Funkkompass (ADF) zeigt zur Station. Bei älteren und östlichen Mustern und bei Warbirds üblich.
+  aliases: [ADF, Funkfeuer]
+  topic: navigationshilfen
+  see: [TACAN, VOR]
+- word: Proword
+  meaning: Festes Wort, das den Ablauf des Gesprächs steuert („roger“, „wilco“, „say again“, „standby“). Jedes hat genau eine Bedeutung.
+  aliases: [Prowords, procedure word, Standardwort, Standardwörter]
+  topic: brevity-und-prowords
+  see: [Brevity]
+- word: QFE
+  meaning: Luftdruck in Platzhöhe. Der Höhenmesser zeigt am Platz 0 und danach die Höhe über dem Platz. Vor allem bei russischen Mustern und an manchen Plätzen üblich.
+  topic: hoehen-und-hoehenmesser
+  see: [QNH, Flight Level]
+- word: SAR
+  meaning: Search And Rescue – Suche und Rettung nach einem Absturz oder Ausstieg. Rettungsstellen hören die Notfrequenzen und die Notsender ab.
+  topic: guard-und-notfunk
+  see: [ELT, Guard, mayday]
+- word: VOR
+  meaning: Ziviles Funkfeuer im VHF-Band, das dir das Radial gibt, auf dem du zur Station oder von ihr weg fliegst. In den Sims brauchst du es selten.
+  topic: navigationshilfen
+  see: [TACAN, DME]
+- word: VOX
+  meaning: Sprachaktivierung – deine Stimme schaltet das Mikrofon ein, ohne dass du eine Taste drückst. Läuft sie zu empfindlich, hören alle dich atmen.
+  topic: funkgeraet-bedienen
+  see: [Intercom, PTT]
+- word: Zulu
+  meaning: Die Weltzeit UTC im Funk. Das Z im Buchstabieralphabet steht für sie. „one four three zero Zulu“ heißt 14:30 UTC.
+  aliases: [UTC]
+  topic: zahlen-im-funk
+  see: [NATO-Alphabet, ATIS]
+- word: Base Ops
+  meaning: Base Operations – der Platzbetrieb eines Militärplatzes, mit eigener Frequenz auf der Platzkarte (in BMS Preset 1).
+  aliases: [Base Operations]
+  note: Wofür er genau zuständig ist, hängt vom Platz ab; keine der Quellen belegt es.
+  topic: atc-stellen
+  see: [PMSV, Tower]
+- word: PMSV
+  meaning: Pilot-to-Metro Service, auch METRO – Funkverbindung zu Wetterberatern oder Wetterbeobachtern des Militärs, um Vorhersage und aktuelles Wetter abzufragen.
+  aliases: [METRO, Pilot-to-Metro Service]
+  note: Eine ältere USAF-Vorschrift (1996) nennt als Beispiel einen Wetterbericht aus der Luft (PIREP). Navy-Handbuch P-806, Abs. 409.
+  topic: atc-stellen
+  see: [Base Ops, Tower]
+- word: PLB
+  meaning: Personal Locator Beacon – tragbarer Notsender für eine Person, das Gegenstück zum ELT am Flugzeug. Moderne Geräte senden auf 406 MHz.
+  aliases: [Personal Locator Beacon]
+  topic: guard-und-notfunk
+  see: [ELT, SAR, Guard]
+- word: Fix
+  meaning: Ein durch Funkfeuer, Koordinaten oder Sicht festgelegter Punkt, an dem man Verfahren und Meldungen festmacht. Anflugkarten zeigen den Einflugpunkt (IAF) und weitere Fixes.
+  aliases: [Fixes]
+  note: FAA Pilot/Controller Glossary, „Fix“ (geografische Position, bestimmt durch Sicht, Funknavigation oder andere Verfahren).
+  topic: navigationshilfen
+  see: [TACAN, ILS]
+- word: Fangseil
+  meaning: Seil quer über die Bahn, das ein Flugzeug mit ausgefahrenem Fanghaken einfängt und abbremst, zum Beispiel am Pistenende nach einem Startabbruch oder bei Bremsenausfall.
+  aliases: [Fangseile, Fanghaken, arresting gear, Haken]
+  note: Im Funk zeigst du, dass du es brauchst, durch das Zeichen „Haken senken“ (im Verband) oder blinkendes Landelicht (allein), siehe lost wingman und NORDO.
+  see: [NORDO, LOST WINGMAN]
+- word: Pre-Taxi
+  meaning: Die Prüfungen nach dem Anlassen und vor dem Rollen. Im Korea-BEM heißen sie „After Start/Before Taxi Checks“.
+  aliases: [Pre-Taxi-Checks, Before Taxi]
+  layer: core
+  see: [Crew Chief, LAST CHANCE]
+- word: Join-up on top
+  meaning: Der Flight sammelt sich über den Wolken zur Formation, statt (bei Sichtflug) unter einer Wolkendecke.
+  aliases: [Join-up]
+  note: Die AFMAN 11-2F-16 V3 stellt „join-up on top“ dem „VFR join-up below a ceiling“ gegenüber (3.7.1, 4.3.2.6).
+  layer: core
+  see: [Flight, Lead]
+- word: Targeting-Reichweite
+  meaning: Die im Briefing festgelegte Entfernung, innerhalb der die Jäger Gruppen als Ziele übernehmen sollen. Eine wichtige Gruppe, die dort noch niemand aufgeschaltet hat, meldet der AWACS als UNTARGETED.
+  aliases: [targeting range]
+  note: ATP 3-52.4 (2021), S. 25 („briefed targeting range“). Innerhalb der Reichweite gibt der Controller kein NEW PICTURE.
+  see: [TARGETED, UNTARGETED, TARGET, THREAT, ADDITIONAL GROUP]
+- word: Abort code
+  meaning: Abbruchcode – ein vorab vereinbartes Codewort, mit dem ein Angriff abgebrochen wird. Gehört zum vollständigen Check-in beim AWACS (der Buchstabe A in MNPOPCA).
+  aliases: [Abbruchcode, abort codes]
+  note: ATP 3-52.4 (2021), S. 7, Tabelle 3, nennt den Abort Code als Teil des Check-ins, definiert ihn aber nicht. Die Beschreibung als vorab vereinbartes Codewort folgt Sekundärquellen zur JP 3-09.3 und ist hier nicht an der Vorschrift geprüft.
+  see: [ABORT]
+- word: Force Package
+  meaning: Verband mehrerer Flights mit gemeinsamer Mission. Die Package Commander führen die Teile (Escort, Strike, Airlift, TAC C2), der Mission Commander die ganze Mission.
+  aliases: [Force Packages]
+  note: Nicht zu verwechseln mit dem Brevity-Wort PACKAGE, einer räumlich abgesetzten Ansammlung von Gruppen im Lagebild. ATP 3-52.4 (2021), S. 15 („Force Package Accountability and Roll Call“).
+  see: [PACKAGE, Comm Plan, SPINS]
+# ------------------------------------------------------------------ CAS (Spur C)
+- word: 9-Line
+  meaning: >-
+    Das Briefing des JTAC für einen CAS-Angriff in neun Zeilen: IP, Kurs und Offset, Distanz, Zielhöhe, Zielbeschreibung,
+    Zielkoordinate, Markierung, Freunde, Egress. Danach kommen die Remarks mit den Restriktionen.
+  aliases: [nine-line, 9-Liner, Neun-Zeilen-Briefing, CAS brief]
+  note: Zeilenfolge laut den Quellen (Sekundärquellen zur JP 3-09.3); DCS-Handbücher und BMS-Blätter stimmen überein.
+  topic: jtac-und-luftnahunterstuetzung
+  see: [Remarks, Readback, JTAC]
+- word: IP
+  meaning: >-
+    Initial Point – benannter Punkt, an dem der Anflug auf das Ziel beginnt (Line 1 im 9-Line). Kurs und Distanz in Line 2
+    und 3 gelten von dort. Für Hubschrauber heißt der Startpunkt Battle Position (BP).
+  aliases: [Initial Point, BP, Battle Position]
+  see: [9-Line]
+- word: MGRS
+  meaning: >-
+    Military Grid Reference System – Koordinate aus Zonenfeld (z. B. 37T), 100-km-Quadrat (zwei Buchstaben) und gleich
+    vielen Ziffern für Rechts- und Hochwert. Acht Ziffern sind auf 10 m genau. Line 6 im 9-Line.
+  aliases: [grid, Grid-Koordinate]
+  see: [9-Line]
+- word: Keyhole
+  meaning: >-
+    Schema für Haltepositionen um ein Ziel: Echo ist die Zielmitte, Alfa liegt nördlich, Bravo östlich, Charlie südlich,
+    Delta westlich. „Hold Charlie 8“ heißt 8 NM südlich des Ziels.
+  layer: community
+  note: Praxis auf DCS-Servern mit menschlichen JTACs (Hoggit-Wiki JTAC).
+  see: [JTAC]
+- word: Danger Close
+  meaning: >-
+    Hinweis des JTAC, dass die eigenen Leute näher am Ziel sind, als für die gewählte Waffe als sicher gilt. Steht in den
+    Remarks und wird zurückgelesen.
+  note: Die Schwellen je Waffe und das Verfahren mit den Initialen des Bodenkommandeurs sind hier nicht an der JP 3-09.3 geprüft.
+  see: [Remarks, Readback]
+- word: Control Type
+  meaning: >-
+    Wie eng der JTAC einen Angriff kontrolliert. Type 1 und 2: Jeder Angriff wird einzeln freigegeben (CLEARED HOT). Type 3:
+    mehrere Angriffe innerhalb vorgegebener Grenzen (CLEARED TO ENGAGE).
+  aliases: [Type 1, Type 2, Type 3, Terminal Attack Control, Type of Control]
+  see: [CLEARED HOT, CLEARED TO ENGAGE]
+- word: BOT
+  meaning: Bomb on Target – du bestätigst das Zielobjekt selbst und wirfst darauf. Steht im Game Plan.
+  aliases: [bomb on target]
+  note: Ob BOT oder BOC, entscheidet der JTAC (DCS JTAC-Leitfaden der Community).
+  see: [BOC, Game Plan]
+- word: BOC
+  meaning: Bomb on Coordinate – die Waffe fällt auf die Koordinate, auch ohne dass du das Ziel siehst, z. B. gegen Infanterie.
+  aliases: [bomb on coordinate]
+  note: Ob BOT oder BOC, entscheidet der JTAC (DCS JTAC-Leitfaden der Community).
+  see: [BOT, Game Plan]
+- word: Final Attack Heading
+  meaning: >-
+    Restriktion in den Remarks: der Kurssektor, aus dem du angreifen darfst, von – bis im Uhrzeigersinn. Wird
+    zurückgelesen.
+  aliases: [FAH, final attack headings, Angriffskurs]
+  see: [Remarks, Readback]
+- word: Laser-Target Line
+  meaning: >-
+    Kurs vom Laser des JTAC zum Ziel. Steht bei Laser-Markierung in den Remarks; der Angriff soll nicht entlang dieser
+    Linie laufen, sonst kann die Bombe den Laser statt des Ziels finden.
+  aliases: [LTL]
+  see: [Laser-Code, Remarks]
+- word: Situation Update
+  meaning: >-
+    Lagemeldung des JTAC nach dem Check-in: Bedrohung, Ziele, eigene Kräfte, Artillerie, Einschränkungen.
+  aliases: [SITREP, Lagemeldung]
+  note: Das BMS-Blatt dafür hat sieben Punkte in fester Folge; die Gliederung in der JP 3-09.3 ist hier nicht geprüft.
+  see: [Game Plan]
+- word: Game Plan
+  meaning: Plan des JTAC vor dem 9-Line – Control Type, BOT oder BOC, Waffe und Anzahl pro Anflug.
+  see: [Control Type, BOT, BOC, 9-Line]
+- word: Laser-Code
+  meaning: >-
+    Vierstellige Kennung der Laserpulse, z. B. 1688. Gültig sind 1111 bis 1788: erste Ziffer 1, zweite 1–7, dritte und
+    vierte 1–8 – eine 0 oder 9 gibt es nicht. Steht in Line 7.
+  aliases: [Lasercode]
+  note: Regel laut DCS-Handbuch der A-10C II; dort ist 1688 der Standardcode.
+  see: [Laser-Target Line]
+- word: Willie Pete
+  meaning: Weißer Phosphor – Rauchmarkierung, mit der das Ziel gezeigt wird (Line 7).
+  aliases: [WP, white phosphorus, Willy Pete]
+  see: [9-Line]
+- word: Remarks
+  meaning: >-
+    Was nach den neun Zeilen kommt: Restriktionen (Final Attack Heading, Danger Close), Laser-Target Line, Bedrohung und
+    Time on Target. Die Restriktionen werden zurückgelesen.
+  aliases: [remarks and restrictions, Restriktionen]
+  see: [9-Line, Final Attack Heading, Danger Close]

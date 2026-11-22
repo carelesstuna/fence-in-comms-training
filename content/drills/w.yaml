@@ -1,0 +1,182 @@
+# Spur W – Warbirds & Kalter Krieg
+
+# ------------------------------------------------------------ Lektion 1: Funk im Warbird
+- id: w-l1-channels
+  type: match
+  layer: sim
+  prompt: >-
+    Laut DCS-Handbuch von P-51D und P-47D – wofür ist welcher Kanal gedacht? (Was in deiner Mission gilt,
+    steht trotzdem im Briefing.)
+  pairs:
+    - [A, Flugzeuge untereinander und die Leitstelle]
+    - [B, Der Tower – Start und Landung]
+    - [C, Funkfeuer zum Anpeilen (Homing)]
+    - [D, Peilstationen am Boden]
+  explain: >-
+    Die Belegung ist ein Brauch aus dem Handbuch, keine feste Regel. Die Frequenzen dahinter legt die
+    Mission fest. Mosquito und Spitfire nutzen dieselben Buchstaben.
+
+- id: w-l1-mode-t
+  type: choice
+  layer: sim
+  prompt: Der Moduswähler am Funkgerät deines Warbirds steht auf **T**. Was passiert?
+  options:
+    - Du sendest dauernd – und blockierst den Kanal für alle anderen.
+    - Du hörst nur zu und kannst nicht senden.
+    - Du sendest nur, solange du die Sprechtaste drückst.
+    - Das Funkgerät ist aus.
+  answer: 0
+  explain: >-
+    T heißt Senden, R Empfangen, REM „Senden mit der Sprechtaste“. Im Normalbetrieb steht der Wähler auf
+    REM. Das P-51D-Handbuch kennt T für zwei Fälle: kurz gegen die Feder gedrückt, wenn die Sprechtaste ausfällt,
+    und kurz vor dem Aussteigen über Wasser, damit die Peilstellen dich finden.
+
+- id: w-l1-azimuth
+  type: choice
+  layer: sim
+  aircraft: [spitfire, mosquito, p51, p47, bf109, fw190]
+  prompt: >-
+    Über einer geschlossenen Wolkendecke hast du die Orientierung verloren. Wie findest du in einem DCS-Warbird
+    (P-51D, P-47D, Spitfire, Mosquito, Bf 109, Fw 190) zurück zum Platz?
+  options:
+    - Im ATC-Menü „I'm lost“ – der Platz gibt dir einen Kurs.
+    - Das TACAN des Platzes einstellen und der Nadel folgen.
+    - Den AWACS um „bogey dope“ bitten.
+    - Auf Kanal D dreimal „mayday“ rufen.
+  answer: 0
+  explain: >-
+    Ein TACAN gibt es im Warbird nicht, und „bogey dope“ fragt nach Gegnern, nicht nach dem Heimweg. Im ATC-Menü
+    der DCS-Warbirds heißt der Punkt „I'm lost“ (P-51D-Handbuch; ältere Handbücher wie das der Spitfire sagen
+    „Request Azimuth“). Mayday ist für echte Not.
+
+- id: w-l1-build-mayday
+  type: build
+  call: w-mayday-warbird
+  prompt: Der Motor ist aus, du bist über dem Wasser. Bau den Notruf so, wie ihn die Handbücher von P-51D und P-47D beschreiben.
+  distractors: [pan pan, roger, "say again"]
+  explain: >-
+    Erst dreimal mayday, dann dreimal das Rufzeichen, dann – wenn Zeit bleibt – Position, Kurs, Höhe und
+    Absicht. PAN PAN wäre die Dringlichkeitsmeldung ohne unmittelbare Gefahr.
+
+# ------------------------------------------------------------ Lektion 2: IL-2 ohne Funkgerät
+- id: w-l2-why-srs
+  type: choice
+  layer: community
+  prompt: Warum funken Spieler in IL-2 auf „Kanälen“ statt auf Frequenzen?
+  options:
+    - IL-2 hat kein Funkgerät zum Einstellen. SRS für IL-2 bringt zwei Geräte mit, und der Server benennt die Kanäle.
+    - Weil die Funkgeräte des Zweiten Weltkriegs keine Frequenzen hatten.
+    - Weil IL-2 nur einen einzigen Funkkanal für alle simuliert.
+    - Weil Frequenzen in IL-2 geheim sind und nur der Server sie kennt.
+  answer: 0
+  explain: >-
+    Auch die echten Geräte hatten Frequenzen – nur fest als Kanäle vorgewählt. IL-2 bildet sie gar nicht ab.
+    Die Kanäle in SRS sind deshalb eine Absprache des Servers, und die steht in der Serverinfo.
+
+- id: w-l2-channel-plan
+  type: choice
+  layer: community
+  prompt: >-
+    Laut Serverinfo gilt: Kanal 1 Platz und Planung, 2 Jäger, 3 Bomber, 4 Boden, 5 Koordination, auf 1–5 nur
+    Englisch. Du fliegst Jäger und willst deine Rotte erreichen. Wohin schaltest du?
+  options:
+    - Kanal 2
+    - Kanal 1
+    - Kanal 3
+    - Kanal 5
+  answer: 0
+  explain: >-
+    Kanal 2 ist der Jägerkanal. Den Plan schlägst du vor dem Flug nach – er ist von Server zu Server
+    verschieden. (Das Beispiel stammt von einem IL-2-Server, Stand 2026.)
+
+- id: w-l2-clock
+  type: choice
+  prompt: "„Bandits, right two o'clock, three kilometers, high.“ Wohin schaust du?"
+  options:
+    - Rechts vorn, etwas über dich
+    - Rechts hinten, etwas unter dich
+    - Links vorn, auf deiner Höhe
+    - Gerade nach vorn, über dich
+  answer: 0
+  explain: Zwölf Uhr ist deine Nase, drei Uhr querab rechts – zwei Uhr liegt dazwischen. high heißt über dir.
+
+- id: w-l2-build-contact
+  type: build
+  call: w-contact-report
+  prompt: Du siehst gegnerische Jäger. Bau die Meldung an deine Rotte – Rufzeichen, was, wo, wie weit, wie hoch.
+  distractors: [tally, bogey, roger]
+  explain: >-
+    Erst wer gerufen wird und wer ruft, dann was du siehst, dann Uhr, Entfernung und Höhenlage. So funken auch
+    die KI-Flügelmänner in IL-2 – nur mit Kilometern statt Meilen.
+
+# ------------------------------------------------------------ Lektion 3: Leitstelle statt AWACS
+- id: w-l3-words
+  type: match
+  prompt: Mit diesen Wörtern führt dich eine Leitstelle – alle stehen im heutigen Brevity-Katalog. Ordne zu.
+  pairs:
+    - [SCRAMBLE, So schnell wie möglich starten]
+    - [VECTOR, Auf den genannten Kurs drehen]
+    - [ANGELS, Höhe der Eigenen in tausend Fuß]
+    - [BUSTER, Volle Dauerleistung ohne Nachbrenner]
+    - [GATE, "So schnell wie möglich – Nachbrenner bzw. Höchstleistung"]
+    - [PANCAKE, Landen bzw. um Landung bitten]
+  explain: >-
+    SCRAMBLE, VECTOR, ANGELS, BUSTER und PANCAKE kannte schon die RAF-Jägerleitung von 1940 (Hangar-Karte
+    „Engel über Südengland“ in Modul 1, Lektion 3). GATE meint Nachbrenner oder maximale Leistung – im Warbird also
+    die Notleistung (WEP).
+
+- id: w-l3-ack-vector
+  type: choice
+  prompt: >-
+    Die Leitstelle ruft: „{callsign|spoken}, {gci}, vector two seven zero, angels two zero, buster.“ Was
+    antwortest du?
+  vars:
+    gci: { pool: callsigns.gci }
+  options:
+    - "{callsign|spoken}"
+    - "Roger, vector two seven zero, angels two zero, buster, {callsign|spoken}"
+    - "{gci}, {callsign|spoken}, wilco"
+    - Copy all.
+  answer: 0
+  explain: >-
+    Wie beim AWACS genügt das Rufzeichen – du fliegst, was er sagt. „roger“ und „wilco“ sind überflüssig,
+    und ohne Rufzeichen weiß niemand, wer verstanden hat.
+
+- id: w-l3-tally
+  type: choice
+  prompt: Du siehst jetzt die Gruppe, zu der dich die Leitstelle geführt hat. Welches Wort meldest du?
+  options:
+    - tally
+    - tally-ho
+    - contact
+    - visual
+  answer: 0
+  explain: >-
+    TALLY heißt: Gegner in Sicht. „Tally-ho“ war das Wort der RAF von 1940 – im heutigen Katalog steht nur
+    noch TALLY. CONTACT meint einen Kontakt auf dem eigenen Radar, VISUAL die Sicht auf ein eigenes Flugzeug.
+
+- id: w-l3-clean
+  type: choice
+  prompt: >-
+    Die Leitstelle am Boden beantwortet dein „bogey dope“ mit „clean“. Der Gegner fliegt laut Missionsbriefing
+    gern tief über dem Meer. Was heißt das für dich?
+  options:
+    - Ihr Radar sieht keine Gruppe – das heißt nicht, dass keine da ist.
+    - Der Luftraum ist sicher frei, du kannst zurückfliegen.
+    - Du sollst die Frequenz räumen.
+    - Das Gefecht ist beendet.
+  answer: 0
+  explain: >-
+    CLEAN heißt: keine Radardaten zu einer Gruppe. Ein Radar am Boden sieht nur bis zum Horizont – hohe Ziele
+    sehr weit, tief fliegende aber erst spät, weil ihr eigener Horizont klein ist. Augen auf – und später noch
+    einmal fragen.
+
+- id: w-l3-call-pancake
+  type: call
+  call: w-pancake
+  prompt: >-
+    Dein Treibstoff wird knapp. Melde der Leitstelle **{gci}**, dass du landen willst, und bitte um den Weg
+    nach Hause.
+  hint: Adressat – Rufzeichen – pancake fuel – request pigeons
+  explain: >-
+    PANCAKE mit Grund, dann die Bitte um PIGEONS. Die Antwort nennt Kurs und Entfernung zum Heimatplatz.

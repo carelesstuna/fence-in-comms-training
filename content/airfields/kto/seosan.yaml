@@ -1,0 +1,20 @@
+id: seosan
+name: Seosan
+map: kto
+icao: RKTP
+elevationFt: 42
+runways: ["03L/21R", "03R/21L"]
+atc: { uhf: 353.1, vhf: 126.75 }
+tacan: 73X
+freqs: { atis: 130.3, ground: 275.8, departure: 253.95, approach: 253.95 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_EOR.png" }
+verified: community
+notes:
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "TACAN 73X laut AGC. ILS weggelassen: die Simdaten führen zwei Frequenzen (111.50, 110.10) ohne klare Zuordnung zu den Bahnenden."
+  - "Base Ops UHF 318.1 nur in den Simdaten."
+  - "Funkname ohne „AB“, wie ihn die BMS-ATC spricht („Seosan Ground“, vgl. Comms & Nav Book 4.38.2: „Gunsan Approach, Falcon 1 …“). Die BMS-Karten führen den Platz als „Seosan AB“."

@@ -1,0 +1,88 @@
+# Standardwörter (Prowords) im Flugfunk. Brevity-Codes kommen später in brevity.yaml.
+# Bedeutungen in eigenen Worten nach ICAO Annex 10 Bd. II, 5.2.1.5.8, und dem FAA Pilot/Controller Glossary.
+- word: roger
+  meaning: Ich habe deine letzte Übertragung vollständig empfangen.
+  note: Heißt NICHT „ich mache das“ – nur „angekommen“.
+- word: wilco
+  meaning: Verstanden, ich führe es aus (will comply).
+  note: Enthält roger bereits – „roger wilco“ ist doppelt gemoppelt.
+- word: affirm
+  meaning: Ja.
+  note: ICAO-Form. Die FAA kennt nur „affirmative“ (Pilot/Controller Glossary), und auch im US-Militär hört man meist „affirmative“.
+- word: negative
+  meaning: Nein / nicht erteilt / nicht richtig.
+- word: say again
+  meaning: Bitte wiederholen.
+  note: Niemals „repeat“ – das bedeutet in der Feuerunterstützung „noch einmal feuern“.
+- word: standby
+  meaning: Warte, ich melde mich gleich.
+  note: Ist weder ja noch nein.
+- word: unable
+  meaning: Ich kann die Anweisung nicht ausführen.
+- word: copy
+  meaning: Verstanden (informell, im Militär und in Sim-Staffeln verbreitet).
+  note: Kein Standardwort bei ICAO oder FAA; das britische Funkhandbuch CAP 413 rät ausdrücklich davon ab. Gegenüber ziviler Flugsicherung (VATSIM, IVAO) „roger“ sagen.
+  layer: community
+- word: correction
+  meaning: Ich habe mich versprochen, richtig ist …
+- word: disregard
+  meaning: Vergiss meine letzte Übertragung.
+- word: read back
+  meaning: Wiederhole meine Nachricht genau so, wie du sie verstanden hast.
+- word: go ahead
+  meaning: Sprich, ich höre.
+  note: Die FAA führt es mit genau dieser einen Bedeutung und für nichts anderes. In der ICAO-Liste fehlt es, dort heißt es „pass your message“ – oder man antwortet einfach mit dem eigenen Rufzeichen.
+- word: break
+  meaning: Trennt Teile einer Nachricht, wenn Text und übrige Teile sonst nicht klar auseinanderfallen.
+  note: ICAO Annex 10 Bd. II, 5.2.1.5.8. Im Pilot/Controller Glossary der FAA fehlt „break“. Im Luftkampf ist BREAK (mit Richtung) dagegen ein Brevity-Kommando für eine Maximalkurve!
+- word: break break
+  meaning: Trennt Nachrichten an verschiedene Flugzeuge auf einer sehr vollen Frequenz. Der Lotse sagt damit, dass er ab jetzt mit jemand anderem spricht.
+  note: >-
+    ICAO Annex 10 Bd. II, 5.2.1.5.8. Dass „break break“ eine dringende Meldung ankündigt, die Vorrang hat, ist verbreitete Praxis in
+    Sim-Missionen, steht aber nicht in der ICAO-Liste. Ein Notruf beginnt mit „mayday“. Nicht verwechseln mit BREAK und einer Richtung,
+    der Maximalkurve im Luftkampf.
+- word: contact (Flugsicherung)
+  meaning: Nimm Verbindung mit der genannten Stelle auf. In der Praxis heißt das, auf die genannte Frequenz zu wechseln und dich dort zu melden.
+  note: >-
+    ICAO Annex 10 Bd. II, 5.2.1.5.8; FAA Pilot/Controller Glossary (CONTACT). Beispiel: „contact departure one two three point four“.
+    Bei „monitor“ hörst du dagegen nur zu. Nicht verwechseln mit dem Brevity-Wort CONTACT: Dort geht es um einen Sensorkontakt, und
+    der AWACS antwortet damit beim Check-in.
+  topic: atc-stellen
+- word: radio check
+  meaning: Funkprobe – prüft, ob Funkgerät und Frequenz stimmen. Geantwortet wird mit der Lesbarkeit („read you five“ oder „loud and clear“). Im Flight ruft der Lead „check“, und alle melden sich der Reihe nach mit ihrer Nummer („two, three, four“).
+  note: >-
+    Drei Herkünfte: ICAO kennt die Lesbarkeitsskala von 1 bis 5 („read you five“, Annex 10 Bd. II, 5.2.1.8.4). „Loud and
+    clear“ und „weak but readable“ stammen aus dem militärischen Fernmeldeverfahren (ACP 125: LOUD für die Signalstärke,
+    CLEAR für die Lesbarkeit) und sind auch im US-Flugfunk üblich. „Five by five“ und „Lima Charlie“ sind Slang. USAF:
+    Flugteilnehmer quittieren Radio Checks der Reihe nach, AFMAN 11-2F-16 V3, Abs. 3.30.1. Dass „check“ allein im Flight
+    diese Funkprobe auslöst, ist Staffelpraxis. Nicht verwechseln mit dem Brevity-Wort CHECK (Kursänderung) und dem Ops
+    Check (Systemprüfung im Flight).
+- word: mayday
+  meaning: Notruf – unmittelbare Gefahr, sofortige Hilfe nötig. Wird dreimal gesprochen und hat Vorrang vor allem anderen Funk.
+  note: Auf der aktuellen Frequenz oder auf Guard (243.0 / 121.5).
+- word: pan pan
+  meaning: Dringlichkeitsmeldung – ernstes Problem, aber keine unmittelbare Gefahr. Wird dreimal gesprochen.
+- word: over
+  meaning: Ich bin fertig und erwarte eine Antwort.
+  note: Im Flugfunk, beim Militär und in Sim-Staffeln kaum gebräuchlich – dass du fertig bist, hört man am Loslassen der Taste. Gilt dort als überflüssiges Wort.
+- word: out
+  meaning: Gespräch beendet, keine Antwort erwartet.
+  note: Im Flugfunk selten. „Over and out“ widerspricht sich (Antwort erwartet – und doch nicht).
+- word: blocked
+  meaning: Zwei haben gleichzeitig gesendet, keiner kam durch – die Übertragung war überlagert und nicht zu verstehen.
+  note: >-
+    Phraseologie der US-Flugsicherung (FAA Pilot/Controller Glossary), kein Brevity-Code. Der Lotse bzw. die Station sagt
+    „blocked“ und ruft meist gezielt einen auf („…, say again“) – dann wiederholt nur der. Ruft niemand auf: kurz
+    hineinhören, dann den eigenen Funkspruch vollständig wiederholen.
+- word: confirm
+  meaning: Ich bitte um Bestätigung – einer Freigabe, Anweisung, Handlung oder Information.
+  note: >-
+    ICAO-Standardwort (Annex 10 Bd. II, 5.2.1.5.8), z. B. „confirm squawk four two one five“. Die Antwort ist „affirm“
+    bzw. „affirmative“ oder „negative“ mit dem richtigen Wert. Die US-Flugsicherung sagt dafür meist „verify“.
+- word: verify
+  meaning: Bitte um Bestätigung einer Angabe, z. B. „verify assigned altitude“.
+  note: FAA Pilot/Controller Glossary (VERIFY). Das US-Gegenstück zum ICAO-Wort „confirm“; in den Sims und auf Servern hört man beides.
+- word: readback correct
+  meaning: Der Readback stimmt – so bestätigt die Gegenstelle, dass alles richtig zurückgelesen wurde.
+  note: Beim JTAC in den DCS-Handbüchern belegt. Stimmt etwas nicht, folgt „correction“ mit dem richtigen Wert.
+  layer: community

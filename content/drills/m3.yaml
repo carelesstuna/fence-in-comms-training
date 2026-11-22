@@ -1,0 +1,739 @@
+# Übungen für Modul 3 (Am Boden & Bodencrew) – ENTWURF, Modul ist noch „planned“.
+# Typen: choice, match, build, anatomy, input, generated – siehe content/README.md
+
+# ------------------------------------------------------------ Lektion 1: ATIS
+- id: m3-l1-atis-letter
+  type: input
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+    t: { number: time }
+    # Sicht und Luftdruck in der Form des Platzes (US-Form oder ICAO)
+    wx: { weather: true, airfield: airfield, wind: calm, sky: vmc }
+  prompt: >-
+    Du hörst: „{airfield.name} information **{atis}**, {t|spoken} Zulu, wind calm, {wx.visibility|spoken},
+    {wx.clouds|spoken}, {wx.pressure.word} {wx.pressure|spoken}, runway {wx.runway|spoken} in use, advise on initial
+    contact you have information {atis}.“ – Mit welchen Worten bestätigst du beim Erstanruf die ATIS? Tippe den
+    Teil, der die ATIS nennt (der ganze Erstanruf bis dahin zählt auch).
+  accept:
+    - "information {atis}"
+    - "with {atis}"
+    - "with information {atis}"
+    - "{airfield.name} Ground {callsign|spoken} information {atis}"
+    - "{airfield.name} Ground {callsign|spoken} with {atis}"
+    - "{airfield.name} Ground {callsign|spoken} with information {atis}"
+    - "{airfield.alias} Ground {callsign|spoken} information {atis}"
+    - "{airfield.alias} Ground {callsign|spoken} with {atis}"
+  explain: >-
+    „information“ plus der Buchstabe im Alphabet – in den USA oft kürzer „with {atis}“. Damit weiß
+    Ground, dass du die aktuelle Ausgabe kennst.
+
+- id: m3-l1-atis-runway
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+    wx: { weather: true, airfield: airfield }
+    # Falschantworten: Bahnnummern, die es auf keinem Platz im Pool gibt
+    r1: { oneOf: ["02", "04", "05", "10"] }
+    r2: { oneOf: ["11", "12", "14", "15", "16", "17"] }
+    r3: { oneOf: ["28", "29", "30", "32", "33", "34"] }
+  prompt: >-
+    „{airfield.name} information {atis}, wind {wx.wind|spoken}, {wx.visibility|spoken},
+    {wx.clouds|spoken}, {wx.pressure.word} {wx.pressure|spoken}, runway {wx.runway|spoken} in use.“ – Von
+    welcher Bahn startest du?
+  options:
+    - "Runway {wx.runway}"
+    - "Runway {r1}"
+    - "Runway {r2}"
+    - "Runway {r3}"
+  answer: 0
+  explain: „runway … in use“ ist die aktive Bahn. Ground wird dich dorthin schicken.
+
+- id: m3-l1-atis-form
+  type: form
+  call: m3-atis
+  prompt: Du hörst die ATIS. Schreib die vier Werte mit, die du vor dem Erstanruf aufs Kneeboard notierst.
+  fields:
+    - { label: Kennbuchstabe, accept: ["{atis}", "{atis.letter}"], placeholder: Buchstabe oder Wort }
+    - { label: Aktive Runway, accept: ["{wx.runway}"], placeholder: z. B. 31 }
+    - { label: Wind, accept: ["{wx.wind}", "{wx.wind|spoken}", "{wx.windShort}"], placeholder: z. B. 310 at 6 oder 310/6 }
+    - { label: "Luftdruck ({wx.pressure.unit})", accept: ["{wx.pressure}", "{wx.pressure|spoken}"], placeholder: Zahl eintippen … }
+  explain: >-
+    Kennung {atis}, Runway {wx.runway}, Wind {wx.wind}, {wx.pressure.word} {wx.pressure} ({wx.pressure.unit}). Den
+    Luftdruck sprichst du Ziffer für Ziffer. Beim Altimeter in inHg fällt dabei der Punkt weg, am Höhenmesser stellst
+    du ihn mit ein. Die Runway passt zum Wind – gestartet wird gegen den Wind.
+
+- id: m3-l1-why-letter
+  type: choice
+  exam: true
+  prompt: Warum nennst du beim Erstanruf den ATIS-Buchstaben?
+  options:
+    - Damit Ground weiß, dass du Wetter, Bahn und Luftdruck schon kennst.
+    - Weil der ATIS-Buchstabe bei der ersten Meldung dein Rufzeichen ersetzt.
+    - Weil Ground sonst nicht weiß, auf welcher Frequenz du bist.
+    - Reine Höflichkeit – Ground liest dir die Werte trotzdem noch einmal komplett vor, damit niemand etwas verpasst.
+  answer: 0
+  explain: >-
+    Der Buchstabe ist eine Abkürzung für „ich bin auf dem Stand von Ausgabe X“. Ist er veraltet, gibt
+    Ground dir die neuen Werte.
+
+- id: m3-l1-wind-runway
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    wx: { weather: true, airfield: airfield, wind: strong }
+  prompt: >-
+    Der Wind kommt aus {wx.windDir} Grad mit {wx.windSpeed} Knoten. Die ATIS in {airfield.name} meldet
+    „runway {wx.runway|spoken} in use“. Warum genau diese Richtung?
+  options:
+    - "Gestartet wird gegen den Wind – Bahn {wx.runway} zeigt dorthin, woher er kommt."
+    - "Weil man mit Rückenwind startet – mit dem Wind im Rücken erreicht man die Abhebegeschwindigkeit deutlich früher."
+    - "Weil die Bahnnummer die höchste erlaubte Windstärke für diese Bahn in Knoten angibt."
+    - "Zufall – der Tower wählt die Bahn nur nach Verkehrslage, der Wind spielt keine Rolle."
+  answer: 0
+  explain: >-
+    Gegenwind verkürzt Start- und Landestrecke. Die Bahnnummer ist die magnetische Richtung der Bahn
+    in Zehnergrad, gerundet: Bahn 13 zeigt nach etwa 130 Grad.
+
+- id: m3-l1-match-atis
+  type: match
+  prompt: Was bedeutet welcher ATIS-Teil?
+  pairs:
+    - [wind variable at three, Schwacher Wind aus wechselnder Richtung]
+    - [sky clear, Keine Wolken]
+    - [dew point, "Taupunkt – liegt er nah an der Temperatur, droht Nebel"]
+    - [runway … in use, Die aktive Startbahn]
+    - [advise on initial contact …, Nenne beim ersten Anruf den ATIS-Buchstaben]
+
+- id: m3-l1-anatomy-instruction
+  type: anatomy
+  exam: true
+  call: m3-atis
+  transmission: 0
+  target: instruction
+  prompt: Wo bittet dich die ATIS um etwas?
+  explain: Am Ende jeder ATIS steht die Bitte, beim Erstanruf den Buchstaben zu nennen.
+
+- id: m3-l1-build-initial
+  type: build
+  call: m3-atis
+  transmission: 1
+  prompt: Du hast die ATIS gehört. Ruf Ground und bitte ums Anlassen.
+  distractors: ["{airfield.name} Tower", request takeoff]
+  explain: Ground ist für das Anlassen zuständig, nicht der Tower. Und vom Start bist du noch weit entfernt.
+
+- id: m3-l1-update
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    atis2: { letter: true }
+    altim: { number: pressure, airfield: airfield }
+  prompt: >-
+    Während du in {airfield.name} rollst, sagt Ground: „{callsign|spoken}, information {atis2} now current,
+    {altim.word} {altim|spoken}.“ Was tust du?
+  options:
+    - "Den Höhenmesser zurücklesen und sofort auf {altim} {altim.unit} einstellen."
+    - "Nichts – der neue Höhenmesser gilt erst nach dem Start, bis dahin bleibt der alte Wert eingestellt."
+    - "Anhalten und die ATIS komplett neu hören."
+    - "„roger“ sagen und den alten Wert behalten."
+  answer: 0
+  explain: >-
+    Ein neuer ATIS-Buchstabe heißt: Es gibt eine neue Ausgabe, meist weil sich etwas geändert hat. Den
+    Höhenmesser liest du immer zurück und stellst ihn gleich ein. Wenn Zeit ist, hörst du die neue ATIS noch
+    einmal auf dem zweiten Funkgerät.
+
+- id: m3-l1-letter-says
+  type: choice
+  vars:
+    atis: { letter: true }
+  prompt: Du hörst „… information **{atis}** …“. Was sagt dir der Buchstabe?
+  options:
+    - Nur, welche Ausgabe der ATIS das ist – über Wetter und Bahn sagt er nichts.
+    - Wie gut das Wetter ist – je weiter hinten im Alphabet, desto schlechter.
+    - Welche Bahn aktiv ist, zum Beispiel Alfa für die Bahn mit der niedrigsten Nummer.
+    - Dass der Platz geöffnet ist – bei geschlossenem Platz fehlt der Buchstabe.
+  answer: 0
+  explain: >-
+    Der Buchstabe ist nur der Name der Ausgabe, kein Wert. Wetter, Bahn und Luftdruck stehen im Text der ATIS. Er
+    hilft nur beim Vergleich: Ist es dieselbe Ausgabe wie die, die der Lotse als aktuell kennt?
+
+- id: m3-l1-new-issue
+  type: choice
+  prompt: >-
+    Der amtliche Wetterbericht wird erneuert, aber Wind, Sicht, Wolken, Temperatur und Luftdruck sind genau wie vorher.
+    Wird die ATIS neu aufgenommen und bekommt den nächsten Buchstaben?
+  options:
+    - Ja – jeder neue amtliche Wetterbericht bekommt eine neue Ausgabe, auch wenn sich kein Wert geändert hat.
+    - Nein – eine neue Ausgabe gibt es nur, wenn sich mindestens ein Wert ändert.
+    - Nein – der Buchstabe wird nur um Mitternacht UTC weitergezählt.
+    - Nur, wenn ein Pilot am Funk darum bittet.
+  answer: 0
+  explain: >-
+    Nach der FAA-Vorschrift (JO 7110.65, 2-9-2) wird bei jedem neuen amtlichen Wetter neu aufgenommen, ob sich die
+    Werte ändern oder nicht. Auch Bahnwechsel, ein anderes Anflugverfahren oder neue NOTAMs bringen eine neue Ausgabe.
+
+- id: m3-l1-letter-circle
+  type: sequence
+  prompt: >-
+    Die ATIS wurde viermal nacheinander neu aufgenommen. Bring die Ausgaben in die Reihenfolge, in der sie gesendet
+    wurden – die älteste zuerst.
+  items:
+    - information X-ray
+    - information Yankee
+    - information Zulu
+    - information Alfa
+  explain: >-
+    Die Buchstaben laufen von Alfa bis Zulu und beginnen danach wieder bei Alfa. Nach Zulu kommt also Alfa – „Alfa“
+    ist hier die jüngste Ausgabe, obwohl sie im Alphabet ganz vorn steht.
+
+- id: m3-l1-which-current
+  type: choice
+  prompt: >-
+    Um 1450 Zulu hast du „information X-ray“ gehört und aufgeschrieben. Seitdem hörst du auf Tower: „attention all
+    aircraft, information Zulu current“, und eine Weile später: „attention all aircraft, information Alfa current“.
+    Welche Ausgabe ist jetzt die aktuelle?
+  options:
+    - „Alfa“ – nach Zulu beginnt die Reihe wieder von vorn, und es ist die zuletzt ausgerufene Ausgabe.
+    - „Zulu“ – es ist der letzte Buchstabe im Alphabet, also die höchste Ausgabe.
+    - „X-ray“ – deine Ausgabe, denn du hast sie als Erste gehört.
+    - Alle drei – Tower nennt immer alle Ausgaben, die noch nicht abgelaufen sind.
+  answer: 0
+  explain: >-
+    Die zuletzt ausgerufene Ausgabe gilt, hier „Alfa“. Du kannst sie nicht aus der Reihenfolge im Alphabet ablesen, denn
+    nach „Zulu“ kommt wieder „Alfa“. Deine „X-ray“ ist zwei Ausgaben alt: Du hörst die ATIS neu oder lässt dir die Werte
+    geben.
+
+# ------------------------------------------------------------ Lektion 2: Crew Chief
+- id: m3-l2-channel
+  type: choice
+  exam: true
+  layer: community
+  prompt: Wie sprichst du vor dem Anlassen mit dem Crew Chief, der neben deinem Flugzeug steht?
+  options:
+    - Über ein Kabel-Intercom, das er außen am Flugzeug einsteckt.
+    - Über die Ground-Frequenz – so kann Ground das Anlassen mitverfolgen und gleich die Rollfreigabe geben.
+    - Über Guard, weil das am Boden die einzige immer offene Frequenz ist.
+    - Gar nicht über Ton – vor dem Anlassen läuft alles über Handzeichen.
+  answer: 0
+  explain: >-
+    Der Crew Chief steckt sein Headset per Kabel am Flugzeug ein. So hört nur ihr beide mit, und die
+    Funkfrequenzen bleiben frei. Handzeichen kommen dazu, sobald das Kabel ab ist.
+
+- id: m3-l2-match-cc
+  type: match
+  layer: community
+  prompt: Was meldet dir der Crew Chief?
+  pairs:
+    - [clear fore and aft, Vor dem Einlauf und hinter der Düse ist niemand]
+    - [fire guard posted, Ein Helfer steht mit dem Feuerlöscher bereit]
+    - [chocks in place, Die Bremsklötze liegen]
+    - [clear to start, Du darfst anlassen]
+
+- id: m3-l2-order
+  type: sequence
+  layer: community
+  prompt: Bring den Kaltstart mit dem Crew Chief in die richtige Reihenfolge.
+  items:
+    - Intercom-Check
+    - "Crew Chief: Bereich frei, Brandwache, Chocks liegen"
+    - Anlassen
+    - Checks mit laufendem Triebwerk
+    - Chocks weg
+    - Kabel ab
+    - Rollen auf Zeichen des Crew Chiefs
+  explain: >-
+    Erst die Verbindung, dann die Sicherheit (frei, Brandwache, Chocks), dann das Anlassen. Die
+    Bremsklötze kommen erst weg, wenn alles läuft und geprüft ist.
+
+- id: m3-l2-anatomy-clear
+  type: anatomy
+  exam: true
+  call: m3-crew-chief-start
+  transmission: 3
+  target: instruction
+  layer: community
+  prompt: Welcher Teil erlaubt dir das Anlassen?
+  explain: „clear to start“ – vorher hat der Crew Chief geprüft, dass niemand gefährdet ist.
+
+- id: m3-l2-build-ready
+  type: build
+  call: m3-crew-chief-start
+  transmission: 2
+  layer: community
+  prompt: Deine Checks sind durch. Sag dem Crew Chief, dass du anlassen willst.
+  distractors: [request taxi, "{airfield}"]
+  vars:
+    airfield: { oneOf: [Ground, Tower] }
+  explain: Kurz und direkt auf dem Intercom. Ground und Tower haben mit dem Anlassen am Kabel nichts zu tun.
+
+- id: m3-l2-after-disconnect
+  type: choice
+  exam: true
+  layer: community
+  prompt: Der Crew Chief meldet „chocks removed, disconnecting“. Wie verständigt ihr euch jetzt?
+  options:
+    - Nur noch per Handzeichen, bis er dich aus der Parkposition winkt.
+    - Weiter über Intercom – das Kabel ist lang genug und reicht bis zum Rollweg vor der Parkposition.
+    - Über die Ground-Frequenz, auf der der Crew Chief mithört.
+    - Gar nicht mehr – du rollst ohne weiteres Zeichen los.
+  answer: 0
+  explain: >-
+    Mit abgezogenem Kabel bleibt nur die Sicht. Rolle erst los, wenn der Crew Chief dich ausdrücklich
+    herauswinkt – und Ground dir die Rollfreigabe gegeben hat.
+
+- id: m3-l2-fire
+  type: choice
+  layer: community
+  prompt: >-
+    Beim Anlassen macht der Crew Chief mit einem Arm hektisch eine liegende Acht und zeigt mit dem
+    anderen auf dein Triebwerk. Was heißt das?
+  options:
+    - Feuer – jetzt das Notverfahren für Brand beim Anlassen nach Checkliste.
+    - Triebwerk läuft sauber – du kannst mit den Checks weitermachen.
+    - Die Bremsklötze sind entfernt – du kannst gleich rollen.
+    - Du sollst den Tower rufen, weil Verkehr auf dem Rollweg ist.
+  answer: 0
+  explain: >-
+    Die liegende Acht ist das Handzeichen für Feuer. Mit der anderen Hand zeigt der Crew Chief auf die
+    Brandstelle. Jetzt zählt das Notverfahren deines Flugzeugs.
+
+- id: m3-l2-sign-epu
+  type: match
+  prompt: >-
+    Ohne Intercom verständigen sich Pilot und Bodencrew bei der F-16 mit Zusatzzeichen. Welches Zeichen
+    bedeutet was?
+  pairs:
+    - ["Zwei Finger hoch, Hand drehen", EPU-Funktionscheck]
+    - ["Arm heben, Faust, Rührbewegung", Flugsteuerung frei]
+    - ["Arm waagerecht, Hand nach vorn knicken", Bremsencheck]
+    - [Haken senken, Bremsenverlust beim Rollen]
+    - ["Pistole mit Finger und Daumen, Kopfschütteln", Bordkanonencheck]
+  explain: >-
+    Diese sechs Zeichen stehen in AFMAN 11-2F-16 V3, Abs. 3.2.1–3.2.6 (die sechste ist die EPU-Aktivierung:
+    „Bleib weg“ und Hände vor die Sauerstoffmaske). Die Basiszeichen wie Halt und Chocks stehen in AFMAN 11-218.
+
+- id: m3-l2-ack-first
+  type: choice
+  prompt: >-
+    Du sitzt in der F-16 mit laufendem Triebwerk, der Crew Chief steht an den Steuerflächen. Du willst
+    die Flugsteuerung durchbewegen. Was gilt?
+  options:
+    - Erst bewegen, wenn der Crew Chief per Intercom oder Zeichen quittiert hat, dass er frei ist.
+    - Du bewegst den Stick, sobald das Triebwerk läuft – der Crew Chief sieht es ja und tritt dann zur Seite.
+    - Du fragst Ground, ob du die Flugsteuerung bewegen darfst.
+    - Du bewegst den Stick nur, wenn der Tower die Startfreigabe gegeben hat.
+  answer: 0
+  explain: >-
+    Nach AFMAN 11-2F-16 V3 (Abs. 3.2) bedienst du kein System, das die Bodencrew gefährdet, bevor du eine
+    Quittung hast. Ground und Tower sind dafür nicht zuständig.
+
+# ------------------------------------------------------------ Lektion 3: Ground
+- id: m3-l3-build-clearance-readback
+  type: build
+  call: m3-ifr-clearance
+  transmission: 2
+  prompt: Clearance hat dir die IFR-Freigabe gegeben. Lies sie zurück.
+  distractors: [request taxi, "hold short of runway {airfield.runway|spoken}"]
+  explain: >-
+    Die Freigabe kommt in fester Reihenfolge – Ziel, Route, Höhe, Abflugfrequenz, Squawk – und genau so
+    liest du sie zurück, dein Rufzeichen am Ende. Rollen und Rollhalt kommen erst danach von Ground.
+
+- id: m3-l3-clearance-items
+  type: choice
+  exam: true
+  prompt: Was steht in einer IFR-Freigabe vor dem Start? (Alles Zutreffende)
+  options:
+    - Freigabegrenze, meist der Zielplatz
+    - Route oder Abflugroute
+    - Höhe, die du zunächst hältst
+    - Abflugfrequenz und Squawk
+    - Rollweg zur Startbahn
+    - Startfreigabe
+  answer: [0, 1, 2, 3]
+  explain: >-
+    Die Streckenfreigabe sagt, wohin und wie du fliegst. Den Rollweg gibt danach Ground, die
+    Startfreigabe der Tower (FAA JO 7110.65, 4-2-1).
+
+- id: m3-l3-progressive
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+  prompt: Du stehst zum ersten Mal in {airfield.name} und kennst die Rollwege nicht. Was tust du?
+  options:
+    - Beim Rollantrag „request progressive taxi“ sagen.
+    - Dem Flugzeug vor dir folgen – es rollt bestimmt zur selben Bahn und kennt den Weg.
+    - Die Rollwege nach Gefühl abfahren und notfalls fragen.
+    - Den Tower nach dem Weg fragen.
+  answer: 0
+  explain: >-
+    Mit „progressive taxi“ führt dich Ground Abschnitt für Abschnitt. Das ist keine Schande, sondern
+    gute Praxis – besser als auf der falschen Bahn zu stehen.
+
+- id: m3-l3-build-progressive
+  type: build
+  call: m3-progressive-taxi
+  transmission: 0
+  prompt: Bitte Ground um eine Führung über den Platz.
+  distractors: [request startup, "{airfield.name} Tower"]
+  explain: Adressat, Rufzeichen, ATIS, dann der Hinweis, dass du fremd bist, und die Bitte.
+
+- id: m3-l3-anatomy-turn
+  type: anatomy
+  exam: true
+  call: m3-progressive-taxi
+  transmission: 1
+  target: instruction
+  prompt: Tippe auf den Teil, der dir sagt, wie du als Nächstes rollst.
+  explain: Bei „progressive taxi“ kommt die Anweisung stückweise – jeweils bis zur nächsten Kreuzung.
+
+- id: m3-l3-match-ground
+  type: match
+  prompt: Ordne die Begriffe beim Rollen zu.
+  pairs:
+    - [hold position, "Sofort anhalten – genau da, wo du bist"]
+    - [hold short of runway …, Vor dieser Bahn anhalten]
+    - [give way to …, Ein anderes Flugzeug zuerst vorbeilassen]
+    - [request progressive taxi, Bitte um Führung Schritt für Schritt]
+
+- id: m3-l3-input-hold
+  type: input
+  vars:
+    airfield: { pool: airfields }
+  prompt: "Während du rollst, sagt Ground: „{callsign|spoken}, hold position.“ Was antwortest du?"
+  accept: ["holding position {callsign|spoken}", "holding position"]
+  placeholder: …
+  explain: „holding position“ plus dein Rufzeichen. Die „-ing“-Form zeigt Ground, dass du stehst.
+
+- id: m3-l3-build-giveway
+  type: build
+  call: m3-give-way
+  prompt: Ground lässt dich warten. Bestätige, dass du dem anderen Flugzeug Vorfahrt gibst.
+  distractors: [roger, wilco]
+  explain: >-
+    Zurücklesen statt „roger“: Mit dem Flugzeugtyp zeigst du, dass du das richtige Flugzeug gefunden
+    hast.
+
+- id: m3-l3-hold-vs-short
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+  prompt: Was ist der Unterschied zwischen „hold position“ und „hold short of runway {airfield.runway|spoken}“?
+  options:
+    - "„hold position“: sofort stehen. „hold short“: vor Bahn {airfield.runway} halten."
+    - "Kein Unterschied – beides heißt: an der nächsten Kreuzung anhalten."
+    - "„hold position“ gilt nur für Anweisungen vom Tower, „hold short“ nur für Anweisungen von Ground."
+    - "„hold short“ heißt: kurz anhalten und dann weiterrollen."
+  answer: 0
+  explain: >-
+    „hold short“ ist ein Haltepunkt vor einer Bahn, „hold position“ ein Halt auf der Stelle. Beides
+    liest du zurück.
+
+# ------------------------------------------------------------ Lektion 4: EOR
+- id: m3-l4-no-intercom
+  type: choice
+  prompt: >-
+    Du stehst als F-16-Pilot am Bahnende, die EOR-Crew arbeitet am Flugzeug, aber ihr habt kein
+    Intercom. Was verlangt AFMAN 11-2F-16 V3?
+  options:
+    - Blickkontakt zum Chief herstellen und halten und mit Sichtzeichen arbeiten.
+    - Auf der Ground-Frequenz funken, bis die Crew fertig ist.
+    - Die Inspektion ausfallen lassen und direkt zum Tower wechseln.
+    - Das Triebwerk abstellen, bis ein Intercom-Kabel da ist.
+  answer: 0
+  explain: >-
+    Ohne Intercom gilt Sichtkontakt zum Chief und Sichtzeichen (Abs. 3.4). Ein Funkablauf am EOR ist in
+    der Vorschrift nicht vorgesehen.
+
+- id: m3-l4-hands
+  type: choice
+  exam: true
+  prompt: >-
+    Du sitzt in der F-16 am Bahnende. Die EOR-Crew prüft dein Flugzeug und macht die Waffen scharf. Du
+    willst in der Zeit schnell den nächsten Punkt der Checkliste am UFC eingeben. Was gilt?
+  options:
+    - Hände sichtbar halten, keine UFC- oder HUD-Eingaben, solange jemand unter dem Flugzeug ist.
+    - Du darfst eingeben, solange der Master-Arm-Schalter auf SAFE steht.
+    - Du darfst alles bedienen, was nicht direkt mit den Waffen zu tun hat.
+    - Du gibst der Crew ein Zeichen und tippst trotzdem weiter.
+  answer: 0
+  explain: >-
+    AFMAN 11-2F-16 V3 (Abs. 3.4, T-1) verlangt sichtbare Hände während Quick Check und Arming. Das Korea-BEM
+    ergänzt: keine UFC- und HUD-Eingaben, solange Personal unter dem Flugzeug ist. Waffenschalter safe.
+
+- id: m3-l4-order
+  type: sequence
+  exam: true
+  prompt: >-
+    Bring den Ablauf am Bahnende einer F-16 in die richtige Reihenfolge (nach AFMAN 11-2F-16 V3 und
+    Korea-BEM).
+  items:
+    - Anhalten, Waffenschalter auf safe
+    - Hände in Sicht halten
+    - Crew prüft und bewaffnet
+    - Before-Takeoff-Checkliste
+    - Tower rufen – ready for departure
+  explain: >-
+    Erst die Sicherheit (safe, Hände), dann arbeitet die Crew. Die Checkliste folgt, wenn die Crew fertig
+    ist, und der Tower kommt zuletzt.
+
+- id: m3-l4-mutual
+  type: choice
+  prompt: >-
+    Vier F-16 stehen nacheinander am Bahnende. Was sollen die Flugteilnehmer nach AFMAN 11-2F-16 V3 (Abs.
+    3.4.2) untereinander tun?
+  options:
+    - Sich gegenseitig auf richtige Konfiguration und Auffälligkeiten prüfen.
+    - Per Funk die Waffenstationen des Vordermanns durchgeben.
+    - Nichts – die EOR-Crew prüft allein.
+    - Nur der Lead wird vom Wingman geprüft.
+  answer: 0
+  explain: >-
+    Gegenseitige Sichtkontrolle im Flight. Wer etwas sieht, sagt es dem Piloten oder dem Lead.
+
+- id: m3-l4-taxi-past
+  type: choice
+  prompt: >-
+    Du rollst auf dem Weg zur Bahn an einer F-16 vorbei, die gerade mit nach vorn feuernden Waffen
+    scharf gemacht wird. Was verlangt AFMAN 11-2F-16 V3 (Abs. 3.4.1)?
+  options:
+    - Nicht vor dem Flugzeug vorbeirollen, das mit Vorwärtswaffen bewaffnet wird.
+    - Die Bahn per Funk freigeben lassen und dicht vorbeirollen.
+    - Nur mit Nachbrenner vorbeirollen, damit es schnell geht.
+    - Es gibt keine Regel – die Crew passt auf.
+  answer: 0
+  explain: Wer vor ein Flugzeug mit scharf werdenden Vorwärtswaffen rollt, bringt die Crew in Gefahr.
+
+- id: m3-l4-terms
+  type: match
+  prompt: Was bedeutet was am Bahnende?
+  pairs:
+    - [EOR, End of Runway – Ort der Inspektion vor dem Start]
+    - [last chance, Name des EOR-Bereichs im Korea-BEM]
+    - [Quick Check, Letzte Sichtprüfung durch die Crew]
+    - [Arming, Waffen scharf machen]
+    - [De-Arming, Waffen nach der Landung wieder sichern]
+
+# ------------------------------------------------------------ Lektion 5: Tower
+- id: m3-l5-match-tower
+  type: match
+  prompt: Was darfst du nach welcher Anweisung?
+  pairs:
+    - [hold short of runway …, Vor der Bahn stehen bleiben]
+    - [line up and wait, Auf die Bahn rollen und dort warten]
+    - [cleared for takeoff, Starten]
+
+- id: m3-l5-line-up
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    {airfield.name} Tower: „{callsign|spoken}, runway {airfield.runway|spoken}, line up and wait.“ Was
+    tust du?
+  options:
+    - Auf die Bahn rollen, ausrichten, zurücklesen – und auf die Startfreigabe warten.
+    - Auf die Bahn rollen, ausrichten und sofort starten – „line up and wait“ ist die Startfreigabe für den Flight.
+    - Am Rollhalt stehen bleiben, bis der Tower die Bahn freigibt.
+    - „wilco“ sagen und starten, sobald die Bahn frei ist.
+  answer: 0
+  explain: >-
+    „line up and wait“ ist ausdrücklich KEINE Startfreigabe. Gestartet wird erst nach „cleared for
+    takeoff“.
+
+- id: m3-l5-build-ready
+  type: build
+  call: m3-ready-departure
+  transmission: 0
+  prompt: Dein Flight steht am Rollhalt. Melde euch beim Tower abflugbereit.
+  distractors: [ready for takeoff, "{airfield.name} Ground"]
+  explain: >-
+    „ready for departure“, nicht „ready for takeoff“ – das Wort „takeoff“ bleibt der Freigabe
+    vorbehalten. Und am Rollhalt sprichst du schon mit dem Tower.
+
+- id: m3-l5-build-takeoff-readback
+  type: build
+  call: m3-takeoff-clearance
+  prompt: Du stehst auf der Bahn, der Tower gibt dir die Startfreigabe. Lies sie zurück.
+  distractors: [roger, "wind {wx.wind|spoken}"]
+  explain: Bahn und „cleared for takeoff“, dann dein Rufzeichen. Den Wind musst du nicht zurücklesen.
+
+- id: m3-l5-input-takeoff
+  type: input
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    „{callsign|spoken}, wind calm, runway {airfield.runway|spoken}, cleared for takeoff.“ – Lies
+    zurück.
+  accept:
+    - "runway {airfield.runway|spoken} cleared for takeoff {callsign|spoken}"
+    - "cleared for takeoff runway {airfield.runway|spoken} {callsign|spoken}"
+    - "runway {airfield.runway} cleared for takeoff {callsign|spoken}"
+    - "cleared for takeoff runway {airfield.runway} {callsign|spoken}"
+    # Rufzeichen vorn lässt jeder Lotse gelten (E3-07); üblich ist es am Ende
+    - "{callsign|spoken} runway {airfield.runway|spoken} cleared for takeoff"
+    - "{callsign|spoken} cleared for takeoff runway {airfield.runway|spoken}"
+  explain: Runway und Freigabe, üblich mit dem Rufzeichen am Ende.
+
+- id: m3-l5-unsure
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Auf der Tower-Frequenz hörst du „… cleared for takeoff“ – den Anfang hat ein Pfeifton
+    verschluckt. Du stehst auf der Bahn {airfield.runway}. Was tust du?
+  options:
+    - "Stehen bleiben und nachfragen: „{airfield.name} Tower, {callsign|spoken}, say again.“"
+    - Losrollen – du stehst auf der Bahn und bist als Nächster dran, also war die Freigabe sicher für dich.
+    - Losrollen und dabei „rolling“ melden.
+    - Auf den Flight warten und mit ihm gemeinsam starten.
+  answer: 0
+  explain: >-
+    Eine Startfreigabe, die du nicht sicher dir zuordnen kannst, ist keine. Genau so begann Teneriffa
+    1977. Nachfragen kostet Sekunden, Raten kann alles kosten.
+
+- id: m3-l5-interval
+  type: choice
+  exam: true
+  prompt: >-
+    Zwei F-16 der US Air Force starten nacheinander, die zweite Maschine trägt scharfe Bomben (keine
+    BDU-33, keine Raketen). Welches Mindestintervall gilt nach AFMAN 11-2F-16 V3?
+  options:
+    - 20 Sekunden
+    - 10 Sekunden
+    - 15 Sekunden – die gelten bei Waffen immer
+    - 5 Sekunden, weil beide Maschinen im selben Element starten
+  answer: 0
+  explain: >-
+    Grundwert 10 Sekunden, 15 mit Nachbrenner. Bei scharfen Luft-Boden-Waffen (außer BDU-33, Raketen
+    und 20-mm-Munition) und beim Join-up „on top“ (über den Wolken) mindestens 20 Sekunden (Abs. 3.6.8).
+
+- id: m3-l5-abort-call
+  type: choice
+  prompt: >-
+    Du startest als Nummer 2 einer F-16-Rotte und brichst im Startlauf ab. Das Flugzeug verfängt sich am
+    Pistenende im Fangseil. Was sagst du?
+  options:
+    - "„Cable, Cable, Cable“"
+    - "„Barrier, Barrier, Barrier“"
+    - "„Abort, abort, abort“"
+    - "Nichts – bei einem Seilfang meldet der Tower."
+  answer: 0
+  explain: >-
+    „Cable, Cable, Cable“ bei Seil, „Barrier, Barrier, Barrier“ bei einem Netz. Davor, soweit möglich:
+    Rufzeichen und Absicht (AFMAN 11-2F-16 V3, Abs. 7.4.1). Die Nachfolgenden ändern ihren Startlauf
+    oder brechen ab.
+
+- id: m3-l5-ack-clearance
+  type: choice
+  exam: true
+  prompt: >-
+    Zwei F-16 der US Air Force fliegen gemeinsam ab. Vor dem Rollen kommt die erste ATC-Freigabe, die
+    Flugfreigabe; der Lead hat sie zurückgelesen. Was gilt für die Nummer 2 nach AFMAN 11-2F-16 V3?
+  options:
+    - Jeder Flugteilnehmer quittiert die erste Freigabe, die Nummer 2 mit „Two“.
+    - Nur der Lead quittiert, die anderen schweigen immer.
+    - Die Nummer 2 liest die komplette Freigabe wörtlich zurück.
+    - Der Flügel quittiert gar nichts, weil der Tower nur mit dem Lead spricht.
+  answer: 0
+  explain: >-
+    Alle Flugteilnehmer bestätigen die erste ATC-Freigabe (AFMAN 11-2F-16 V3, Abs. 3.30.2), laut Korea-BEM
+    die Flugfreigabe. Spätere Anweisungen nur auf Aufforderung des Leads. Eine eigene Regel im Korea-BEM:
+    Tower-Freigaben auf die Bahn wie „on to hold“ oder „cleared for takeoff“ werden immer quittiert. In BMS
+    und DCS spricht ATC dagegen nur mit dem Lead.
+
+# ------------------------------------------------------------ Lektion 6: Departure
+- id: m3-l6-build-checkin
+  type: build
+  call: m3-departure-checkin
+  transmission: 0
+  prompt: Du steigst nach dem Start. Mach deinen Erstanruf bei Departure.
+  distractors: ["{airfield.name} Tower", request startup]
+  explain: Adressat, Rufzeichen, aktuelle Höhe, freigegebene Höhe. Den Tower hast du schon verlassen.
+
+- id: m3-l6-radar-contact
+  type: choice
+  prompt: Departure sagt „radar contact“. Was heißt das?
+  options:
+    - Der Lotse hat dich auf dem Radar identifiziert und führt dich ab jetzt.
+    - Der Lotse sieht ein anderes Flugzeug in deiner Nähe auf dem Radar.
+    - Du hast die Platzzone verlassen und darfst jetzt dein eigenes Radar einschalten und benutzen.
+    - Du bist aus der Platzzone heraus und sollst dich beim AWACS melden.
+  answer: 0
+  explain: Ab „radar contact“ bist du unter Radarkontrolle. Vorher weiß der Lotse nur, dass du da sein solltest.
+
+- id: m3-l6-input-fl
+  # Als getippter Funkspruch (statt Freitext), damit Varianten wie „FL250“ zählen.
+  type: call
+  call: m3-departure-checkin
+  transmission: 2
+  prompt: Du steigst nach dem Start, Departure gibt dir eine neue Höhe. Lies sie zurück.
+  hint: Anweisung mit Flight Level – Rufzeichen
+  explain: Die Höhe wörtlich, Rufzeichen am Ende. „FL{fl}0“ oder „flight level {fl|spoken} zero“ – beides geht.
+
+- id: m3-l6-flight-level
+  type: choice
+  exam: true
+  vars:
+    fl: { int: [18, 28] }
+  prompt: Was ist „flight level {fl|spoken} zero“?
+  options:
+    - "Rund {fl}.000 Fuß bei Standard-Luftdruck (29.92 inHg)."
+    - "Genau {fl}0 Fuß über Grund, gemessen mit dem Radarhöhenmesser des Flugzeugs."
+    - "{fl}.000 Meter über dem Meer – Flight Levels sind metrisch."
+    - "Die {fl}. Höhenstufe der Warteschleife über dem Platz."
+  answer: 0
+  explain: >-
+    Über der Übergangshöhe stellen alle den Standard-Luftdruck ein. Die Anzeige ist dann für alle gleich
+    falsch – und genau deshalb sicher gestaffelt. Die Zahl sind Hunderte Fuß: FL {fl}0 = {fl}.000 ft.
+
+- id: m3-l6-contact-monitor
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Du rollst zum Rollhalt. Ground sagt: „{callsign|spoken}, monitor {airfield.name} Tower.“ Was tust du?
+  options:
+    - Auf die Tower-Frequenz wechseln und zuhören, bis der Tower dich ruft.
+    - Auf die Tower-Frequenz wechseln und dich sofort mit Rufzeichen melden.
+    - Auf Ground bleiben und die Tower-Frequenz nur zusätzlich mithören.
+    - Mit „monitor“ quittieren und warten, bis Ground dich noch einmal schickt.
+  answer: 0
+  explain: >-
+    „monitor“ heißt wechseln und zuhören, ohne dich zu melden – der Tower ruft dich, wenn er dich
+    braucht. Bei „contact“ meldest du dich dagegen sofort selbst.
+
+- id: m3-l6-match-frequency
+  type: match
+  prompt: Ordne jede Anweisung zu dem zu, was du danach tust.
+  pairs:
+    - ["contact departure …", Wechseln und dich dort melden]
+    - ["monitor tower …", "Wechseln und nur zuhören, bis du gerufen wirst"]
+    - [remain this frequency, Bleiben – kein Wechsel]
+    - ["change to my frequency …", Derselbe Lotse auf einer anderen Frequenz]
+    - ["push (Kanal) – vom Lead", "Ohne Antwort wechseln, dort prüft der Lead mit „check“"]
+  explain: >-
+    contact, monitor, remain this frequency und change to my frequency kommen von der Flugsicherung
+    (FAA JO 7110.65, 2-1-17). push ist Brevity und gilt im eigenen Flight.
+
+- id: m3-l6-formation-squawk
+  type: choice
+  exam: true
+  vars:
+    sq: { number: squawk }
+  prompt: >-
+    Ihr fliegt zu zweit in enger Formation. Departure sagt zum Lead: „{lead|spoken}, squawk
+    {sq|spoken}.“ Du bist Nummer 2. Was stellst du ein?
+  options:
+    - Standby – den Code squawkt nur der Lead.
+    - "Ebenfalls {sq} – jeder in der Formation setzt den zugewiesenen Code."
+    - 1200, den VFR-Code (für Sichtflug), weil nicht du, sondern der Lead geführt wird.
+    - 7600, weil du nicht selbst mit Departure sprichst.
+  answer: 0
+  explain: >-
+    In einer Standard-Formation (höchstens 1 NM und 100 ft vom Lead) ist die Formation für die
+    Flugsicherung ein einziger Verkehr. Nur der Lead squawkt, alle anderen stehen auf standby
+    (FAA JO 7110.65, 2-1-13). Eigene Codes gibt es erst, wenn sich die Formation aufteilt. 1200 ist der
+    US-Code für VFR-Flüge ohne Zuweisung, 7600 heißt Funkausfall.

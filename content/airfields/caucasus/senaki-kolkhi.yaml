@@ -1,0 +1,20 @@
+id: senaki-kolkhi
+name: Senaki-Kolkhi
+map: caucasus
+icao: UGKS
+elevationFt: 43
+runways: ["09/27"]
+atc: { uhf: 261.0, vhf: 132.0, hf: 4.3, vhfLow: 40.6 }
+tacan: 31X
+ils: "ILS 09: 108.90"
+# Mitgelieferte Kneeboard-Karten (DCS zeigt sie auf dieser Karte im Kneeboard an)
+charts:
+  - { sim: dcs, name: "Visual Operation Chart RWY 09/27 (VAD 06)", path: "Mods/terrains/Caucasus/Kneeboard/06_VAD_UGKS_Senaki_Kolkhi.png" }
+  - { sim: dcs, name: "Aerodrome Chart (GND 06), Seite 1", path: "Mods/terrains/Caucasus/Kneeboard/06_GND_UGKS_Senaki_Kolkhi_18_P1.png" }
+  - { sim: dcs, name: "Zusatzblatt PAR, Seite 2", path: "Mods/terrains/Caucasus/Kneeboard/06_PAR_UGKS_Senaki_Kolkhi_18_P2.png" }
+verified: dcs-data
+notes:
+  - Ausweichplatz nahe Kutaisi, geteilter Luftraum.
+  - TACAN und ILS laut DCS-Funkfeuerdaten (Mods/terrains/Caucasus/Beacons.lua) bestätigt.
+  - Platzhöhe 43 ft (13 m) und ILS auf RWY 09 laut mitgelieferter Karte VAD 06, passt zu Beacons.lua (13 m).
+  - "HF und tiefes VHF (Flugplatzfenster der F10-Karte) laut DCS-Funkdaten (radio.lua der Karte)."

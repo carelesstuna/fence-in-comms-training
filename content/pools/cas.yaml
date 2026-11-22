@@ -1,0 +1,64 @@
+# Würfelpools für den CAS-Einsatzraum (Variable { casArea: true }).
+# Der Generator (src/core/random/cas.ts) würfelt daraus Ziel, Bedrohung und Waffe und leitet alle
+# 9-Line-Werte aus einer gemeinsamen Lage ab. Namen der Punkte sind frei erfunden.
+#
+# Unsicher (⚠): Mindesthöhen über Grund je Bedrohung sind eine Community-Faustregel (Hoggit-Wiki JTAC:
+# MANPADS über 12.000 ft, AAA über 7.000 ft), die Danger-Close-Schwellen sind vereinfacht und nicht aus
+# den Risk-Estimate-Tabellen der JP 3-09.3 übernommen (nicht gelesen). Der Ruf beim Bombenwurf
+# („bombs away“) ist verbreitet, aber nicht als Brevity belegt.
+
+# Benannte Punkte für IP (Line 1) und Egress (Line 9)
+ips:
+  - Granite
+  - Copper
+  - Harbor
+  - Juniper
+  - Lantern
+  - Marble
+  - Nugget
+  - Pepper
+  - Quarry
+  - Saddle
+  - Timber
+  - Walnut
+  - Willow
+  - Bluebird
+  - Cobalt
+  - Meadow
+
+# Line 5: so, wie der JTAC das Ziel beschreibt. keyword (und alt) zählen bei der Mitschrift.
+targets:
+  - { text: "two BMP-2 in the open", count: 2, keyword: BMP, alt: [BMPs, IFV], kind: armor, bda: "two BMP-2 destroyed" }
+  - { text: "three T-72 in a tree line", count: 3, keyword: T-72, alt: [tanks, tank, T72], kind: armor, bda: "three T-72 destroyed" }
+  - { text: "two BTR-80 on the road", count: 2, keyword: BTR, alt: [APC, APCs], kind: armor, bda: "two BTR-80 destroyed" }
+  - { text: "one technical vehicle", count: 1, keyword: technical, alt: [pickup, truck], kind: vehicle, bda: "one technical destroyed" }
+  - { text: "two trucks at a road junction", count: 2, keyword: trucks, alt: [truck, vehicles], kind: vehicle, bda: "two trucks destroyed" }
+  - { text: "infantry squad in a tree line", count: 1, keyword: infantry, alt: [troops, squad, dismounts], kind: infantry, bda: "infantry squad neutralized" }
+  - { text: "mortar position, two tubes", count: 2, keyword: mortar, alt: [mortars], kind: artillery, bda: "mortar position destroyed" }
+
+# Bedrohung im Zielgebiet (Situation Update, Remarks). agl = Faustregel für die Mindesthöhe über Grund (⚠).
+threats:
+  - { name: SA-18, kind: manpads, agl: 12000 }
+  - { name: SA-24, kind: manpads, agl: 12000 }
+  - { name: ZSU-23-4, kind: aaa, agl: 7000 }
+  - { name: ZU-23, kind: aaa, agl: 7000 }
+  - { name: SA-13, kind: sam-ir, agl: 12000 }
+  - { name: SA-9, kind: sam-ir, agl: 12000 }
+
+# Radargelenkte SAM: die Systeme, gegen die SEAD-Flights eine HARM schießen (MAGNUM, SLAPSHOT)
+sams: [SA-6, SA-8, SA-11, SA-15]
+
+# Waffen je Flugzeug (Game Plan „effect“, Ruf beim Auslösen)
+weapons:
+  - { id: gbu12, name: GBU-12, aircraft: [a10, f16], class: bomb, guidance: laser, effect: "one GBU-12", call: "bombs away" }
+  - { id: gbu38, name: GBU-38, aircraft: [a10, f16], class: bomb, guidance: gps, effect: "one GBU-38", call: "bombs away" }
+  - { id: mk82, name: Mk-82, aircraft: [a10, f16], class: bomb, effect: "two Mk-82", call: "bombs away" }
+  - { id: agm65, name: AGM-65, aircraft: [a10, f16], class: missile, guidance: ir, effect: "one Maverick", call: rifle }
+  - { id: gau8, name: 30 mm, aircraft: [a10], class: gun, effect: "guns, one pass", call: guns }
+  - { id: m61, name: 20 mm, aircraft: [f16], class: gun, effect: "guns, one pass", call: guns }
+  - { id: hellfire, name: AGM-114, aircraft: [ah64], class: missile, guidance: laser, effect: "one Hellfire", call: rifle }
+  - { id: hydra, name: rockets, aircraft: [ah64, a10], class: rocket, effect: "rockets, one pass", call: rockets }
+  - { id: m230, name: 30 mm, aircraft: [ah64], class: gun, effect: "guns, one pass", call: guns }
+
+# Danger Close, wenn die Freunde näher am Ziel sind als diese Schwelle (Meter, vereinfacht ⚠)
+dangerClose: { bomb: 500, missile: 300, rocket: 300, gun: 200 }

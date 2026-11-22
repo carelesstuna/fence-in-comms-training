@@ -1,0 +1,150 @@
+# Spur W, Szenario S1 (Lektion w-l3): Alarmstart mit einer Leitstelle am Boden statt AWACS.
+# Ablauf: Leitstelle einstellen → Scramble mit Vector/Angels/Buster → Bogey Dope → Tally → Pancake mit
+# Pigeons. Brevity laut ATP 1-02.1 (2020/21); die Gesprächsformen sind Beispiele (community), wie sie auf
+# Servern mit menschlichem GCI und mit SkyEye üblich sind.
+# Gewürfelt: Leitstelle, ihr Kanal (A oder C) und ihre VHF-Frequenz (100–156 MHz wie SCR-522), Lage (eine
+# feindliche Gruppe), Steighöhe, Pigeons. Der Vector ist ein Abfangkurs (`pic.g1.cutoff`); auf ihm bleibt die
+# Peilung zur Gruppe gleich, und beim Bogey Dope ist die Entfernung halbiert (`pic.g1.braaLater`).
+id: w-s1-scramble-gci
+title: Alarmstart mit {gci}
+summary: Eine Leitstelle am Boden schickt dich los – Kurs, Höhe, Tempo, dann Bogey Dope, Tally und mit Pancake nach Hause.
+layer: community
+as: lead
+sources:
+  - title: "ATP 1-02.1 Multi-Service Brevity Codes (Mai 2020, Change 1 April 2021) – SCRAMBLE S. 54, VECTOR S. 68, PANCAKE S. 46, BUSTER, ANGELS, BOGEY DOPE, TALLY, PIGEONS"
+  - title: "DCS P-51D Flight Manual – SCR-522-A: 100–156 MHz, vier Kanäle, A für Leitstelle, B für Tower (S. 94)"
+  - title: "SkyEye Player Guide (Bogey Dope, Vector, Picture über SRS)"
+    url: https://github.com/dharmab/skyeye/blob/main/docs/PLAYER.md
+  - title: "Tempest's Blue Flash: Serverbriefing (GCI je Seite, EWR statt AWACS)"
+vars:
+  gci: { pool: callsigns.gci }
+  gch: { oneOf: [A, A, C] }
+  gf: { number: vhf, range: [100, 155.95] }
+  pic: { geo: true, groups: 1, id: hostile }
+  ang: { number: angels, range: [15, 30] }
+  pb: { number: bearing }
+  pr: { oneOf: [{ text: "25", spoken: twenty-five }, { text: "40", spoken: forty }, { text: "55", spoken: fifty-five }] }
+kneeboard:
+  title: "Comm Card {flight} – Alarmrotte"
+  rows:
+    - { label: "Leitstelle (GCI)", value: "{gci}" }
+    - { label: "Leitstelle – Kanal", value: "{gch}" }
+    - { label: "Leitstelle – Frequenz (VHF)", value: "{gf}" }
+    - { label: "Tower – Kanal", value: "B" }
+    - { label: "Auftrag", value: "Alarmrotte – Start auf Befehl der Leitstelle" }
+  where:
+    dcs: >-
+      Missionsbriefing bzw. Comm Card im Kneeboard. In P-51D, P-47D, Spitfire und Mosquito drückst du den Kanalknopf
+      A–D (die Frequenz dahinter legt die Mission fest), in Bf 109 und Fw 190 wählst du die Stellung am FuG 16ZY laut
+      Briefing.
+    il2: "IL-2 hat kein Funkgerät; die Leitstelle ist ein SRS-Kanal laut Serverinfo."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – den Wert liefern Briefing oder Serverinfo."
+steps:
+  - stage: Alarm
+    tune: { name: "{gci} (GCI)", freq: "{gf}", channel: "{gch}" }
+    situation: >-
+      Du sitzt mit deinem Flight in Bereitschaft. Laut Missionsbriefing führt heute kein AWACS, sondern die
+      Leitstelle am Boden. Stell sie ein und hör zu.
+    hear:
+      - speaker: "{gci}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{gci}", role: callsign }
+          - { text: scramble, role: brevity, note: "SCRAMBLE – so schnell wie möglich starten." }
+          - { text: "vector {pic.g1.cutoff|spoken}", role: brevity, note: "Abfangkurs nach dem Start: {pic.g1.cutoff}. Die Leitstelle hält vor, wohin die Gruppe fliegt." }
+          - { text: "angels {ang|spoken}", role: value, note: "Steig auf {ang}.000 ft." }
+          - { text: buster, role: brevity, note: Volle Dauerleistung ohne Nachbrenner. }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Nur das Rufzeichen – dann losrollen. Kurs {pic.g1.cutoff}, angels {ang}, buster: Das fliegst du,
+      zurücklesen musst du es nicht.
+
+  - stage: Steigflug
+    situation: Ein paar Minuten nach dem Start bist du auf Kurs und im Steigflug. Frag die Leitstelle, was vor dir ist.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{gci}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: bogey dope, role: brevity, critical: true }
+    reply:
+      - speaker: "{gci}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{gci}", role: callsign }
+          - { text: "group BRAA {pic.g1.braaLater|spoken}", role: value, note: "Von dir aus: {pic.g1.braaLater}. Auf dem Abfangkurs bleibt die Peilung zur Gruppe gleich, nur die Entfernung schrumpft." }
+          - { text: "{pic.g1.alt|spoken}", role: value }
+          - { text: "{pic.g1.aspect}", role: brevity }
+          - { text: hostile, role: brevity }
+
+  - stage: Steigflug
+    situation: Die Leitstelle hat geantwortet.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Gruppe in BRAA {pic.g1.braaLater}, {pic.g1.alt}, {pic.g1.aspect} – gerechnet von dir aus. Dein Kurs
+      ({pic.g1.cutoff}) ist der Abfangkurs, die Gruppe selbst peilst du auf {pic.g1.braaLater.bearing}. Ein Bullseye
+      braucht die Leitstelle dafür nicht: Sie führt nur dich.
+
+  - stage: Tally
+    situation: Vor dir tauchen Punkte am Himmel auf – das ist die Gruppe. Was meldest du der Leitstelle?
+    you:
+      mode: choice
+      wrong:
+        - "{callsign|spoken}, tally-ho"
+        - "{callsign|spoken}, contact"
+        - "{callsign|spoken}, visual"
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign }
+          - { text: tally, role: brevity }
+    explain: >-
+      TALLY – Gegner in Sicht. „Tally-ho“ ist das alte RAF-Wort, CONTACT meint das eigene Radar, VISUAL ein
+      eigenes Flugzeug. Was im Luftkampf weiter passiert, übt die später geplante Spur Luftkampf.
+
+  - stage: Heimweg
+    situation: >-
+      Der Kampf ist vorbei, dein Treibstoff wird knapp. Melde der Leitstelle, dass du landen willst, und lass
+      dir den Weg nach Hause geben.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – pancake fuel – request pigeons
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{gci}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: pancake fuel, role: brevity, critical: true, alt: [pancake] }
+          - { text: request pigeons, role: request, alt: [pigeons, say pigeons] }
+    reply:
+      - speaker: "{gci}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{gci}", role: callsign }
+          - { text: pigeons home plate, role: brevity }
+          - { text: "{pb|spoken}", role: value }
+          - { text: "{pr|spoken}", role: value }
+
+  - stage: Heimweg
+    situation: Du drehst auf den Kurs nach Hause.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Kurs {pb}, {pr} Meilen bis zum Platz. Dort meldest du dich beim Tower – im Warbird auf dem Kanal laut
+      Briefing (meist B), in IL-2 über das Befehlsmenü und im Multiplayer zusätzlich per Selbstansage auf SRS.

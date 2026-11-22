@@ -1,0 +1,1203 @@
+# Brevity-Codes (Multi-Service Brevity Codes, ATP 1-02.1) – sinngemäß und in eigenen Worten.
+# Grundlage: USAF Test Pilot School „Flight Test Brevity“ und Wikipedia „Multiservice tactical brevity
+# code“ (bezieht sich auf die Ausgabe vom 25. April 2025), abgeglichen am 2026-11-20. Zusätzlich lag das
+# Original ATP 1-02.1 (Mai 2020, Change 1 April 2021, Distribution A) vor und wurde am 2026-11-21 gegen die
+# Einträge geprüft; Seitenangaben „ATP 1-02.1 (2020/21), S. n“ sind PDF-Seiten dieser Ausgabe. Wo die
+# 2020/21-Fassung eindeutig ist, steht sie; eine Abweichung der 2025er Fassung ist dadurch nicht
+# ausgeschlossen. Verfahren (Picture, Declare, FADED usw.) folgen ATP 3-52.4 (2021). Maßgeblich ist das Original.
+#
+# Namensnennung (CC BY-SA 4.0): Teile der Erklärungen beruhen auf dem Wikipedia-Artikel „Multiservice tactical
+# brevity code“ (https://en.wikipedia.org/wiki/Multiservice_tactical_brevity_code, Fassung
+# https://en.wikipedia.org/w/index.php?oldid=1287901013), Autorinnen und Autoren siehe Versionsgeschichte
+# (https://en.wikipedia.org/w/index.php?title=Multiservice_tactical_brevity_code&action=history), Lizenz
+# CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Ins Deutsche übertragen, gekürzt, umformuliert
+# und mit ATP 1-02.1 und weiteren Quellen abgeglichen und ergänzt; die bearbeitete Fassung steht ebenfalls unter
+# CC BY-SA 4.0.
+# check: true = die Quellen weichen voneinander ab, oder der Begriff steht nicht in allen Brevity-Listen.
+#
+# Felder: word (Großschreibung wie im Original), meaning, category, note?, example?, see? (andere
+# Einträge, auch Standardwörter), aliases? (weitere Schreibweisen für Suche und Erkennung), layer?, check?
+
+# ------------------------------------------------------------------ Identität & ROE
+- word: BOGEY
+  meaning: Luftkontakt (Radar oder Sicht), dessen Identität noch unbekannt ist.
+  category: identitaet
+  see: [BANDIT, HOSTILE, DECLARE, BOGEY DOPE, SPADES, PAINTS, SQUAWKING]
+- word: BANDIT
+  meaning: Als feindlich identifiziertes Flugzeug. Das allein erlaubt noch nicht, es zu bekämpfen.
+  category: identitaet
+  note: Der Unterschied zu HOSTILE ist die Feuerfreigabe nach den Einsatzregeln (ROE).
+  aliases: [bandits]
+  see: [HOSTILE, BOGEY]
+- word: HOSTILE
+  meaning: Als feindlich identifizierter Kontakt, der nach den Einsatzregeln (ROE) bekämpft werden darf.
+  category: identitaet
+  see: [BANDIT, DECLARE]
+- word: FRIENDLY
+  meaning: Sicher als eigen oder verbündet identifiziertes Flugzeug, Schiff oder Bodenposition.
+  category: identitaet
+- word: NEUTRAL
+  meaning: Sicher identifiziert, unterstützt aber weder die eigene noch die gegnerische Seite.
+  category: identitaet
+- word: STRANGER
+  meaning: Nicht identifizierter Verkehr, der an der laufenden Aktion nicht beteiligt ist.
+  category: identitaet
+  aliases: [strangers]
+  note: >-
+    Solche Gruppen zählen nicht zum Picture und nicht zur Gruppenzahl. Sind sie von Bedeutung, meldet die Leitstelle
+    sie in einem eigenen Funkspruch (ATP 3-52.4 (2021), S. 27). ATP 1-02.1 (2020/21), S. 63.
+  see: [BOGEY, NEUTRAL, PICTURE]
+- word: DECLARE
+  meaning: Anfrage nach der Identität eines Kontakts oder einer Gruppe. Antworten sind FRIENDLY, BOGEY, BANDIT, HOSTILE, NEUTRAL, FURBALL, CLEAN oder UNABLE – stets mit voller Position im BULLSEYE-Format.
+  category: identitaet
+  example: "Darkstar, Viper 1-1, declare bullseye 315/40, 12 thousand."
+  note: >-
+    Nach einem Picture mit Gruppennamen genügt der Name („declare east group“). Die Antwort nennt Position, Höhe, Track,
+    Declaration und Fill-ins. Gefragt wird nach ATP 3-52.4 (2021), S. 37 und 50–51, mit Bullseye oder Gruppenname;
+    eine Anfrage in BRAA ist Praxis einzelner Leitstellen (z. B. SkyEye in DCS). ATP 1-02.1 (2020/21), S. 27.
+  see: [BOGEY, HOSTILE, FURBALL, CLEAN, UNABLE]
+- word: SPADES
+  meaning: Abgefragter Kontakt hat keinen der nach Einsatzbefehl verlangten IFF-Modi und -Codes.
+  category: identitaet
+  note: >-
+    SPADES ist ein Zusatz zu BOGEY („bogey spades“), keine eigene Declaration. Es erfüllt nur den IFF-Teil von „keine
+    Freund-Merkmale“ – für BANDIT braucht es zusätzlich ein positives Feindmerkmal. Mit richtigen Modi und Codes heißt es
+    PAINTS, mit falschem Modus oder Code SQUAWKING. ATP 1-02.1 (2020/21), S. 60; ATP 3-52.4 (2021), S. 37.
+  see: [PAINTS, SQUAWKING, SQUAWK, SWEET, SOUR]
+- word: PAINTS
+  meaning: Abgefragte Gruppe oder abgefragter Radarkontakt antwortet mit allen verlangten IFF-Modi und den richtigen Codes.
+  category: identitaet
+  aliases: [paint, painted]
+  note: Nach ATP 1-02.1 (2020/21) und ATP 3-52.4 (2021) steht es wie SPADES als Zusatz bei der Declaration („bogey paints“). Es macht den Kontakt allein noch nicht zum FRIENDLY.
+  see: [SPADES, SQUAWKING, BOGEY]
+- word: SQUAWKING
+  meaning: Ein BOGEY antwortet mit einem anderen IFF-Modus oder Code als nach Einsatzbefehl bzw. Identifizierungskriterien vorgesehen.
+  category: identitaet
+  note: Der Zusatz nennt den betroffenen Modus („bogey squawking mode 3“). ATP 1-02.1 (2020/21), S. 61. Nicht verwechseln mit SQUAWK, dem Befehl, den eigenen Transponder zu schalten.
+  see: [SPADES, PAINTS, SQUAWK]
+- word: FURBALL
+  meaning: Eigene und nicht eigene Flugzeuge sind auf etwa 5 NM durchmischt. Auch als Antwort auf DECLARE.
+  category: identitaet
+  see: [DECLARE, MERGED]
+- word: CLEAN
+  meaning: "Je nach Zusammenhang: keine Sensordaten zur gefragten Gruppe, kein sichtbarer Schaden oder keine Außenlasten."
+  category: identitaet
+  example: "Picture clean."
+  note: Bedeutung hängt vom Zusammenhang ab. „Picture clean“ heißt, es gibt keine Kontakte. Als Antwort auf DECLARE wiederholt die Leitstelle die erfragte Position mit „clean“.
+  see: [DECLARE, FADED]
+
+# ------------------------------------------------------------------ Anfragen & Formate
+- word: PICTURE
+  meaning: Anfrage nach dem Lagebild in der Luft im Bullseye-Format.
+  category: anfragen
+  example: "Darkstar, Viper 1-1, picture."
+  note: In den Beispielen der ATP 3-52.4 (2021) fragt der Jäger nur mit dem Wort selbst („…, picture“), ohne „request“ (S. 64).
+  see: [BULLSEYE, GROUP, BOGEY DOPE, NEW PICTURE]
+- word: BOGEY DOPE
+  meaning: Anfrage nach BRAA-Angaben zur nächsten (oder genannten) Gruppe.
+  category: anfragen
+  example: "Darkstar, Viper 1-1, bogey dope."
+  note: >-
+    Mit Gruppenname („bogey dope north group“) bezieht sich die Frage auf diese Gruppe. Beantwortet wird sie mit BRAA.
+    Die Anfrage heißt nicht, dass du den Kontakt als Ziel übernimmst. ATP 1-02.1 (2020/21), S. 18; ATP 3-52.4 (2021), S. 22.
+  see: [BRAA, SNAP, CUTOFF, BOGEY]
+- word: SNAP
+  meaning: Anfrage des Jägers nach sofortigem BRAA zur genannten Gruppe – er will abfangen oder anschließen. Auch die dringende Anweisung, auf einen Kurs zu drehen.
+  category: anfragen
+  note: Gleiches Format wie BOGEY DOPE (mit Gruppenname oder Rufzeichen); unterschieden wird nur die Absicht. ATP 1-02.1 (2020/21), S. 59.
+  see: [BOGEY DOPE, BRAA, SNAPLOCK, CUTOFF]
+- word: BRAA
+  meaning: Peilung (Bearing), Entfernung (Range), Höhe (Altitude) und Aspekt eines Kontakts – bezogen auf das genannte eigene Flugzeug.
+  category: anfragen
+  example: "Viper 1-1, group BRAA 270/25, 18 thousand, hot, hostile."
+  see: [BULLSEYE, HOT, COLD, BEAM, FLANK, DRAG]
+- word: STATUS
+  meaning: Anfrage nach der taktischen Lage eines Flugzeugs oder einer Gruppe. Auch die Aufforderung, den Stand der Aufgabe oder des Flugzeugs genauer zu melden.
+  category: anfragen
+  note: >-
+    Mit Gruppenname („status north group“) liefert die Leitstelle Bullseye, Höhe und Fill-ins samt Identität
+    (ATP 3-52.4 (2021)). Als Aufforderung an ein Flugzeug antwortet man z. B. mit WORKING, TARGETED, LOCKED,
+    CLEAN, ENGAGED oder mit Treibstoff und Waffen in YELLOW/RED/GREEN – oder in Klartext (ATP 1-02.1 (2020/21), S. 62).
+  see: [PICTURE, BOGEY DOPE, YELLOW, TARGETED]
+- word: CUTOFF
+  meaning: Anfrage nach oder Anweisung zu einem Abfangkurs mit Abschneidegeometrie.
+  category: anfragen
+  example: "Viper 1-1, cutoff north."
+  note: Zuerst kommt der Abfangkurs, danach die BRAA-Angaben. ATP 1-02.1 (2020/21), S. 27. Das Beispiel ist Praxis, nicht wörtlich aus der Vorschrift.
+  layer: community
+  see: [BOGEY DOPE, STERN, SNAP]
+- word: ALPHA CHECK
+  meaning: Anfrage nach Bestätigung von Peilung und Entfernung vom eigenen Flugzeug zu einem genannten Punkt.
+  category: anfragen
+  example: "Darkstar, Viper 1-1, request alpha check bullseye."
+  note: Nach ATP 1-02.1 (2020/21), S. 14 und ATP 3-52.4 (2021), S. 7–9 antwortet die Leitstelle mit „alpha check bullseye“ und Peilung/Entfernung; die Bestätigung des Fliegers ist nur das Flight-Rufzeichen.
+  see: [BULLSEYE, POSIT, PICTURE]
+- word: BULLSEYE
+  meaning: Gebriefter Bezugspunkt. Positionen werden als magnetische Peilung und Entfernung in NM von diesem Punkt angegeben.
+  category: anfragen
+  example: "Group bullseye 045/60, 25 thousand, track west, hostile."
+  see: [BRAA, PICTURE]
+- word: COMMIT
+  meaning: Die genannte Gruppe abfangen und die gebriefte Abfanggeometrie einnehmen.
+  category: anfragen
+  example: "Viper 1-1, commit."
+  note: >-
+    Der Ruf lautet „[Flight] commit“. Wer ihn geben darf, legt das Briefing fest (SPINS/OPTASK): Die Leitstelle kann ihn
+    empfehlen („recommend viper commit“) oder befehlen, dann quittiert der Jäger mit dem Rufzeichen. Ruft der Jäger
+    selbst COMMIT, wechselt die Leitstelle zu Labels bzw. LEADING EDGE. Ein Antwortwort „committing“ steht in der
+    Vorschrift nicht. ATP 1-02.1 (2020/21), S. 25; ATP 3-52.4 (2021), S. 48–50.
+  see: [JUDY, TIGER, TARGETED, LEADING EDGE]
+- word: JUDY
+  meaning: Die Besatzung hat das Abfangen selbst übernommen und braucht nur noch Lageinformationen – der Controller hält sich zurück.
+  category: anfragen
+  see: [COMMIT]
+- word: PIGEONS
+  meaning: Magnetische Peilung und Entfernung in NM zum Heimatplatz oder -schiff (HOME PLATE).
+  category: anfragen
+  example: "Viper 1-1, pigeons home plate 090/120."
+  see: [HOME PLATE]
+- word: POSIT
+  meaning: Anfrage nach der Position eines Eigenen. Antwort relativ zu einem Geländemerkmal oder gemeinsamen Bezugspunkt.
+  category: anfragen
+- word: WHAT STATE
+  meaning: Anfrage nach Treibstoff und Raketen.
+  category: anfragen
+  aliases: [state]
+  example: "Viper 1-2, what state? – Viper 1-2, 4-0-2 by 5 point 8."
+  note: >-
+    Die Antwort nennt nacheinander die Zahl aktiv radargelenkter, halbaktiv radargelenkter und IR-Raketen; „minus“
+    dahinter heißt: keine oder zu wenig Kanonenmunition. Danach folgt „by“ und der Treibstoff in tausend Pfund mit einer
+    Dezimale oder die Restzeit. Munition und Sauerstoff nennt man nur auf Nachfrage oder wenn sie knapp werden.
+    Die bloße Treibstoffangabe heißt FUEL STATE (Menge bis BINGO). Im Flight sagt man oft kurz „state“ – das ist
+    Sprachgebrauch, nicht der ATP-Begriff. ATP 1-02.1 (2020/21), S. 70 (Antwortformat) und S. 33 (FUEL STATE).
+  see: [JOKER, BINGO, TIGER, YELLOW]
+- word: FUEL STATE
+  meaning: Treibstoffmenge in Zeit oder Pfund, die bis BINGO bleibt. Ohne Zahl auch eine Anfrage danach.
+  category: treibstoff
+  note: ATP 1-02.1 (2020/21), S. 33. Nicht verwechseln mit der Anfrage WHAT STATE, die auch Raketen umfasst.
+  see: [WHAT STATE, BINGO, JOKER]
+- word: WORDS
+  meaning: Anweisung oder Frage nach weiteren Einsatzinformationen oder Anweisungen.
+  category: anfragen
+  check: true
+  note: >-
+    Beim Check-in nennt der Flug nach ATP 3-52.4 (2021) seinen Stand der Einsatzinformationen; die Leitstelle schickt
+    nur, was fehlt. Wie genau die Einträge gezählt werden, ist hier nicht abschließend geprüft.
+- word: TARGET
+  meaning: "Luft-Luft: Zuweisung der Targeting-Verantwortung. Der Controller teilt einem Jäger eine Gruppe als Ziel zu."
+  category: anfragen
+  example: "Hornet 2, target north group."
+  note: >-
+    Der Jäger bestätigt mit TARGETED, sobald er die Gruppe aufgeschaltet hat. Für Luft-Boden nennt die ATP 1-02.1 eine zweite Bedeutung
+    (Einsatzregeln, Identifizierung und Koordination sind erfüllt, der Angriff darf kommen). ATP 1-02.1 (2020/21), „TARGET“; ATP 3-52.4 (2021), S. 5.
+  see: [TARGETED, UNTARGETED, THREAT]
+- word: TARGETED
+  meaning: Der Jäger hat die zugeteilte Gruppe aufgeschaltet und die Verantwortung für sie übernommen.
+  category: anfragen
+  example: "Viper 1-1, targeted group bullseye 270/38."
+  note: >-
+    Mit Datalink zur Leitstelle genügen Rufzeichen und Gruppenname; ohne Datalink gehört die Bullseye-Position dazu.
+    TARGETED beendet einen UNTARGETED- oder THREAT-Kontrakt. ATP 1-02.1 (2020/21), S. 65; ATP 3-52.4 (2021), S. 50.
+  see: [SORTED, COMMIT, UNTARGETED, LOCKED]
+- word: SORTED
+  meaning: Die Zielaufteilung innerhalb einer Gruppe ist erledigt – jeder weiß, wer welchen Kontakt nimmt.
+  category: anfragen
+  see: [TARGETED, LOCKED]
+- word: STERN
+  meaning: Anfrage oder Anweisung, mit Heckgeometrie abzufangen.
+  category: anfragen
+
+# ------------------------------------------------------------------ Sicht & Kontakt
+- word: TALLY
+  meaning: Ziel, nicht eigenes Flugzeug oder feindliche Stellung gesichtet. Gegenteil von NO JOY.
+  category: sicht
+  note: Hervorgegangen aus dem „tally-ho“ der RAF-Jägerleitung. In ATP 1-02.1 steht nur noch TALLY.
+  see: [NO JOY, VISUAL]
+- word: NO JOY
+  meaning: Kein Sichtkontakt zum Ziel oder Gegner. Gegenteil von TALLY.
+  category: sicht
+  see: [TALLY, BLIND]
+- word: VISUAL
+  meaning: Eigenes Flugzeug, Schiff oder eigene Bodenposition gesichtet. Gegenteil von BLIND.
+  category: sicht
+  see: [BLIND, TALLY]
+- word: BLIND
+  meaning: Kein Sichtkontakt zu einem Eigenen. Gegenteil von VISUAL.
+  category: sicht
+  note: >-
+    Zu „blind“ gehört die eigene Höhe, auf hundert Fuß genau („one six point niner“ = 16.900 ft), damit der andere sofort
+    sieht, ob 500 bzw. 1.000 ft Staffelung bestehen (AFMAN 11-2F-16 V3, Abs. 3.12.2.1). Die „angels“-Form in ganzen Tausend
+    hört man in der Praxis auch, sie verschenkt aber bis zu 500 ft Genauigkeit. Wer Sicht hat, antwortet „visual“. Sind
+    beide blind, gibt der Lead Richtung und Höhenstaffelung vor, bis wieder Sichtkontakt besteht (Abs. 3.12.2.2).
+    ATP 1-02.1 (2020/21), S. 18.
+  example: "Viper 1-2, blind, one six point niner."
+  see: [VISUAL, NO JOY, PADLOCKED, ANGELS]
+- word: PADLOCKED
+  meaning: Die Besatzung kann den Blick nicht vom Ziel nehmen, ohne TALLY oder VISUAL zu verlieren – voll ausgelastet.
+  category: sicht
+  note: >-
+    In taktischer Formation geht die Verantwortung für den Flugweg bei „blind“ oder „padlocked“ auf den Lead über, bis der
+    Wingman wieder Sicht bestätigt (AFMAN 11-2F-16 V3, Abs. 3.12).
+  see: [TALLY, VISUAL, BLIND]
+- word: CONTACT
+  meaning: Sensorkontakt an der genannten Position. Auch Bestätigung eines Bezugspunkts oder einzelnes Radarecho innerhalb einer Gruppe.
+  category: sicht
+  note: >-
+    ATP 1-02.1 (2020/21), S. 25. Beim Check-in antwortet der AWACS im Beispiel der ATP 3-52.4 (2021), S. 8 mit „contact“, bei
+    Verfahrenskontrolle mit „negative contact“ (S. 14). Erklärt wird das Wort dort nicht; naheliegend ist der Sensorkontakt, also
+    „ich habe dich“. Nicht verwechseln mit „contact“ der Flugsicherung: Das heißt, auf die genannte Frequenz zu wechseln und sich zu melden.
+  see: [TALLY, GROUP, NEGATIVE CONTACT, contact (Flugsicherung)]
+- word: MERGED
+  meaning: Eigene und Ziele sind im selben Sichtbereich angekommen.
+  category: sicht
+  note: >-
+    Die Leitstelle sagt MERGED bei etwa 3–5 NM oder wenn ihre Radarauflösung nicht mehr reicht; der Jäger antwortet mit
+    ANCHORED oder STANDBY. ATP 1-02.1 (2020/21), S. 43; ATP 3-52.4 (2021), S. 65.
+  see: [FURBALL, ENGAGED, ANCHORED]
+- word: HOLDING HANDS
+  meaning: Flugzeuge fliegen in Sichtformation.
+  category: sicht
+  note: >-
+    ATP 1-02.1 (2020/21), S. 36. Am Träger meldet der Lead damit beim Marshal, wer mit ihm in Formation fliegt
+    („Marshal, 205, holding hands with 206 …“, DCS Supercarrier).
+  see: [MOTHER, Marshal]
+
+# ------------------------------------------------------------------ Sensoren & Störung
+- word: SPIKED
+  meaning: Der Radarwarnempfänger (RWR) zeigt einen Abfangjäger, der verfolgt oder schießt.
+  category: sensoren
+  aliases: [spike]
+  example: "Viper 1-2, spiked, two seven zero."
+  note: >-
+    Die Richtung kommt als Peilung (ziffernweise) oder Himmelsrichtung. Die Leitstelle gleicht ab (±30°) und antwortet mit
+    Entfernung, Höhe, Aspekt (hot angenommen) und Declaration – oder „clean“ mit der Peilung. ATP 1-02.1 (2020/21), S. 60 („SPIKE(D)“);
+    ATP 3-52.4 (2021), S. 59–60.
+  see: [NAKED, BUDDY SPIKE, NAILS, SNAPLOCK]
+- word: SNAPLOCK
+  meaning: Der Jäger hat Sensorkontakt zu einer Gruppe innerhalb der Threat-Reichweite mit Aspekt BEAM oder heißer und kann seine Sanitize-Aufgabe nicht erfüllen.
+  category: sensoren
+  note: >-
+    BRAA und Aspekt sind damit schon gemeldet. Die Leitstelle antwortet mit Gruppe, BRAA, Declaration und Fill-ins;
+    war die Gruppe unbekannt, heißt sie THREAT GROUP. ATP 1-02.1 (2020/21), S. 59; ATP 3-52.4 (2021), S. 59–60.
+  see: [SPIKED, THREAT GROUP, BRAA]
+- word: NAKED
+  meaning: Keine Anzeige auf dem Radarwarnempfänger.
+  category: sensoren
+  see: [SPIKED]
+- word: BUDDY SPIKE
+  meaning: Der Radarwarnempfänger zeigt die Aufschaltung durch ein eigenes Flugzeug.
+  category: sensoren
+  see: [RAYGUN, SPIKED]
+- word: RAYGUN
+  meaning: Radaraufschaltung auf ein unbekanntes Flugzeug. Eigene mit diesen Daten sollen mit BUDDY SPIKE antworten.
+  category: sensoren
+  see: [BUDDY SPIKE]
+- word: NAILS
+  meaning: Der Radarwarnempfänger zeigt ein Bordradar eines Abfangjägers im Suchmodus.
+  category: sensoren
+  see: [SPIKED, MUD]
+- word: MUD
+  meaning: "Der Radarwarnempfänger zeigt eine Bodenbedrohung ohne Startanzeige. Auch: Bodenbedrohung im Track-Modus."
+  category: sensoren
+  note: ATP 1-02.1 (2020/21), S. 44. Mit Startanzeige heißt es SINGER.
+  see: [SINGER, NAILS]
+- word: SINGER
+  meaning: Der Radarwarnempfänger zeigt den Start einer Boden-Luft-Rakete.
+  category: sensoren
+  see: [MUD]
+- word: STROBE
+  meaning: Das Radar zeigt Rauschstörung.
+  category: sensoren
+  see: [MUSIC]
+- word: MUSIC
+  meaning: Elektronische Täuschstörung gegen Radar.
+  category: sensoren
+  see: [STROBE]
+- word: LOCKED
+  meaning: Radaraufschaltung. Mit Gruppenname heißt das nicht, dass die Ziele schon aufgeteilt sind.
+  category: sensoren
+  see: [SORTED, TARGETED]
+
+# ------------------------------------------------------------------ Waffen
+- word: FOX ONE
+  meaning: Start einer halbaktiv radargelenkten Rakete.
+  category: waffen
+  aliases: [fox 1]
+  see: [FOX TWO, FOX THREE]
+- word: FOX TWO
+  meaning: Start einer infrarotgelenkten Rakete.
+  category: waffen
+  aliases: [fox 2]
+  see: [FOX ONE, FOX THREE]
+- word: FOX THREE
+  meaning: Start einer aktiv radargelenkten Rakete.
+  category: waffen
+  aliases: [fox 3]
+  example: "Viper 1-1, fox three."
+  note: >-
+    „Fox three 2 ship“ heißt: zwei Raketen auf getrennte Ziele; „second fox three“ ist ein weiterer Start auf dasselbe Ziel.
+    Nach TARGETED nennt der Jäger Gruppe und Bullseye mit Höhe; bei unbekannter Gruppe auch HOSTILE. ATP 1-02.1 (2020/21), S. 32;
+    ATP 3-52.4 (2021), S. 49–51.
+  see: [FOX ONE, FOX TWO, PITBULL, TARGETED]
+- word: PITBULL
+  meaning: Eine AIM-120 ist in der Entfernung, in der ihr eigenes Radar das Ziel selbst verfolgt.
+  category: waffen
+  see: [FOX THREE]
+- word: SPLASH
+  meaning: "Luft-Luft: Ziel zerstört. Luft-Boden: Waffeneinschlag. Boden-Luft/Boden-Boden: Hinweis an den Beobachter etwa 5 Sekunden vor dem erwarteten Einschlag."
+  category: waffen
+  note: >-
+    ATP 1-02.1 (2020/21), S. 60. Im Korea-BEM (2005) ist die Vorwarnung vor dem Einschlag in der Luft-Boden-Lage ein eigener
+    Ruf, THUNDER (eine Minute vorher).
+  see: [THUNDER]
+- word: THUNDER
+  meaning: Hinweis etwa eine Minute vor dem Einschlag einer Luft-Boden-Waffe.
+  category: waffen
+  check: true
+  note: Nur im Korea-BEM (2005) belegt, nicht in ATP 1-02.1 (2020/21). Dort ist SPLASH der Einschlag selbst.
+  see: [SPLASH]
+- word: TRASHED
+  meaning: Eine eigene Rakete wurde vom Gegner ausmanövriert oder gestört.
+  category: waffen
+- word: MAGNUM
+  meaning: Start einer eigenen Anti-Radar-Rakete.
+  category: waffen
+  see: [RIFLE]
+- word: RIFLE
+  meaning: Start einer eigenen Luft-Boden-Rakete.
+  category: waffen
+  see: [MAGNUM]
+- word: GUNS
+  meaning: Die Bordkanone wird eingesetzt.
+  category: waffen
+
+# ------------------------------------------------------------------ Treibstoff & Waffenstand
+- word: JOKER
+  meaning: Gebriefter Treibstoffstand über BINGO, ab dem das Lösen vom Gefecht (SEPARATE), der Abbruch (BUGOUT) oder das Ende des Ereignisses beginnen soll.
+  category: treibstoff
+  example: "Viper 1-2, joker."
+  note: >-
+    ATP 1-02.1 (2020/21), S. 40. Die USAF beschreibt dieselbe Menge für die F-16 so: der Treibstoff, den man braucht, um ein
+    Ereignis zu beenden und den Rest der Mission zu fliegen (AFMAN 11-2F-16 V3, Abs. 3.33.1). Der Wert steht im Briefing.
+  see: [BINGO, WHAT STATE, FUEL STATE, SEPARATE, BUGOUT]
+- word: BINGO
+  meaning: "Vorab gebriefter Treibstoffstand für den Rückflug: Er reicht für den Heimweg und die Landung samt der Reserve, die bei der Landung noch im Tank sein muss."
+  category: treibstoff
+  example: "Viper 1-1, bingo."
+  note: >-
+    ATP 1-02.1 (2020/21), S. 17. Für die F-16 nennt die USAF die Reserve Normal Recovery Fuel: auf Initial bzw. am FAF
+    mindestens 1.000 lb (Block 10 bis 32) oder 1.200 lb (ab Block 40), AFMAN 11-2F-16 V3, Abs. 3.33.2 und 3.33.3. Den Wert
+    für deinen Flug legt das Briefing fest.
+  see: [JOKER, WHAT STATE, FUEL STATE]
+- word: TIGER
+  meaning: Genug Treibstoff und Waffen, um einen Commit anzunehmen.
+  category: treibstoff
+  note: >-
+    Luft-Luft, ATP 1-02.1 (2020/21), S. 66. COMMIT heißt, die genannte Gruppe abzufangen. Als Zusatz im Ops Check („two, 5.8,
+    tiger“) ist TIGER Praxis: Die Vorschrift legt nicht fest, was beim Ops Check geantwortet wird.
+  see: [COMMIT, WHAT STATE]
+- word: WINCHESTER
+  meaning: Keine Munition mehr.
+  category: treibstoff
+  see: [REMINGTON, SKOSH]
+- word: REMINGTON
+  meaning: Keine Munition mehr – außer Kanone oder Selbstschutz-Munition (Luft-Luft und Luft-Boden).
+  category: treibstoff
+  note: ATP 1-02.1 (2020/21), S. 51.
+  see: [WINCHESTER, SKOSH]
+- word: SKOSH
+  meaning: Keine aktiv radargelenkten Raketen mehr (oder nicht einsetzbar).
+  category: treibstoff
+  see: [WINCHESTER, REMINGTON]
+- word: SHOTGUN
+  meaning: Gebriefter Waffenstand (Luft-Luft, Luft-Boden, Boden-Luft), der im Briefing festgelegt ist.
+  category: treibstoff
+  note: Was dann geschieht – etwa Lösen vom Gefecht oder Rückzug –, steht nicht in der Definition, sondern im Briefing. ATP 1-02.1 (2020/21), S. 56.
+  see: [JOKER, WINCHESTER]
+- word: RTB
+  meaning: Return to base – Rückflug zum Heimatplatz.
+  category: treibstoff
+  example: "Viper, RTB."
+  layer: community
+  note: Verbreitete Abkürzung; in ATP 1-02.1 (2020/21) nur in der Liste der Chat-Abkürzungen, nicht als Brevity-Code.
+  see: [BINGO, JOKER]
+- word: YELLOW
+  meaning: Treibstoff- oder Waffenstand nähert sich dem Punkt, an dem die Mission nicht mehr fortgesetzt werden kann – nach ATP 3-52.4 bleibt genau eine Einsatzoption.
+  category: treibstoff
+  note: >-
+    Was gelb ist, legt das Briefing je Flugzeugmuster fest. Der Flug meldet sich kombiniert („fuel red, weapons green“),
+    bei RED auf dem Hauptnetz erst nach Abstimmung der Ablösung. ATP 1-02.1 (2020/21), S. 71; ATP 3-52.4 (2021), S. 19–20 (Kap. III, Abs. 6), Beispiele beim Check-in S. 6 und 8.
+  see: [RED, GREEN, WHAT STATE, JOKER]
+- word: RED
+  meaning: Keine Einsatzoption mehr – wegen Treibstoff, Waffen oder Sensoren.
+  category: treibstoff
+  note: Meldung kombiniert mit den anderen Stufen („fuel red, weapons green“). ATP 3-52.4 (2021), S. 19–20.
+  see: [YELLOW, GREEN]
+- word: GREEN
+  meaning: Treibstoff und Waffen sind normal – keine Einschränkung für den Auftrag.
+  category: treibstoff
+  check: true
+  note: Im ATP 1-02.1 (2020/21) nur in der Liste der Luft-Luft-Begriffe aufgeführt; die Bedeutung folgt dem Gebrauch in ATP 3-52.4 (2021).
+  see: [YELLOW, RED]
+
+# ------------------------------------------------------------------ Manöver & Geschwindigkeit
+- word: BREAK
+  meaning: Sofortige Kurve mit maximaler Leistung in die genannte Richtung (Standard 180°).
+  category: manoever
+  example: "Viper 1-2, break right!"
+  note: Nicht verwechseln mit dem Standardwort „break“, das Teile einer Nachricht trennt, und mit „break break“ (Trennung zwischen Nachrichten an verschiedene Flugzeuge). ATP 1-02.1 (2020/21), S. 19.
+  see: [DEFENDING]
+- word: DEFENDING
+  meaning: In defensiver Lage, man manövriert gegen eine SAM-Bedrohung.
+  category: manoever
+  note: ATP 1-02.1 (2020/21), S. 28.
+  see: [NOTCH, BREAK, DEFENSIVE]
+- word: NOTCH
+  meaning: In defensiver Lage, man manövriert gegen eine Bedrohung.
+  category: manoever
+  note: >-
+    Üblich ist, dabei quer zur Bedrohung zu drehen, um aus dem Radar zu fallen; die Definition nennt nur das defensive
+    Manöver. Bei einem SPIKED meldet man die Richtung („spiked northwest, notch 230“ – Beispiel aus dem Korea-BEM, 2005).
+  see: [BEAM, DEFENDING, SPIKED]
+- word: CRANK
+  meaning: In die genannte Richtung abdrehen und das Ziel dabei am Rand des Radar-Schwenkbereichs weiter beleuchten.
+  category: manoever
+  see: [PUMP, NOTCH]
+- word: PUMP
+  meaning: Gebriefte Abwendung, um die Annäherung an eine Bedrohung zu verringern – mit der Absicht, wieder anzugreifen.
+  category: manoever
+  see: [EXTEND, CRANK]
+- word: SKATE
+  meaning: Schießen und abdrehen (launch and leave) auf gebriefte Entfernung.
+  category: manoever
+- word: EXTEND
+  meaning: Kurzes Manöver, um Energie, Abstand oder Trennung zu gewinnen – meist, um wieder anzugreifen.
+  category: manoever
+  see: [PUMP]
+- word: SEPARATE
+  meaning: Ein bestimmtes Gefecht verlassen. Ob man später wieder eintritt, bleibt offen.
+  category: manoever
+  aliases: [separating]
+  note: >-
+    Luft-Luft, ATP 1-02.1 (2020/21), S. 54. Nicht verwechseln mit der Anfrage SEPARATION (Abstand zwischen zwei Gruppen) und
+    mit dem englischen „separation“ im Sinn von Abstand zu anderen Flugzeugen, etwa beim Lost Wingman.
+  see: [BUGOUT, JOKER, SEPARATION]
+- word: BUGOUT
+  meaning: Sich von einem bestimmten Gefecht, Angriff oder Einsatz lösen, ohne wieder einzutreten oder zurückzukehren.
+  category: manoever
+  note: ATP 1-02.1 (2020/21), S. 19. Mit Richtungsangabe („bugout north“). Im Unterschied zu SEPARATE ist die Rückkehr nicht vorgesehen.
+  see: [SEPARATE, JOKER]
+- word: BRACKET
+  meaning: Manöver auf entgegengesetzte Seiten des Ziels, seitlich oder in der Höhe.
+  category: manoever
+- word: BLOW THROUGH
+  meaning: Im Merge geradeaus weiterfliegen, ohne sich an Zielen festzubeißen.
+  category: manoever
+  see: [MERGED]
+- word: ENGAGED
+  meaning: Ruf eines Flugzeugs, das im Sichtbereich manövriert – man gibt die Verantwortung für die Entflechtung ab.
+  category: manoever
+  example: "Viper 1-1, engaged."
+  note: >-
+    Beim Package nennt der Ruf die Gruppe mit Bullseye, Höhe und Identität, damit andere entflechten können. ATP 1-02.1 (2020/21), S. 30;
+    Praxis nach Korea-BEM (2005).
+  see: [SUPPORTING, SUPPORT, DEFENSIVE, PRESS]
+- word: SUPPORT
+  meaning: Anweisung, die gebrieften Unterstützungsabsprachen (Support Contracts) auszuführen.
+  category: manoever
+  note: Nicht verwechseln mit SUPPORTING – das ist der Ruf des Wingmans, der die Unterstützung übernimmt. ATP 1-02.1 (2020/21), S. 64.
+  see: [SUPPORTING, ENGAGED]
+- word: SUPPORTING
+  meaning: Der Sprecher übernimmt die unterstützende Rolle, kann das Ergebnis beeinflussen und trägt die Verantwortung für die Entflechtung.
+  category: manoever
+  example: "Viper 1-2, supporting."
+  note: >-
+    Im Verband gilt der Wingman als Supporting, bis etwas anderes festgelegt ist (Korea-BEM, 2005). Zurück in die
+    Unterstützung nach einem DEFENSIVE: „press“ vom Lead oder „supporting“ vom Wingman. ATP 1-02.1 (2020/21), S. 64.
+  see: [SUPPORT, ENGAGED, DEFENSIVE, PRESS]
+- word: DEFENSIVE
+  meaning: Flugzeug wird angegriffen, manövriert defensiv und kann Entflechtung und gegenseitige Unterstützung nicht sicherstellen.
+  category: manoever
+  example: "Viper 1-2, defensive."
+  note: ATP 1-02.1 (2020/21), S. 28. Wird der Supporting-Flieger bedroht, meldet er sich so mit seinem Rufzeichen.
+  see: [DEFENDING, ENGAGED, SUPPORTING, SWITCHED]
+- word: PRESS
+  meaning: "Die erbetene Aktion ist genehmigt, die gegenseitige Unterstützung bleibt bestehen (bei Luft-Luft: Sichtkontakt vorausgesetzt)."
+  category: manoever
+  note: >-
+    So definiert ATP 1-02.1 (2020/21), S. 49. In der Praxis nach dem Korea-BEM (2005) ruft der Lead „press“, wenn er den
+    Angriff fortsetzen lässt und der Wingman die Unterstützung übernimmt. Wer nach einem DEFENSIVE „press“ ruft, übergibt die
+    Entflechtung zurück.
+  see: [SUPPORTING, ENGAGED]
+- word: SWITCHED
+  meaning: Der Angreifer wechselt von einem Flugzeug zum anderen.
+  category: manoever
+  note: ATP 1-02.1 (2020/21), S. 64. Laut Korea-BEM (2005) überträgt es keine Verantwortung; erst „defensive“ im Ruf gibt die Entflechtung ab.
+  see: [DEFENSIVE, ENGAGED]
+- word: ENTRY
+  meaning: Anfrage des Supporting-Fliegers, die Rollen zu tauschen – mit Richtung (Himmelsrichtung) und high/low.
+  category: manoever
+  check: true
+  note: Nur im Korea-BEM (2005) belegt, nicht in ATP 1-02.1 (2020/21).
+  see: [SUPPORTING, PRESS, ENGAGED]
+- word: LEAN
+  meaning: Ein Paket oder Element in die genannte Richtung versetzen – Höhe, Geschwindigkeit und Formation bleiben wie gebrieft.
+  category: manoever
+  note: ATP 1-02.1 (2020/21), S. 41.
+- word: CHECK
+  meaning: Um die genannte Gradzahl nach links oder rechts drehen und den neuen Kurs halten.
+  category: manoever
+  example: "Viper, check left 30."
+  note: >-
+    ATP 1-02.1 (2020/21), S. 22. „check“ hat im Funk mehrere Bedeutungen: Im Flight löst „check“ auf der neuen Frequenz die Funkprobe aus,
+    alle melden sich der Reihe nach (Praxis, siehe radio check). Dazu kommt der Ops Check, die Systemprüfung im Flight. In der ICAO-Liste
+    heißt „check“ nur, ein System oder Verfahren zu prüfen (Annex 10 Bd. II, 5.2.1.5.8). Bei der Kursänderung drehst du um die genannte
+    Gradzahl, nicht auf einen Kurs.
+  see: [radio check, Ops Check]
+- word: BUSTER
+  meaning: Mit maximaler Dauerleistung fliegen (ohne Nachbrenner).
+  category: manoever
+  see: [GATE]
+- word: GATE
+  meaning: So schnell wie möglich fliegen – mit Nachbrenner bzw. maximaler Leistung.
+  category: manoever
+  see: [BUSTER]
+
+# ------------------------------------------------------------------ Aspekt
+- word: HOT
+  meaning: "Aspekt von vorn: Der Kontakt steht 0–20° vom Bug und fliegt auf dich zu. Je nach Zusammenhang auch: zur Bedrohung hin drehen (Air Patrol), Gebiet steht unter Beschuss, Waffeneinsatz geplant oder erfolgt, Abfanggeometrie „vor dem Ziel vorbei“."
+  category: aspekt
+  note: >-
+    Die Grenze 0–20° vom Bug (160–180° vom Heck) steht in ATP 1-02.1 (2020/21), S. 37. Ältere Quellen und Sekundärquellen
+    können andere Winkel nennen (etwa 0–30°).
+  see: [COLD, FLANK, BEAM, DRAG, CLEARED HOT]
+- word: FLANK
+  meaning: Aspekt schräg von vorn – der Kontakt steht 30–60° vom Bug, zwischen HOT und BEAM.
+  category: aspekt
+  note: Falcon BMS kennt kein FLANK. ATP 1-02.1 (2020/21), S. 31.
+  see: [HOT, BEAM]
+- word: BEAM
+  meaning: Kontakt fliegt quer zu dir – Aspekt 70–110°.
+  category: aspekt
+  note: ATP 1-02.1 (2020/21), S. 17.
+  see: [FLANK, DRAG, NOTCH]
+- word: DRAG
+  meaning: Kontakt fliegt von dir weg – 0–60° vom Heck (120–180° vom Bug).
+  category: aspekt
+  note: Mit Richtung („drag east“) gesprochen. ATP 1-02.1 (2020/21), S. 29.
+  see: [BEAM, COLD]
+- word: COLD
+  meaning: "Aspekt von hinten: Der Kontakt steht 0–20° vom Heck. Je nach Zusammenhang auch: von der Bedrohung wegdrehen, Gebiet ohne Beschuss, Abfanggeometrie „hinter dem Ziel“."
+  category: aspekt
+  note: ATP 1-02.1 (2020/21), S. 24.
+  see: [HOT, DRAG]
+
+# ------------------------------------------------------------------ Navigation & Ablauf
+- word: PUSH
+  meaning: Auf den genannten Kanal bzw. die genannte Frequenz wechseln – ohne Bestätigung.
+  category: ablauf
+  example: "Viper, push Strike."
+  note: Dass man sich auf der neuen Frequenz mit dem Check anmeldet, ist übliche Praxis, keine Vorgabe der Definition. ATP 1-02.1 (2020/21), S. 50. Das Verlassen eines festgelegten Punkts heißt PUSHING.
+  see: [PUSHING, KICK, UNIFORM, VICTOR]
+- word: PUSHING
+  meaning: Einen festgelegten Punkt verlassen.
+  category: ablauf
+  example: "Viper, pushing."
+  note: Nicht verwechseln mit PUSH – das ist der Frequenzwechsel. ATP 1-02.1 (2020/21), S. 50.
+  see: [PUSH, ROLEX]
+- word: KICK
+  meaning: Radio oder Datalink auf ein genanntes Netz bzw. eine Frequenz wechseln – meist bei ungeplantem Wechsel, etwa nach einer Störung.
+  category: ablauf
+  note: ATP 1-02.1 (2020/21), S. 40. Siehe auch PUSH.
+  see: [PUSH, CHATTERMARK]
+- word: CHATTERMARK
+  meaning: Gebriefte Funkverfahren gegen Störung beginnen. Ohne Zusatz ist „radio“ gemeint.
+  category: ablauf
+  note: Danach kann ein KICK auf eine andere Frequenz folgen. ATP 1-02.1 (2020/21), S. 22.
+  see: [KICK, SHREW, BEAD WINDOW]
+- word: SHREW
+  meaning: Anhaltende Störung unbekannter Herkunft auf dem aktuellen Funkkanal, die das Lagebewusstsein beeinträchtigt.
+  category: ablauf
+  note: ATP 1-02.1 (2020/21), S. 56.
+  see: [CHATTERMARK]
+- word: BEAD WINDOW
+  meaning: Die letzte Übertragung hat möglicherweise etwas preisgegeben, was nicht gesendet werden durfte.
+  category: kontrolle
+  note: ATP 1-02.1 (2020/21), S. 17.
+  see: [CHATTERMARK]
+- word: ANCHOR
+  meaning: Um einen bestimmten Punkt kreisen. Auch Kurvenkampf an einem Ort oder Tankerstrecke.
+  category: ablauf
+  see: [CAP, ANCHORED]
+- word: CAP
+  meaning: >-
+    Combat Air Patrol – Jäger halten einen zugewiesenen Luftraum frei und warten dort, bis ein Gegner auftaucht. Als
+    Brevity-Wort die Anweisung, an einem genannten Punkt eine CAP einzurichten, oder die Meldung, dass ein Flugzeug dort
+    im Orbit kreist.
+  category: ablauf
+  aliases: [Combat Air Patrol, CAPPING]
+  example: "Viper 1, Darkstar, CAP bullseye 177/40."
+  note: >-
+    ATP 1-02.1 (2020/21), S. 20 („CAP(ING) [location]“). Im Lagebild darf die Leitstelle „CAP“ anstelle von Track oder
+    Aspekt sagen, wenn eine Gruppe kreist (ATP 3-52.4 (2021), S. 24). ANCHOR heißt allgemeiner, um einen Punkt zu
+    kreisen; ANCHORED ist dagegen der Kurvenkampf an einer Stelle.
+  see: [ANCHOR, TRACK, AWACS]
+- word: DASH
+  meaning: Position eines Flugzeugs im Flight, z. B. „Dash 2“ für die Nummer 2. Gesprochen, wenn das genaue Rufzeichen nicht bekannt ist.
+  category: ablauf
+  aliases: [Dash 2, Dash two]
+  note: >-
+    ATP 1-02.1 (2020/21), S. 27. Auch im Briefing und Debriefing hört man „Dash 2“. Im eigenen Flight antwortet der
+    Wingman nur mit seiner Nummer („Two“), nach außen gilt das volle Rufzeichen.
+  see: [Position, Wingman, Flight]
+- word: MOTHER
+  meaning: Das Mutterschiff – im Trägerbetrieb das eigene Schiff, auf das man zurückkehrt.
+  category: ablauf
+  note: >-
+    Marine-Begriff (AIR-MAR), ATP 1-02.1 (2020/21), S. 44. Positionen beim Marshal-Check-in gibt man relativ zum Schiff
+    an („mother's 180 for 40“, DCS Supercarrier).
+  see: [CHARLIE, DELTA, HOME PLATE, Marshal]
+- word: CHARLIE
+  meaning: >-
+    Am Träger: die erwartete Landezeit, die Anweisung zu landen oder – mit einer Minutenzahl – die Verschiebung der
+    gebrieften Landezeit („Charlie ten“).
+  category: ablauf
+  note: >-
+    Marine-Begriff (AIR-MAR), ATP 1-02.1 (2020/21), S. 21. In DCS Supercarrier schickt der Tower den Flight mit „your
+    signal is Charlie“ aus der Warteschleife ins Landemuster. Nicht verwechseln mit dem Buchstaben C im
+    Buchstabieralphabet.
+  see: [DELTA, MOTHER, Marshal]
+- word: DELTA
+  meaning: Am Träger in der genannten Höhe und Position warten und Treibstoff sparen – etwa, weil das Deck noch nicht frei ist.
+  category: ablauf
+  note: >-
+    Marine-Begriff (AIR-MAR), ATP 1-02.1 (2020/21), S. 28. Gesprochen mit Höhe und Position. Nicht verwechseln mit dem
+    Buchstaben D im Buchstabieralphabet.
+  see: [CHARLIE, MOTHER]
+- word: FENCE IN
+  meaning: Schalter im Cockpit für das Kampfgebiet setzen (Waffen, Sensoren, Lichter, Störer).
+  category: ablauf
+  example: "Viper, fence in."
+  see: [FENCE OUT, FEET DRY]
+- word: FENCE OUT
+  meaning: Schalter beim Verlassen des Kampfgebiets zurücksetzen.
+  category: ablauf
+  see: [FENCE IN]
+- word: FEET WET
+  meaning: Flug über Wasser.
+  category: ablauf
+  see: [FEET DRY]
+- word: FEET DRY
+  meaning: Flug über Land.
+  category: ablauf
+  see: [FEET WET]
+- word: IN
+  meaning: "Einflug in die Endphase eines Luft-Boden-Angriffs. Im Luftkampf: zur Bedrohung hin drehen."
+  category: ablauf
+  example: "Hog 1-1, in from the south."
+  see: [OFF, CLEARED HOT]
+- word: OFF
+  meaning: Angriff beendet, man fliegt in die genannte Richtung ab.
+  category: ablauf
+  example: "Hog 1-1, off north."
+  see: [IN]
+- word: ROLEX
+  meaning: Zeitplan der ganzen Mission verschiebt sich um die genannten Minuten, bezogen auf die ursprünglich geplante Zeit. Plus heißt später, minus früher.
+  category: ablauf
+  example: "Viper, rolex plus five."
+  note: Die ATP 3-52.4 (2021), S. 17 rechnet in Fünf-Minuten-Schritten, Verschiebungen addieren sich nicht („rolex 10“, dann „rolex 15“ heißt 15 Minuten nach der ursprünglichen Zeit). ATP 1-02.1 (2020/21), S. 53.
+  see: [PUSHING]
+- word: PLAYTIME
+  meaning: Wie lange ein Flugzeug auf Station bleiben kann, in Stunden plus Minuten.
+  category: ablauf
+  example: "Playtime one plus three zero."
+- word: AS FRAGGED
+  meaning: Einheit oder Element fliegt genau wie im Einsatzbefehl (Frag) gebrieft oder geplant – Auftrag, Zeiten, Daten.
+  category: ablauf
+  example: "Darkstar, Viper 1-1, checking in as fragged."
+  note: >-
+    Typisch beim Check-in beim AWACS: Es ist die verkürzte Anmeldung mit Missionsnummer bzw. Flight-Rufzeichen und
+    der Bitte um einen Alpha Check. Anzahl, Höhe und die übrigen Angaben gehören zur vollen Anmeldung (MNPOPCA).
+    ATP 1-02.1 (2020/21), S. 15; ATP 3-52.4 (2021), S. 7–9.
+  see: [ALPHA CHECK, ATO]
+- word: HOME PLATE
+  meaning: Der Heimatflugplatz oder das Heimatschiff.
+  category: ablauf
+  see: [PIGEONS]
+- word: RESET
+  meaning: Zu einer gebrieften Position oder in ein gebrieftes Gebiet fliegen.
+  category: ablauf
+- word: ANGELS
+  meaning: Höhe eines Eigenen in tausend Fuß über dem Meeresspiegel.
+  category: ablauf
+  example: "Angels 2-5 = 25.000 ft."
+  see: [CHERUBS]
+- word: CHERUBS
+  meaning: Höhe eines Eigenen in hundert Fuß über Grund.
+  category: ablauf
+  see: [ANGELS]
+- word: VECTOR
+  meaning: Auf den genannten Kurs drehen.
+  category: ablauf
+  example: "Viper 1-1, vector 2-7-0, angels 2-0, buster."
+  note: Typisch für Leitstellen (GCI/EWR), die einen Jäger heranführen. Schon im RAF-Jägerleitfunk von 1940 gebräuchlich. ATP 1-02.1 (2020/21), S. 68.
+  see: [SNAP, ANGELS, BUSTER]
+- word: SCRAMBLE
+  meaning: So schnell wie möglich starten.
+  category: ablauf
+  note: Stammt aus der RAF-Jägerleitung des Zweiten Weltkriegs. ATP 1-02.1 (2020/21), S. 54.
+  see: [VECTOR]
+- word: PANCAKE
+  meaning: Landen bzw. um Landung bitten. Ein Grund darf folgen, z. B. PANCAKE FUEL oder PANCAKE AMMO.
+  category: ablauf
+  note: Stammt aus der RAF-Jägerleitung des Zweiten Weltkriegs. ATP 1-02.1 (2020/21), S. 46.
+  see: [HOME PLATE, RTB]
+- word: UNIFORM
+  meaning: UHF-Funkgerät.
+  category: ablauf
+  see: [VICTOR, FOX MIKE, PUSH]
+- word: VICTOR
+  meaning: VHF-Funkgerät (VHF-AM).
+  category: ablauf
+  see: [UNIFORM, FOX MIKE, PUSH]
+- word: FOX MIKE
+  meaning: FM-Funkgerät (VHF-FM, 30–88 MHz) – das Netz von Bodentruppen und JTAC.
+  category: ablauf
+  example: "Contact Hammer, fox mike 42.50."
+  note: ATP 1-02.1 (2020/21), S. 32.
+  see: [UNIFORM, VICTOR, HOTEL FOX]
+- word: HOTEL FOX
+  meaning: Kurzwellenfunkgerät (HF).
+  category: ablauf
+  note: ATP 1-02.1 (2020/21), S. 37.
+  see: [UNIFORM, VICTOR, FOX MIKE]
+- word: PRI
+  meaning: Primäre Funkfrequenz – bei UHF/VHF das UHF-Gerät, bei zwei UHF-Geräten das erste.
+  category: ablauf
+  layer: community
+  check: true
+  note: Sprachgebrauch von Verbänden und Sims. In ATP 1-02.1 (2020/21) steht „pri“ nur als Chat-Abkürzung für „priority“, kein Brevity-Code.
+  see: [AUX, UNIFORM]
+- word: AUX
+  meaning: Zweite (Hilfs-)Funkfrequenz – bei UHF/VHF das VHF-Gerät, bei zwei UHF-Geräten das zweite.
+  category: ablauf
+  layer: community
+  check: true
+  note: Sprachgebrauch von Verbänden und Sims; in ATP 1-02.1 (2020/21) nicht enthalten.
+  see: [PRI, VICTOR]
+
+# ------------------------------------------------------------------ Lagebild & Gruppen
+- word: GROUP
+  meaning: Luftkontakte, die innerhalb von 3 NM in Seite (Azimut) und Entfernung beieinander liegen.
+  category: lagebild
+  note: Beide Bedingungen müssen gelten. Kontakte, die das nicht erfüllen, sind verschiedene Gruppen. ATP 1-02.1 (2020/21).
+  see: [SINGLE, HEAVY, CONTACT, STRENGTH, STACK]
+- word: SINGLE
+  meaning: Eine Gruppe bzw. ein einzelner Kontakt.
+  category: lagebild
+  see: [GROUP, HEAVY]
+- word: HEAVY
+  meaning: Gruppe mit bekanntermaßen drei oder mehr Kontakten.
+  category: lagebild
+  see: [GROUP]
+- word: STRENGTH
+  meaning: Zahl der Kontakte einer Gruppe oder Spur.
+  category: lagebild
+  example: "Viper 1-1, targeted west group bullseye 270/15, 20 thousand, hot, hostile, strength two."
+  note: Jäger sagen STRENGTH, die Leitstelle sagt CONTACTS. ATP 1-02.1 (2020/21), S. 63.
+  see: [GROUP, HEAVY, CONTACT]
+- word: STACK
+  meaning: Zwei oder mehr Kontakte innerhalb der Gruppenkriterien mit deutlichem Höhenunterschied (üblich ab 10.000 ft). Auch die Anfrage nach allen Flugzeugen mit ihren Höhenblöcken in einem Gebiet.
+  category: lagebild
+  note: ATP 1-02.1 (2020/21), S. 61.
+  see: [GROUP, HEAVY, STRENGTH]
+- word: AZIMUTH
+  meaning: Lagebild mit zwei Gruppen nebeneinander (seitlich getrennt).
+  category: lagebild
+  example: "Two groups azimuth 12."
+  see: [RANGE, WALL]
+- word: RANGE
+  meaning: Lagebild mit zwei Gruppen hintereinander auf derselben Peilung.
+  category: lagebild
+  see: [AZIMUTH, LADDER]
+- word: WALL
+  meaning: Lagebild mit drei oder mehr Gruppen nebeneinander.
+  category: lagebild
+  see: [AZIMUTH]
+- word: LADDER
+  meaning: Lagebild mit drei oder mehr Gruppen hintereinander.
+  category: lagebild
+  see: [RANGE]
+- word: VIC
+  meaning: Lagebild mit drei Gruppen – eine vorn, zwei dahinter seitlich versetzt.
+  category: lagebild
+  see: [CHAMPAGNE]
+- word: CHAMPAGNE
+  meaning: Lagebild mit drei Gruppen – zwei vorn, eine dahinter.
+  category: lagebild
+  see: [VIC]
+- word: ECHELON
+  meaning: Eine Gruppe hinter und seitlich versetzt zu einer anderen.
+  category: lagebild
+- word: BOX
+  meaning: Lagebild mit vier Gruppen im (versetzten) Quadrat – zwei vorn, zwei dahinter.
+  category: lagebild
+- word: WIDE
+  meaning: Seitlicher Abstand (Azimut) zwischen den äußersten Gruppen eines Lagebilds mit drei oder mehr Gruppen – bei WALL, VIC, CHAMPAGNE und BOX.
+  category: lagebild
+  example: "Three groups vic 15 deep, 10 wide."
+  note: >-
+    Bei WALL steht nur WIDE. Bei VIC kommt zuerst DEEP, dann WIDE; bei CHAMPAGNE und BOX zuerst WIDE, dann DEEP.
+    ATP 1-02.1 (2020/21), S. 70; ATP 3-52.4 (2021), S. 38–41.
+  see: [DEEP, WALL, VIC, CHAMPAGNE, BOX]
+- word: DEEP
+  meaning: Abstand in Entfernungsrichtung zwischen der nächsten und der fernsten Gruppe eines Lagebilds mit drei oder mehr Gruppen – bei LADDER, VIC, CHAMPAGNE und BOX.
+  category: lagebild
+  note: >-
+    Bei LADDER steht nur DEEP. Reihenfolge der Maße siehe WIDE. ATP 1-02.1 (2020/21), S. 27; ATP 3-52.4 (2021),
+    S. 38–42.
+  see: [WIDE, LADDER, VIC, CHAMPAGNE, BOX]
+- word: OPENING
+  meaning: Der Abstand zwischen Gruppen (oder zu einem Kontakt) wird größer.
+  category: lagebild
+  example: "Two groups range 25 opening."
+  note: >-
+    Steht im Picture direkt hinter Label und Maß, vor weiteren Zusätzen wie WEIGHTED, ECHELON und TRACK.
+    ATP 1-02.1 (2020/21), S. 46; ATP 3-52.4 (2021), S. 30–31.
+  see: [CLOSING, WEIGHTED, TRACK]
+- word: CLOSING
+  meaning: Der Abstand zwischen Gruppen (oder zu einem Kontakt) wird kleiner.
+  category: lagebild
+  note: Gegenstück zu OPENING, an derselben Stelle im Picture. ATP 1-02.1 (2020/21), S. 24; ATP 3-52.4 (2021), S. 30–31.
+  see: [OPENING]
+- word: WEIGHTED
+  meaning: Zusatz zu CHAMPAGNE, VIC, WALL oder LADDER – eine oder mehrere Gruppen stehen nicht an ihrem Platz im Standardbild, sondern zur genannten Himmelsrichtung versetzt.
+  category: lagebild
+  example: "Three groups vic 15 deep, 10 wide, weighted north."
+  note: ATP 1-02.1 (2020/21), S. 69; ATP 3-52.4 (2021), S. 31.
+  see: [VIC, CHAMPAGNE, WALL, LADDER, OPENING]
+- word: TRACK
+  meaning: Flugrichtung einer Gruppe oder eines Kontakts, angesagt als Himmelsrichtung der 8er-Rose (north, northeast, east …).
+  category: lagebild
+  example: "Group bullseye 045/60, 25 thousand, track west, hostile."
+  note: >-
+    Im Bullseye-Format gehört der Track zu jeder Gruppe (ATP 3-52.4 (2021), S. 24). Fliegen alle Gruppen eines
+    Pictures in dieselbe Richtung, steht „track …“ einmal hinter dem Label; sind alle heiß zur Kampfachse, entfällt er
+    (S. 24 und 32). Kreist eine Gruppe, darf „CAP“ statt des Tracks stehen. Im BRAA-Format steht statt des Tracks der
+    Aspekt (HOT, FLANK, BEAM, DRAG). Im Luft-Boden-Einsatz hat TRACK weitere Bedeutungen, etwa den Auftrag, ein Objekt
+    mit Sensor oder Auge zu beobachten. ATP 1-02.1 (2020/21), S. 67.
+  see: [BULLSEYE, BRAA, GROUP, CAP, MANEUVER]
+- word: HIGH (Lagebild)
+  meaning: Zusatz im Lagebild – der Kontakt fliegt höher als 40.000 ft MSL.
+  category: lagebild
+  note: >-
+    Steht als Fill-in hinter der Declaration („… hostile, high“). Nicht verwechseln mit „high“ in einer Positionsansage
+    im Verband („your left ten o'clock, two miles, high“): Dort heißt es nur „über dir“. ATP 1-02.1 (2020/21), S. 36;
+    ATP 3-52.4 (2021), S. 25.
+  see: [FAST, VERY FAST, STACK]
+- word: FAST
+  meaning: Zielgeschwindigkeit 600–900 kt über Grund bzw. Mach 1,0 bis 1,5.
+  category: lagebild
+  note: Fill-in im Lagebild wie HIGH. ATP 1-02.1 (2020/21), S. 31; ATP 3-52.4 (2021), S. 25.
+  see: [VERY FAST, HIGH (Lagebild)]
+- word: VERY FAST
+  meaning: Zielgeschwindigkeit über 900 kt bzw. über Mach 1,5.
+  category: lagebild
+  note: ATP 1-02.1 (2020/21), S. 68; ATP 3-52.4 (2021), S. 25.
+  see: [FAST, HIGH (Lagebild)]
+- word: PACKAGE
+  meaning: Räumlich abgesetzte Ansammlung von Gruppen außerhalb der gebrieften Entfernung zueinander.
+  category: lagebild
+  note: Die Grenze legt die Missionsplanung fest. Benannt wird nach Himmelsrichtung („north package“) mit eigenem Bullseye-Bezug. Nicht verwechseln mit dem Force Package, dem ganzen Verband aus mehreren Flights mit gemeinsamer Mission, den der Mission Commander führt (Roll Call „package … roll call“). ATP 3-52.4 (2021), S. 15 und S. 44; ATP 1-02.1 (2020/21), S. 46.
+  see: [GROUP, LEADING EDGE]
+- word: LEADING EDGE
+  meaning: "Kurzform des Lagebilds, wenn kein Label passt oder die Lage komplex ist: Gesamtzahl, dann die Gruppen des nächsten Angriffs mit Label, am Ende FOLLOW ON."
+  category: lagebild
+  check: true
+  note: Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021).
+  see: [PICTURE, FOLLOW ON, PACKAGE]
+- word: FOLLOW ON
+  meaning: "Angabe nach dem LEADING EDGE: nachfolgende Gruppen mit dem kürzesten Abstand zur Bedrohungsachse."
+  category: lagebild
+  check: true
+  note: Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021).
+  see: [LEADING EDGE]
+- word: NEW PICTURE
+  meaning: Das Lagebild hat sich geändert. Ersetzt alle früheren Meldungen und gilt für alle Beteiligten neu.
+  category: lagebild
+  note: >-
+    Wird bei heißen Jägern gerufen, nicht innerhalb der Targeting-Reichweite; kalte Jäger fordern das Picture selbst an.
+    Beide Seiten dürfen es rufen. ATP 1-02.1 (2020/21), S. 45; ATP 3-52.4 (2021), S. 45–46.
+  see: [PICTURE, ADDITIONAL GROUP, POP-UP]
+- word: MANEUVER
+  meaning: Die genannte Gruppe verändert Azimut, Entfernung oder Höhe.
+  category: lagebild
+  example: "Viper 1-1, north group maneuver drag east."
+  layer: community
+  note: >-
+    ATP 1-02.1 (2020/21), S. 42 kennt „MANEUVER [Azimut, Entfernung, Höhe]“; das Beispiel mit Gruppenname und Aspekt
+    (BEAM NORTH, DRAG EAST) folgt ATP 3-52.4 (2021).
+  see: [GROUP, BEAM, DRAG, SEPARATION]
+- word: SEPARATION
+  meaning: Anfrage nach dem Abstand zwischen zwei Gruppen. Auch die Meldung, wie sich Gruppen zueinander verhalten, wenn das im Label nicht (mehr) steht.
+  category: lagebild
+  note: >-
+    Ohne weitere Angabe ist die verankerte Gruppe gemeint. Die Antwort enthält Folgegruppe, Abstand in NM, Höhe und Fill-ins.
+    ATP 1-02.1 (2020/21), S. 55; ATP 3-52.4 (2021), S. 65.
+  see: [GROUP, MANEUVER, ANCHORED]
+- word: ANCHORED
+  meaning: Kurvenkampf an der genannten Stelle – der Jäger bleibt an der Gruppe, statt durchzufliegen.
+  category: lagebild
+  note: Typische Antwort des Jägers auf MERGED, mit Gruppenname oder Bullseye. ATP 1-02.1 (2020/21), S. 15; ATP 3-52.4 (2021), S. 65.
+  see: [MERGED, BLOW THROUGH, STANDBY]
+- word: LEAKER
+  meaning: Eine Luftbedrohung ist durch eine Verteidigungslinie gebrochen.
+  category: lagebild
+- word: POP-UP
+  meaning: Eine Gruppe, die plötzlich im Bereich zwischen Targeting- und Threat-Reichweite auftaucht, bisher nicht gemeldet.
+  category: lagebild
+  note: >-
+    Im Funk heißt sie POP-UP GROUP. Liegt sie schon innerhalb der Threat-Reichweite, heißt sie THREAT GROUP; liegt sie
+    außerhalb der Targeting-Reichweite oder passt nicht zum Label, ADDITIONAL GROUP. ATP 1-02.1 (2020/21), S. 49;
+    ATP 3-52.4 (2021), S. 45–46.
+  see: [ADDITIONAL GROUP, THREAT GROUP, THREAT, NEW PICTURE]
+- word: ADDITIONAL GROUP
+  meaning: Neu erkannte Gruppe außerhalb der Targeting-Reichweite oder eine, die nicht zum bestehenden Label passt.
+  category: lagebild
+  check: true
+  note: Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021), S. 45–46. Wird mit Bullseye verankert.
+  see: [POP-UP, THREAT GROUP, NEW PICTURE]
+- word: THREAT GROUP
+  meaning: Bisher nicht gemeldete Gruppe, die sofort die Bedrohungskriterien erfüllt. Meldung im BRAA-Format an das nächste Flugzeug.
+  category: lagebild
+  check: true
+  example: "Viper 1-1, Darkstar, threat group BRAA 270/13, 20 thousand, hot, hostile."
+  note: Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021), S. 45–46. Mehrere gleiche bekommen Himmelsrichtung oder Zahl davor.
+  see: [THREAT, POP-UP, SNAPLOCK]
+- word: THREAT
+  meaning: Ungefragte Warnung – ein Gegner (hostile, bandit oder bogey) ist innerhalb der gebrieften Entfernung zu einem Freund, und niemand hat ihn als Ziel übernommen.
+  category: lagebild
+  example: "Viper 1-1, Darkstar, north group threat BRAA 040/12, 20 thousand, hot, hostile."
+  note: >-
+    THREAT steht unmittelbar vor BRAA. Als Standardschwelle nennt ATP 3-52.4 (2021), S. 22–23, 35 NM unabhängig vom Aspekt,
+    wenn das Briefing nichts anderes sagt (SkyEye in DCS z. B. 25 NM). Ist die Position des Jägers unbekannt oder sind
+    mehrere betroffen, kommt „threat bullseye“ und der Jäger antwortet mit Rufzeichen. TARGETED beendet die Meldung. ATP 1-02.1 (2020/21), S. 66.
+  see: [BRAA, POP-UP, THREAT GROUP, TARGETED]
+- word: GORILLA
+  meaning: Großer Verband unbekannter oder nicht eigener Flugzeuge, Anzahl unklar.
+  category: lagebild
+- word: FADED
+  meaning: Sensordaten zu einer Gruppe oder einem Kontakt sind verloren. Die Leitstelle nennt die letzte bekannte Position samt Zahl der Kontakte und Track.
+  category: lagebild
+  note: >-
+    Nach ATP 3-52.4 (2021), S. 63–65 gilt eine Gruppe nach 30 s ohne Aktualisierung als FADED. Wird innerhalb einer Minute
+    ein Picture angefragt, kommt „faded last known“ mit letztem Bullseye; später „clean, [n] contacts faded“. Gilt nur für
+    Gegner – bei Eigenen heißt es NEGATIVE CONTACT. ATP 1-02.1 (2020/21), S. 30.
+  see: [VANISHED, NEGATIVE CONTACT, PICTURE]
+- word: VANISHED
+  meaning: "Sonderfall von FADED: keine Sensordaten mehr, und zwar außerhalb bekannter Blindzonen und zugleich passend zu einem Schuss eigener Kräfte."
+  category: lagebild
+  note: "Im Training: Nach dem „dead“ des Trainingsleiters (RTO) antwortet die Leitstelle mit VANISHED. ATP 1-02.1 (2020/21), S. 68; ATP 3-52.4 (2021), S. 65."
+  see: [FADED, DEADMAN, KILL]
+- word: NEGATIVE CONTACT
+  meaning: Die Leitstelle hat keinen Kontakt zu dem genannten eigenen Flugzeug (Gegenstück zu FADED bei Gegnern).
+  category: lagebild
+  check: true
+  example: "Eagle 1, Darkstar, negative contact."
+  note: Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021), S. 63–65. Beim Wechsel auf prozedurale Kontrolle auch beim Check-in.
+  see: [FADED, VANISHED]
+- word: DEADMAN
+  meaning: Antwort des Trainingsleiters (RTO) auf eine Anfrage zu einem Flugzeug, das im Übungsablauf als abgeschossen gilt.
+  category: lagebild
+  check: true
+  note: Nur Training. Nicht in ATP 1-02.1 (2020/21); beschrieben in ATP 3-52.4 (2021), S. 65.
+  see: [VANISHED, KILL]
+- word: UNTARGETED
+  meaning: "Zusatz zum Gruppennamen: Die Gruppe steht innerhalb der Targeting-Reichweite, ist aber nicht aufgeschaltet und gefährdet Mission oder Kräfte."
+  category: lagebild
+  check: true
+  note: Endet, sobald ein Jäger TARGETED meldet. In ATP 3-52.4 (2021) in der Änderungsübersicht als entfernt geführt, im Text aber noch beschrieben – Gebrauch unsicher.
+  see: [TARGETED, THREAT]
+
+# ------------------------------------------------------------------ Kontrolle & Systeme
+- word: KNOCK IT OFF
+  meaning: Alle Luftkampfmanöver, Angriffe, Aktivitäten oder Übungen sofort einstellen – nur im Training.
+  category: kontrolle
+  example: "Knock it off, knock it off, Viper 1-1 knock it off."
+  note: Auch aus Sicherheitsgründen. ATP 1-02.1 (2020/21), S. 40.
+  see: [TERMINATE]
+- word: TERMINATE
+  meaning: Im Training das örtliche Gefecht beenden, ohne die ganze Übung zu stoppen.
+  category: kontrolle
+  check: true
+  note: >-
+    ATP 1-02.1 (2020/21), S. 66 kennt nur diese Trainingsbedeutung. Im Korea-BEM (2005) heißt TERMINATE zuerst „Laser
+    beenden“; nach ATP 1-02.1 (2020/21) dient dafür CEASE LASER.
+  see: [KNOCK IT OFF, CEASE LASER]
+- word: KILL
+  meaning: Im Training der Ruf des Schützen, dass sein Abschuss gewertet wird – er hat zum bewerteten Ende der Rakete Sichtkontakt zum Ziel.
+  category: kontrolle
+  check: true
+  note: >-
+    Das Korea-BEM (2005) kennt zudem KILL als Anweisung zu schießen. Danach entfernt der Trainingsleiter die Gruppe aus dem
+    Lagebild (VANISHED/DEADMAN). Format des Rufs: je nach Briefing. ATP 1-02.1 (2020/21), S. 40.
+  see: [VANISHED, DEADMAN, KNOCK IT OFF]
+- word: ABORT
+  meaning: Handlung, Angriff oder Mission abbrechen – vor Waffenauslösung, Ereignis oder Missionsende.
+  category: kontrolle
+  note: ATP 1-02.1 (2020/21), S. 14.
+  see: [CLEARED HOT, CONTINUE DRY]
+- word: CLEARED HOT
+  meaning: Waffenfreigabe bei CAS-Terminal-Control Typ 1 und 2 für ein bestimmtes Ziel (durch JTAC oder FAC(A)).
+  category: kontrolle
+  note: Bei Typ 3 heißt die Freigabe CLEARED TO ENGAGE. ATP 1-02.1 (2020/21), S. 23.
+  see: [CLEARED TO ENGAGE, CONTINUE DRY, ABORT, IN]
+- word: CLEARED TO ENGAGE
+  meaning: "Bei Typ-3-Kontrolle: Freigabe an Flug oder Flugzeug, innerhalb der vom JTAC/FAC(A) genannten Parameter anzugreifen. Auch (Luft-Luft): Feuerfreigabe für die bezeichnete Gruppe."
+  category: kontrolle
+  note: ATP 1-02.1 (2020/21), S. 24. Der Angreifer meldet danach den Abschluss (ENGAGEMENT COMPLETE bzw. ATTACK COMPLETE).
+  see: [CLEARED HOT, ENGAGEMENT COMPLETE, ATTACK COMPLETE]
+- word: ENGAGEMENT COMPLETE
+  meaning: "Pflichtmeldung des Angreifers an den JTAC bei Typ-3-Kontrolle: Waffenabwurf abgeschlossen."
+  category: kontrolle
+  note: ATP 1-02.1 (2020/21), S. 30. Die ältere Bezeichnung (Korea-BEM, 2005) ist ATTACK COMPLETE.
+  see: [ATTACK COMPLETE, CLEARED TO ENGAGE]
+- word: ATTACK COMPLETE
+  meaning: Pflichtmeldung des Angreifers an den JTAC bei Typ-3-Kontrolle nach dem Abwurf.
+  category: kontrolle
+  check: true
+  note: Ältere Fassung (Korea-BEM, 2005); in ATP 1-02.1 (2020/21) heißt dieselbe Meldung ENGAGEMENT COMPLETE. Sims und Kneeboards verwenden meist „attack complete“.
+  see: [ENGAGEMENT COMPLETE, CLEARED TO ENGAGE]
+- word: LASER ON
+  meaning: Anweisung, mit der Laserbeleuchtung zu beginnen.
+  category: kontrolle
+  example: "Hog 1-1, laser on."
+  note: ATP 1-02.1 (2020/21), S. 41.
+  see: [LASING, CEASE LASER, TEN SECONDS]
+- word: LASING
+  meaning: Der Sprecher beleuchtet mit dem Laser – Antwort auf LASER ON.
+  category: sensoren
+  note: ATP 1-02.1 (2020/21), S. 41.
+  see: [LASER ON, SPOT]
+- word: MONITOR
+  meaning: Die Sensor-Aufmerksamkeit auf die genannte Gruppe oder das genannte Objekt richten. Wichtige Änderungen werden gemeldet.
+  category: sensoren
+  aliases: [monitoring]
+  note: Die Antwort heißt MONITORING. Bei FADED bleibt die Gruppe in der MONITOR-Verantwortung der Jäger, solange sie sie noch korrelieren. Nicht verwechseln mit „monitor (Flugsicherung)“, dem Frequenzwechsel, bei dem man nur zuhört. ATP 1-02.1 (2020/21), S. 44; ATP 3-52.4 (2021), S. 64 und S. 77.
+  see: [FADED, monitor (Flugsicherung)]
+- word: SPOT
+  meaning: "Laser-Reflexion erfasst. Auch: Plattform kann einen Laser Spot Tracker nutzen."
+  category: sensoren
+  note: ATP 1-02.1 (2020/21), S. 61.
+  see: [LASING, LASER ON]
+- word: SHIFT
+  meaning: Laser, IR, Radar oder Zielpunkt in die genannte Richtung verlegen.
+  category: kontrolle
+  note: "Auch bei mehreren Angreifern: Laserenergie oder Zielzuweisung verschieben. ATP 1-02.1 (2020/21), S. 55."
+  see: [LASER ON, CEASE LASER]
+- word: CEASE LASER
+  meaning: Anweisung, die Laserbeleuchtung zu beenden. Gegenstück zu LASER ON.
+  category: kontrolle
+  note: Aus der allgemeinen Form „CEASE [Tätigkeit]“. ATP 1-02.1 (2020/21), S. 21; Korea-BEM (2005).
+  see: [LASER ON, TERMINATE]
+- word: TEN SECONDS
+  meaning: "Achtung: etwa in zehn Sekunden folgt der Ruf für die Waffenfunktion, z. B. LASER ON."
+  category: kontrolle
+  note: Pilot an den Terminal-Controller. ATP 1-02.1 (2020/21), S. 65.
+  see: [LASER ON, LASING]
+- word: CONTINUE DRY
+  meaning: Das laufende Manöver fortsetzen, aber keine Waffen auslösen.
+  category: kontrolle
+  note: >-
+    Gilt bei Type-1-, -2- und -3-Kontrolle; bei Type 3 sagt der JTAC „Type 3, continue dry“. Ein simulierter Angriff ist
+    erlaubt. ATP 1-02.1 (2020/21), S. 26.
+  see: [CONTINUE, CLEARED HOT, CLEARED TO ENGAGE]
+- word: CONTINUE
+  meaning: Das laufende Manöver fortsetzen – das ist keine Freigabe, Waffen einzusetzen.
+  category: kontrolle
+  note: >-
+    ATP 1-02.1 (2020/21), S. 25: CONTINUE ändert nichts an der Freigabe zum Angriff oder Waffeneinsatz. Wer „continue“
+    mit CLEARED HOT oder CLEARED TO ENGAGE verwechselt, wirft ohne Erlaubnis – eine der gefährlichsten Verwechslungen
+    im CAS-Funk.
+  topic: jtac-und-luftnahunterstuetzung
+  see: [CONTINUE DRY, CLEARED HOT, CLEARED TO ENGAGE, ABORT]
+- word: WEAPONS FREE
+  meaning: Feuer auf alle Ziele, die nicht als eigen identifiziert sind (im Rahmen der ROE).
+  category: kontrolle
+  see: [WEAPONS TIGHT, WEAPONS HOLD]
+- word: WEAPONS TIGHT
+  meaning: Feuer nur auf Ziele, die sicher als feindlich (HOSTILE) identifiziert sind.
+  category: kontrolle
+  see: [WEAPONS FREE, WEAPONS HOLD, HOSTILE]
+- word: WEAPONS HOLD
+  meaning: Feuer nur zur Selbstverteidigung oder auf ausdrücklichen Befehl.
+  category: kontrolle
+  see: [WEAPONS TIGHT]
+- word: SWEET
+  meaning: "Gültige Antwort bei der IFF-Prüfung. Auch: System bzw. Datenlink arbeitet normal."
+  category: kontrolle
+  see: [SOUR, BENT]
+- word: SOUR
+  meaning: "Ungültige oder keine Antwort bei der IFF-Prüfung. Auch: Probleme beim Netzeintritt (z. B. „TIMBER SOUR“)."
+  category: kontrolle
+  see: [SWEET, TIMBER]
+- word: BENT
+  meaning: Das genannte System ist ausgefallen. Aufgehoben mit SWEET.
+  category: kontrolle
+  see: [SWEET]
+- word: SQUAWK
+  meaning: Den Transponder (IFF/SIF) wie angegeben schalten – oder er arbeitet wie angegeben.
+  category: kontrolle
+  see: [STRANGLE, SPADES]
+- word: STRANGLE
+  meaning: Das genannte Gerät abschalten (z. B. „strangle parrot“ – Transponder aus).
+  category: kontrolle
+  see: [SQUAWK]
+- word: TIMBER
+  meaning: Link-16-Datenlinknetz (Teilnahmegruppe für die Luftraumkontrolle).
+  category: kontrolle
+  see: [SWEET, SOUR]
+
+# ------------------------------------------------------------------ CAS (Spur C): Talk-on, IR, Angriff, SEAD
+- word: CAPTURED
+  meaning: Ziel im eigenen Sensor (z. B. Zielbehälter) erfasst und verfolgt.
+  category: sicht
+  note: Nicht dasselbe wie TALLY (mit den Augen gesehen). Laut Zusammenfassung der ATP 1-02.1 (April 2025).
+  see: [TALLY, CONTACT]
+- word: LOOKING
+  meaning: Bezugspunkt oder Ziel nicht in Sicht – der JTAC soll weiterbeschreiben. Gegenteil von CONTACT.
+  category: sicht
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025).
+  see: [CONTACT, NO JOY]
+- word: SPARKLE
+  meaning: Ziel ist mit einem IR-Pointer markiert – nur mit Nachtsichtbrille zu sehen.
+  category: sensoren
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025). Steht auf den BMS-CAS-Blättern auch als Markierung in Line 7.
+  see: [SNAKE, STEADY, ROPE]
+- word: SNAKE
+  meaning: Den IR-Pointer um das Ziel kreisen lassen, damit es leichter zu finden ist.
+  category: sensoren
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025) und JTAC-Leitfaden der Community. Manche Community-Handbücher führen SNAKE als Ausweichmanöver – das ist nicht gemeint.
+  see: [SPARKLE, STEADY]
+- word: STEADY
+  meaning: Den IR-Pointer ruhig auf das Ziel halten.
+  category: sensoren
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025).
+  see: [SPARKLE, SNAKE]
+- word: ROPE
+  meaning: Der Trupp am Boden zieht mit dem IR-Pointer einen Kreis um ein Flugzeug, damit es die eigene Stellung am Boden findet.
+  category: sensoren
+  note: ATP 1-02.1 (2020/21), Tabelle 2, als Boden-Luft-Ruf [S/A] – das Wort kommt vom Boden, nicht vom Piloten.
+  see: [SPARKLE]
+- word: SLAPSHOT
+  meaning: Aufforderung, sofort mit der besten verfügbaren Anti-Radar-Rakete eine Bedrohung in der genannten Peilung zu bekämpfen.
+  category: waffen
+  check: true
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025). Von wo aus die Peilung gilt, ist in den Quellen offen.
+  see: [MAGNUM]
+- word: DIRT
+  meaning: Der Radarwarnempfänger zeigt eine Bodenbedrohung, aber nur in der Suche (noch nicht im Track).
+  category: sensoren
+  check: true
+  note: Laut Zusammenfassung der ATP 1-02.1 (April 2025). Stärker sind MUD (Track) und SINGER (Start).
+  see: [MUD, SINGER]

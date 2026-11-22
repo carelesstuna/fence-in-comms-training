@@ -1,0 +1,56 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Fence In Comms Training",
+  "mainBinaryName": "fence-in-comms-training",
+  "version": "0.1.0",
+  "identifier": "io.github.carelesstuna.fence-in-comms-training",
+  "build": {
+    "beforeDevCommand": "npm run dev -- --port 5185 --strictPort",
+    "devUrl": "http://localhost:5185",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "create": false,
+        "title": "Fence In Comms Training",
+        "width": 1200,
+        "height": 860,
+        "minWidth": 720,
+        "minHeight": 560,
+        "center": true,
+        "dragDropEnabled": false,
+        "useHttpsScheme": false,
+        "backgroundColor": "#0b120e"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; form-action 'none'",
+      "headers": {
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Embedder-Policy": "require-corp"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Fence In Comms Training",
+    "category": "Education",
+    "shortDescription": "Militärischer Flugfunk für Flugsim-Piloten",
+    "longDescription": "Fence In Comms Training: Lern-App für militärischen Flugfunk in Flugsims. Phraseologie, Brevity, gewürfelte Szenarien. Läuft offline.",
+    "copyright": "Code: MIT · Inhalte: CC BY-SA 4.0",
+    "licenseFile": "../dist/INSTALLER-LIZENZ.txt",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["German"],
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

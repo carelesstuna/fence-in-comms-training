@@ -1,0 +1,357 @@
+# Modul 4, Zugabe zum Checkride (Lektion m4-l6): derselbe Einsatz, diesmal führst du den Flight.
+# Die App spielt die Wingmen. Im 2-ship entfallen Three und Four automatisch.
+# Treibstoff: Two ist der Niedrigste im Flight – den musst du bei WHAT STATE melden.
+id: m4-s2-als-lead
+title: "Als Lead: {flight} führen"
+summary: Diesmal gibst du die Anweisungen – push, check, fence in, pushing, Ops Check, WHAT STATE, RTB und BD-Check.
+layer: community
+as: lead
+sources:
+  - title: "Wikipedia: Multiservice tactical brevity code (ATP 1-02.1, Stand 25.04.2025)"
+    url: https://en.wikipedia.org/wiki/Multiservice_tactical_brevity_code
+vars:
+  af: { pool: airfields }
+  cp: { commplan: true, airfield: af }
+  awacs: { pool: callsigns.awacs }
+  ang: { number: angels, range: [18, 28] }
+  push: { number: time }
+  bingo: { number: fuel, range: [2.5, 3.5] }
+  jadd: { oneOf: ["1.0", "1.5", "2.0"] }
+  joker: { derive: sum, of: [bingo, jadd], kind: fuel }
+  m2: { oneOf: ["0.9", "1.4", "1.9"] }
+  f2: { derive: sum, of: [joker, m2], kind: fuel }
+  d1: { oneOf: ["0.4", "0.6", "0.8"] }
+  d3: { oneOf: ["0.2", "0.5", "0.7"] }
+  d4: { oneOf: ["0.3", "0.6", "0.9"] }
+  f1: { derive: sum, of: [f2, d1], kind: fuel }
+  f3: { derive: sum, of: [f2, d3], kind: fuel }
+  f4: { derive: sum, of: [f2, d4], kind: fuel }
+  ma: { int: [2, 4] }
+  # mit Sprechform, sonst stünde die Ziffer roh im Funkspruch
+  ms: { oneOf: [{ text: "0", spoken: zero }, { text: "0", spoken: zero }, { text: "1", spoken: one }] }
+  mi: { int: [1, 2] }
+kneeboard:
+  title: "Line-up-Card {flight}"
+  commplan: cp
+  stations: [departure, awacs, approach]
+  rows:
+    - { label: "AWACS", value: "{awacs}" }
+    - { label: "Push-Zeit", value: "{push}Z" }
+    - { label: "Joker / Bingo", value: "{joker} / {bingo}" }
+    - { label: "Ops Check", value: "Nummer und Treibstoff" }
+  airfield: af
+  where:
+    dcs: "Missionsbriefing bzw. Comm Card im Kneeboard. Netze wie AWACS legt der Missionsersteller fest – sie stehen im Briefing."
+    bms: "Comm Plan im Briefing bzw. Line-up-Card im Kneeboard. In BMS liegen die Netze auf festen Presets, z. B. Tactical (AWACS) auf UHF 6."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Werte kommen aus Briefing oder Comm Card."
+steps:
+  - stage: Abflug
+    freq: "{cp.departure.name}"
+    situation: >-
+      Du führst **{flight}**, gerade in **{af.name}** gestartet. Laut Missionsbriefing meldet sich der
+      Flight zuerst beim AWACS. Schick deinen Flight auf dessen Netz – mit dem Netznamen von der
+      Line-up-Card.
+    you:
+      mode: type
+      hint: Adressat – push – Netz
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: push, role: brevity, critical: true }
+          - { text: "{cp.awacs.name}", role: info, critical: true, alt: ["{awacs}", "button {cp.awacs.channel|spoken}", "channel {cp.awacs.channel|spoken}", "{cp.awacs.channel|spoken}"] }
+    explain: >-
+      Niemand antwortet – das ist richtig so. Die Bestätigung kommt auf dem neuen Netz. Statt des Netznamens geht
+      auch die Kanalnummer („push {cp.awacs.channel}“, „push button {cp.awacs.channel}“) – laut ATP 1-02.1 heißt es
+      „push [channel]“.
+
+  - stage: AWACS
+    tune: { name: "{awacs} ({cp.awacs.name})", freq: "{cp.awacs.freq}", channel: "{cp.awacs.channel}" }
+    situation: Stell selbst um. Dann prüf, ob alle mitgekommen sind.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: check, role: request, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+    explain: Alle da. Erst jetzt meldest du den Flight beim AWACS an.
+
+  - stage: AWACS
+    situation: Melde deinen Flight beim AWACS an. Ihr fliegt wie geplant (laut Einsatzbefehl), auf **angels {ang}**.
+    you:
+      mode: type
+      hint: Adressat – Flight-Rufzeichen – as fragged
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{flight|spoken}", role: callsign, critical: true, alt: ["{callsign|spoken}"] }
+          - { text: "flight of {flightSize|spoken}", role: info, optional: true }
+          - { text: checking in as fragged, role: info, alt: [as fragged] }
+          - { text: "angels {ang|spoken}", role: value, optional: true }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{flight|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: contact, role: info }
+          - { text: picture clean, role: brevity }
+    explain: >-
+      Das Gespräch mit dem AWACS führst du für den Flight, mit dem Flight-Rufzeichen. „As fragged“ ist die kurze
+      Anmeldung: Ihr fliegt wie geplant. Anzahl und Höhe gehören zur vollen Anmeldung und dürfen hier dabei sein,
+      müssen aber nicht (ATP 3-52.4 (2021), S. 7–9). Mehr dazu in Modul 5.
+
+  - stage: Push Point
+    situation: Kurz vor dem Einsatzgebiet. Lass den Flight die Schalter setzen.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: fence in, role: brevity, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+
+  - stage: Push Point
+    situation: Es ist **{push}Z** – die Push-Zeit von der Line-up-Card. Melde dem AWACS, dass ihr aufbrecht.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{flight|spoken}", role: callsign, critical: true, alt: ["{callsign|spoken}"] }
+          - { text: pushing, role: brevity, critical: true }
+    explain: pushing – nicht push. Du verlässt den Punkt, die Frequenz bleibt.
+
+  - stage: Im Gebiet
+    situation: Zeit für einen Ops Check. Merk dir die Antworten gut.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: ops check, role: request, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+          - { text: "{f2|spoken}", role: value }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+          - { text: "{f3|spoken}", role: value }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+          - { text: "{f4|spoken}", role: value }
+
+  - stage: Im Gebiet
+    situation: >-
+      Dein eigener Treibstoff: **{f1}**. Raketen im Flight laut Ops Check: aktiv {ma}, halbaktiv {ms}, IR {mi},
+      Kanonen mit Munition. Laut Missionsbriefing meldest du dem AWACS für den ganzen Flight. Er ruft dich.
+    hear:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: what state, role: brevity }
+    you:
+      mode: type
+      hint: Rufzeichen – aktive – halbaktive – IR – by – niedrigster Treibstoff
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true, alt: ["{flight|spoken}"] }
+          - { text: is, role: info, optional: true }
+          - { text: "{ma|spoken}", role: value }
+          - { text: "{ms|spoken}", role: value }
+          - { text: "{mi|spoken}", role: value }
+          - { text: by, role: info, optional: true }
+          - { text: "{f2|spoken}", role: value, critical: true, alt: ["{f2}"] }
+    explain: >-
+      Format nach ATP 1-02.1: Raketen (aktiv, halbaktiv, IR), dann „by“ und der Treibstoff – „{ma}-{ms}-{mi} by
+      {f2}“. Der niedrigste Stand im Flight war Twos **{f2}**, nicht dein eigener {f1}. Der Flight bleibt
+      zusammen, also zählt laut Briefing der Schwächste.
+
+  - stage: Treibstoff
+    situation: Two meldet sich.
+    hear:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: "{two|spoken}", role: callsign }
+          - { text: joker, role: brevity }
+    you:
+      mode: choice
+      wrong:
+        - "{flightName}, RTB"
+        - "Two, say again"
+        - "Roger, Two, joker, wilco"
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: copy, role: proword }
+    explain: >-
+      Joker heißt: laufendes Ereignis beenden, kein neues mehr anfangen, den Rest der Mission fliegen – noch
+      nicht nach Hause. Ein knappes „copy“ reicht; den Abbruch leitest du als Lead ein.
+
+  - stage: Treibstoff
+    situation: Ihr habt euch vom Gefecht gelöst und fliegt aus dem Gebiet. Da meldet sich Two noch einmal.
+    hear:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: "{two|spoken}", role: callsign }
+          - { text: bingo, role: brevity }
+    you:
+      mode: type
+      hint: Adressat – Brevity
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: RTB, role: brevity, critical: true, alt: ["bingo RTB"] }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+    explain: Einer hat Bingo – der ganze Flight fliegt nach Hause.
+
+  - stage: Rückflug
+    situation: Der Flight hat das Einsatzgebiet verlassen. Schalter zurück.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: fence out, role: brevity, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+
+  - stage: Rückflug
+    situation: Jetzt schaut jeder beim anderen nach Schäden.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: battle damage check, role: request, critical: true, alt: ["BD check"] }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: One, role: addressee }
+          - { text: you're clean, role: brevity }
+
+  - stage: Rückflug
+    situation: Du hast dir Two von außen angeschaut – alles in Ordnung.
+    you:
+      mode: type
+      hint: Adressat – Brevity
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: Two, role: addressee, critical: true }
+          - { text: you're clean, role: brevity, critical: true, alt: [clean] }
+    reply:
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Three, role: addressee }
+          - { text: you're clean, role: brevity }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Four, role: addressee }
+          - { text: you're clean, role: brevity }
+
+  - stage: Heimweg
+    situation: Kurz vor dem Heimatplatz. Schick den Flight zu Approach.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: push, role: brevity, critical: true }
+          - { text: "{cp.approach.name}", role: info, critical: true, alt: ["button {cp.approach.channel|spoken}", "channel {cp.approach.channel|spoken}", "{cp.approach.channel|spoken}"] }
+
+  - stage: Heimweg
+    tune: { name: "{af.name} {cp.approach.name}", freq: "{cp.approach.freq}", channel: "{cp.approach.channel}" }
+    situation: Stell Approach ein und prüf den Flight.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: check, role: request, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+    explain: >-
+      Alle da. Jetzt übernimmt Approach – wie es dort weitergeht, folgt in der später geplanten Spur
+      Air Force Ops.

@@ -1,0 +1,24 @@
+id: nellis
+name: Nellis
+map: nttr
+icao: KLSV
+elevationFt: 1869
+runways: ["03L/21R", "03R/21L"]
+atc: { uhf: 327.0, vhf: 132.55 }
+tacan: 12X
+ils: "ILS 21L: 109.10 (I-DIQ)"
+# Echte Frequenzen (UHF) laut FAA-Karten, die DCS mitliefert. Bei Nellis stimmen Tower-Frequenzen von
+# Sim und Wirklichkeit überein (327.0 / 132.55).
+realFreqs: { atis: 270.1, clearance: 289.4, ground: 275.8, tower: 327.0, approach: 273.55 }
+realSource: "FAA-Karten Nellis AFB, als Kneeboard in DCS mitgeliefert: Airport Diagram (Dezember 2013) und HI-ILS or LOC/DME Z RWY 21L (Amdt 5, 26.05.2016) – Mods/terrains/Nevada/Kneeboard/Nellis_AFB_p1.png, _p2.png"
+# Mitgelieferte Kneeboard-Karten (DCS zeigt sie auf dieser Karte im Kneeboard an)
+charts:
+  - { sim: dcs, name: "Airport Diagram (FAA, Dezember 2013)", path: "Mods/terrains/Nevada/Kneeboard/Nellis_AFB_p1.png" }
+  - { sim: dcs, name: "HI-ILS or LOC/DME Z RWY 21L", path: "Mods/terrains/Nevada/Kneeboard/Nellis_AFB_p2.png" }
+  - { sim: dcs, name: "Weitere FAA-Karten (Seiten 3–6)", path: "Mods/terrains/Nevada/Kneeboard/Nellis_AFB_p3.png" }
+verified: dcs-data
+notes:
+  - Direkt neben dem Class-B-Luftraum von Las Vegas – Ab- und Anflüge über festgelegte Punkte.
+  - Sehr großes Vorfeld (über 200 Abstellplätze), viel Verkehr in Multiplayer-Missionen.
+  - TACAN Kanal 12 (LSV) und Localizer I-DIQ 109.10 laut DCS-Funkfeuerdaten (Mods/terrains/Nevada/Beacons.lua) und Anflugkarte („Chan 12“). Ein Y-Modus steht nirgends, daher X.
+  - Platzhöhe 1869 ft laut mitgelieferter FAA-Karte; das DCS-Gelände liegt an TACAN und Gleitpfadsender bei rund 1850 ft.

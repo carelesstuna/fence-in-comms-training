@@ -1,0 +1,424 @@
+# Prüfungsfragen für Modul 4 (Modulprüfung, S-15). Alle Übungen hier haben exam: true und kommen in keiner Lektion vor.
+# Die Lektion steht am Anfang der ID (m4-l3-x-… gehört zu m4-l3). Achtung: m4-l7 (lost wingman, beide blind, NORDO) steht in
+# der App an Position 6, m4-l6 ist der Checkride (Position 7). Weitere Prüfungsfragen für Modul 4 sind Übungen in m4.yaml,
+# die ebenfalls exam: true tragen (früher in keiner Lektion eingebunden).
+# Bewusst nicht abgefragt (wird noch geklärt): ob ein Wingman auf „push“ antwortet, BINGO/TIGER im Wortlaut, „break“,
+# „check“ als Anmeldung auf dem neuen Netz, Gruppenbegriffe (Staffel, Rotte, Flight, Sektion), Easy Comms, VHF-AM-Grenzen.
+
+# ------------------------------------------------------------ Lektion 1: Lead und Wingman
+- id: m4-l1-x-lead-speaks
+  type: choice
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+  prompt: Dein Flight aus vier Flugzeugen will sich bei **{awacs}** melden. Wer spricht dabei für den Flight?
+  options:
+    - Der Lead – er spricht nach außen für den ganzen Flight
+    - Alle vier der Reihe nach, jeder für sich
+    - Der Wingman Two, damit sich der Lead aufs Fliegen konzentrieren kann
+    - Niemand – die Meldung läuft automatisch über den Datalink
+  answer: 0
+  explain: >-
+    Der Lead navigiert, entscheidet und spricht nach außen, mit AWACS, Flugsicherung oder Package. Die Wingmen hören mit
+    und melden sich ungefragt nur, wenn der Lead etwas wissen muss.
+
+- id: m4-l1-x-joker-call
+  type: call
+  exam: true
+  layer: community
+  call: m4-joker
+  as: two
+  prompt: >-
+    Du bist **Two** ({two}). Dein Treibstoff erreicht die höhere der beiden gebrieften Treibstoffschwellen. Der Lead hat
+    nicht danach gefragt. Was funkst du?
+  explain: >-
+    Der Lead muss das wissen, also meldest du es von dir aus. Wer von sich aus funkt, beginnt mit dem vollen Flight-Rufzeichen,
+    damit auch andere Flights auf der Frequenz wissen, dass sie nicht gemeint sind. Die Kurzform „Two, joker“ gilt mit Abzug –
+    das Korea-BEM (2005) nennt sie eine schlechte Angewohnheit.
+
+- id: m4-l1-x-ack-four
+  type: call
+  exam: true
+  layer: community
+  call: m4-lead-directive
+  as: four
+  show: 1
+  prompt: >-
+    Der Lead hat dem 4-ship eine Anweisung gegeben: „{flightName}, {directive}.“ Two und Three haben schon geantwortet. Du
+    bist **Four**. Was funkst du?
+  explain: >-
+    Auf eine Anweisung des Leads antwortet jeder nur mit seiner Nummer, in der Reihenfolge 2, 3, 4. Die Nummer heißt
+    „verstanden, wird gemacht“ und ersetzt roger und wilco.
+
+# ------------------------------------------------------------ Lektion 2: push, check, pushing, ROLEX
+- id: m4-l2-x-rolex-times
+  type: form
+  exam: true
+  layer: community
+  vars:
+    push: { number: time }
+    tot: { derive: offset, from: push, add: 30 }
+    rx: { int: [5, 15], step: 5 }
+    pushNew: { derive: sum, of: [push, rx], kind: time }
+    totNew: { derive: sum, of: [tot, rx], kind: time }
+  prompt: >-
+    Laut Missionsbriefing ist die Push-Zeit **{push}Z** und die Zeit über dem Ziel **{tot}Z**. Auf dem Strike-Netz hörst du
+    die Missionsleitung: „rolex plus {rx|spoken}“. Welche Zeiten gelten jetzt?
+  fields:
+    - { label: Push-Zeit (Zulu), accept: ["{pushNew}", "{pushNew}z", "{pushNew} zulu", "{pushNew|spoken}"], placeholder: z. B. 1435 }
+    - { label: Zeit über dem Ziel (Zulu), accept: ["{totNew}", "{totNew}z", "{totNew} zulu", "{totNew|spoken}"], placeholder: z. B. 1505 }
+  explain: >-
+    ROLEX verschiebt den Zeitplan der ganzen Mission, plus heißt später. Push-Zeit {push} + {rx} Minuten = **{pushNew}**,
+    Zeit über dem Ziel {tot} + {rx} Minuten = **{totNew}**.
+
+- id: m4-l2-x-rolex-twice
+  type: input
+  exam: true
+  layer: community
+  vars:
+    push: { number: time }
+    rx: { int: [10, 15], step: 5 }
+    pushNew: { derive: sum, of: [push, rx], kind: time }
+  prompt: >-
+    Laut Missionsbriefing ist die Push-Zeit **{push}Z**. Erst hörst du von der Missionsleitung „rolex plus five“, später
+    „rolex plus {rx|spoken}“. Wann pushst du jetzt?
+  accept: ["{pushNew}", "{pushNew|spoken}", "{pushNew}z", "{pushNew} zulu"]
+  placeholder: z. B. 1435
+  explain: >-
+    ROLEX rechnet immer von der ursprünglich geplanten Zeit aus, die Verschiebungen addieren sich nicht (ATP 3-52.4, 2021).
+    Es zählt also nur der letzte Ruf: {push} + {rx} Minuten = **{pushNew}**.
+
+- id: m4-l2-x-commcard-tanker
+  type: form
+  exam: true
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+  prompt: >-
+    Laut Missionsbriefing startet dein Flight in **{af.name}**. Später funkt der Lead „{flightName}, push {cp.tanker.name}“.
+    Welchen Kanal stellst du ein, und welche Frequenz ist das?
+  context: |
+    **Comm Card {af.name}**
+
+    | Stelle | Kanal | Frequenz |
+    |---|---|---|
+    | {cp.ground.name} | {cp.ground.channel} | {cp.ground.freq} |
+    | {cp.tower.name} | {cp.tower.channel} | {cp.tower.freq} |
+    | {cp.departure.name} | {cp.departure.channel} | {cp.departure.freq} |
+    | {cp.awacs.name} | {cp.awacs.channel} | {cp.awacs.freq} |
+    | {cp.strike.name} | {cp.strike.channel} | {cp.strike.freq} |
+    | {cp.tanker.name} | {cp.tanker.channel} | {cp.tanker.freq} |
+    | {cp.approach.name} | {cp.approach.channel} | {cp.approach.freq} |
+  fields:
+    - { label: Kanal, accept: ["{cp.tanker.channel}", "{cp.tanker.channel|spoken}"], placeholder: z. B. 9 }
+    - { label: Frequenz, accept: ["{cp.tanker.freq}", "{cp.tanker.freq|spoken}"], placeholder: z. B. 251.5 }
+  explain: >-
+    Der Netzname im Funk („{cp.tanker.name}“), der Kanal auf der Comm Card: Kanal {cp.tanker.channel}, Frequenz
+    {cp.tanker.freq}. Die Comm Card ordnet jedem Netz Kanal und Frequenz zu.
+
+- id: m4-l2-x-pushing-cloze
+  type: cloze
+  exam: true
+  layer: community
+  call: m4-pushing
+  blanks: [1, 2]
+  prompt: >-
+    Die gebriefte Push-Zeit ist da, und dein Flight verlässt den Push Point. Du bist Lead und meldest das dem AWACS
+    **{awacs}**. Ergänze deine Meldung.
+  explain: >-
+    Du meldest für den ganzen Flight, also mit dem Flight-Rufzeichen ohne Position, und sagst „pushing“: Wir verlassen
+    den festgelegten Punkt. Das ist nicht der Frequenzwechsel, der heißt „push“.
+
+# ------------------------------------------------------------ Lektion 3: Fence in, fence out
+- id: m4-l3-x-when-fence
+  type: choice
+  exam: true
+  prompt: Wann funkt der Lead „fence in“, und wann „fence out“?
+  options:
+    - fence in kurz vor dem Einflug ins Einsatzgebiet, fence out beim Verlassen
+    - fence in direkt nach dem Start, fence out kurz vor der Landung
+    - fence in beim Anlassen am Boden, fence out nach dem Abstellen
+    - fence in beim Wechsel zum AWACS, fence out beim Wechsel zurück
+  answer: 0
+  explain: >-
+    Laut ATP 1-02.1 setzt der Flight die Cockpit-Schalter vor dem Einflug in den Einsatzraum (fence in) und beim Verlassen
+    wieder zurück (fence out). Welche Schalter genau dazugehören, steht im Briefing.
+
+- id: m4-l3-x-clean-bd
+  type: choice
+  exam: true
+  layer: community
+  prompt: "Nach dem Battle Damage Check funkt dein Wingman: „One, you're clean.“ Was heißt das hier?"
+  options:
+    - Er sieht an deinem Flugzeug keinen Schaden
+    - Dein Flugzeug trägt keine Außenlasten
+    - Auf seinem Radar ist keine Gruppe zu sehen
+    - Dein Master Arm ist aus
+  answer: 0
+  explain: >-
+    Nach dem Battle Damage Check heißt „you're clean“: kein sichtbarer Schaden. CLEAN hat in der ATP 1-02.1 mehrere
+    Bedeutungen, etwa „keine Sensordaten“ beim AWACS oder „keine Außenlasten“ – die Lage entscheidet.
+
+- id: m4-l3-x-bd-four
+  type: call
+  exam: true
+  layer: community
+  call: m4-fence-out-bd
+  as: four
+  transmission: 7
+  show: 5
+  prompt: >-
+    Der Lead hat nach dem Einsatz „battle damage check“ angesagt. Du bist **Four**, dein Element-Partner ist Three. Du bist
+    unter ihm durchgekreuzt und hast keinen Schaden gesehen. Was funkst du?
+  explain: >-
+    Jeder schaut sich seinen Element-Partner an: Four prüft Three. Du sprichst ihn an und sagst „you're clean“, also kein
+    sichtbarer Schaden.
+
+# ------------------------------------------------------------ Lektion 4: Treibstoff im Verband
+- id: m4-l4-x-state-decode
+  type: form
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    ma: { int: [0, 4] }
+    ms: { int: [0, 2] }
+    mi: { int: [0, 4] }
+    low: { number: fuel, range: [3.0, 6.5] }
+  prompt: >-
+    **{awacs}** fragt deinen Lead nach dem Stand („what state“). Du hörst seine Antwort: „{lead|spoken}, {ma|spoken},
+    {ms|spoken}, {mi|spoken} by {low|spoken}.“ Was hat er gemeldet?
+  fields:
+    - { label: Treibstoff (Tausend Pfund), accept: ["{low}", "{low|spoken}"], placeholder: Zahl eintippen … }
+    - { label: Infrarotraketen, accept: ["{mi}", "{mi|spoken}"], placeholder: Anzahl }
+    - { label: Aktive Radarraketen, accept: ["{ma}", "{ma|spoken}"], placeholder: Anzahl }
+    - { label: Halbaktive Radarraketen, accept: ["{ms}", "{ms|spoken}"], placeholder: Anzahl }
+  explain: >-
+    Die Antwort auf „what state“ hat eine feste Reihenfolge: erst aktive, dann halbaktive und dann Infrarotraketen, nach
+    „by“ der Treibstoff in Tausend Pfund (ATP 1-02.1). Hier also {ma} aktive, {ms} halbaktive, {mi} IR-Raketen und {low}
+    Tausend Pfund.
+
+- id: m4-l4-x-state-call
+  type: call
+  exam: true
+  layer: community
+  call: m4-what-state
+  prompt: >-
+    **{awacs}** fragt dich als Lead „what state“. Raketen im Flight: aktiv **{ma}**, halbaktiv **{ms}**, IR **{mi}**,
+    Kanone mit Munition; niedrigster Treibstoff im Flight **{low}**. Laut Missionsbriefing meldest du für den ganzen
+    Flight. Was funkst du?
+  explain: >-
+    Rufzeichen, dann die Raketen in fester Reihenfolge (aktiv, halbaktiv, IR), „by“ und der niedrigste Treibstoff
+    im Flight: „{callsign|spoken}, {ma}-{ms}-{mi} by {low|spoken}“ (Format nach ATP 1-02.1).
+
+- id: m4-l4-x-fuel-red
+  type: choice
+  exam: true
+  prompt: >-
+    Du leitest einen Flight. Mit dem Treibstoff bleibt dem Flight **keine** Einsatzoption mehr, Waffen und Sensoren sind
+    in Ordnung. Was meldest du der Leitstelle (AWACS)?
+  options:
+    - fuel red
+    - fuel yellow
+    - weapons red
+    - joker
+  answer: 0
+  explain: >-
+    RED heißt: keine Einsatzoption mehr, hier wegen des Treibstoffs. YELLOW wäre noch genau eine Option. JOKER ist dagegen
+    eine Schwelle aus dem Briefing deines eigenen Flights (ATP 3-52.4, 2021).
+
+- id: m4-l4-x-fuel-order
+  type: sequence
+  exam: true
+  layer: community
+  prompt: Der Treibstoff eines Wingmans sinkt im Einsatz. Bring den Ablauf in die richtige Reihenfolge.
+  items:
+    - Dein Treibstoff liegt noch über Joker – du funkst nichts
+    - "Dein Treibstoff erreicht Joker – du meldest „joker“"
+    - "Dein Treibstoff erreicht Bingo – du meldest „bingo“"
+    - "Der Lead schickt den ganzen Flight mit „RTB“ nach Hause"
+  explain: >-
+    Joker liegt über Bingo, also kommt er zuerst. Wer eine Schwelle erreicht, meldet sie ungefragt. Bei Bingo geht der ganze
+    Flight nach Hause, denn der niedrigste Stand bestimmt.
+
+# ------------------------------------------------------------ Lektion 5: Formationsfunk
+- id: m4-l5-x-visual-call
+  type: call
+  exam: true
+  layer: community
+  call: m4-blind
+  as: two
+  transmission: 2
+  show: 1
+  prompt: >-
+    Du bist **Two**, hast den Lead aus den Augen verloren und „blind“ gemeldet. Er sagt dir, wo er von dir aus steht:
+    „your {clk}, {dist|spoken}, {hl}.“ Du schaust dorthin und siehst ihn. Was funkst du?
+  explain: >-
+    Du meldest dich mit „visual“ zurück: Du hast den Lead wieder in Sicht, und erst jetzt schließt du wieder auf. Die Meldung
+    trägt das Flight-Rufzeichen, weil du von dir aus sprichst.
+
+- id: m4-l5-x-clock-level
+  type: choice
+  exam: true
+  prompt: >-
+    Du bist Two und hast „blind“ gemeldet. Der Lead antwortet: „{lead|spoken}, visual, your left eight o'clock, three miles, level.“
+    Wo ist der Lead von dir aus?
+  options:
+    - Links hinten, auf deiner Höhe
+    - Links vorn, auf deiner Höhe
+    - Rechts hinten, auf deiner Höhe
+    - Links hinten, über dir
+  answer: 0
+  explain: >-
+    12 Uhr ist deine Nase, 9 Uhr liegt querab links, 8 Uhr also links etwas hinter dir. „level“ heißt auf deiner Höhe.
+
+- id: m4-l5-x-posit-choice
+  type: choice
+  exam: true
+  prompt: >-
+    Du bist Two und vom Lead getrennt. Er ruft: „Two, posit.“ Was gehört in deine Antwort? (Alles Zutreffende)
+  options:
+    - Deine Position, bezogen auf einen Punkt, den ihr beide kennt, etwa einen Flugplatz
+    - Deine Höhe
+    - Dein Treibstoff in Tausend Pfund
+    - Die Zahl deiner Raketen
+  answer: [0, 1]
+  explain: >-
+    POSIT fragt nach der Position eines Freundes. Die Antwort nennt einen gemeinsamen Bezugspunkt und gehört mit der Höhe
+    zusammen. Treibstoff und Raketen sind Sache von Ops Check und „what state“.
+
+# ------------------------------------------------------------ Lektion 6: Checkride (m4-l6)
+# Fragen zu den Regeln der App (kritische Fehler, Wiederholen) stehen als Übungen in der Lektion selbst (P1-11),
+# geprüft wird hier nur Funk.
+- id: m4-l6-x-lead-duties
+  type: choice
+  exam: true
+  layer: community
+  prompt: Du führst den Flight als Lead. Worauf achtest du im Funk, was ein Wingman nicht muss? (Alles Zutreffende)
+  options:
+    - Beim Check mitzählen, ob alle auf dem neuen Netz angekommen sind
+    - Beim Ops Check den niedrigsten Treibstoff im Flight merken
+    - Für den ganzen Flight mit AWACS und Flugsicherung sprechen
+    - Jede eigene Anweisung mit „roger“ und „wilco“ abschließen
+  answer: [0, 1, 2]
+  explain: >-
+    Der Lead zählt beim Check mit, merkt sich den niedrigsten Stand (danach fragt der AWACS mit „what state“) und spricht
+    nach außen für den Flight. „Roger“ und „wilco“ hängt er an seine Anweisungen nicht an.
+
+- id: m4-l6-x-mission-order
+  type: sequence
+  exam: true
+  layer: community
+  prompt: Ein Einsatz im Verband aus Sicht von Two. Bring die Funksprüche in die richtige Reihenfolge.
+  items:
+    - "Lead: „{flightName}, push Strike“ – der Flight wechselt das Netz"
+    - "Lead auf Strike: „{flightName}, check“ – du sagst „Two“"
+    - "Lead: „{flightName}, fence in“ – du sagst „Two“"
+    - "Lead: „{flightName}, ops check“ – du meldest Nummer und Treibstoff"
+    - "Dein Treibstoff erreicht Joker – du meldest „{two|spoken}, joker“"
+    - "Lead: „{flightName}, fence out“, danach der Battle Damage Check"
+  explain: >-
+    Erst wechseln und zählen, dann die Schalter fürs Einsatzgebiet. Im Gebiet kommt der Ops Check; mit Joker endet das
+    laufende Ereignis. Beim Verlassen des Gebiets folgen fence out und der Battle Damage Check.
+
+# ------------------------------------------------------------ Lektion 7 (Position 6): Lost Wingman, beide blind, NORDO
+- id: m4-l7-x-lost-order
+  type: sequence
+  exam: true
+  layer: community
+  prompt: Als Two verlierst du in einer Wolke den Anschluss an den Lead. Bring den Ablauf in die richtige Reihenfolge.
+  items:
+    - Du stellst sichere Trennung her, gehst auf Instrumente und informierst gleichzeitig den Lead
+    - Der Lead bestätigt und gibt Fluglage, Kurs, Höhe und Geschwindigkeit durch
+    - Du hast wieder eine sichere Lage und bittest um Erlaubnis zum Wiederanschluss
+    - Der Lead gibt die Freigabe zum Wiederanschluss
+    - Du schließt wieder an den Lead an
+  explain: >-
+    Erste Priorität ist die sichere Trennung, nicht das Funken. Der Lead nennt dir seine Werte, damit du auf Instrumenten
+    sicher bleibst, und der Wiederanschluss geht nur mit seiner Freigabe (AFMAN 11-2F-16 V3, Abs. 7.9).
+
+- id: m4-l7-x-lead-values
+  type: choice
+  exam: true
+  prompt: >-
+    Du bist Lead und hörst von Two „lost wingman“. Welche Angaben gibst du ihm durch, damit er auf Instrumenten sicher
+    bleibt? (Alles Zutreffende)
+  options:
+    - Deine Fluglage
+    - Deinen Kurs
+    - Deine Höhe
+    - Deine Geschwindigkeit
+    - Deinen Treibstoff
+    - Deine Position vom Bullseye
+  answer: [0, 1, 2, 3]
+  explain: >-
+    Der Lead bestätigt und nennt Fluglage, Kurs, Höhe und Geschwindigkeit (AFMAN 11-2F-16 V3, Abs. 7.9.3). Damit weiß Two,
+    wo der Lead ist und wie er fliegt, auch ohne ihn zu sehen.
+
+- id: m4-l7-x-blind-match
+  type: match
+  exam: true
+  prompt: Beide Flugzeuge eines Elements haben „blind“ gemeldet, oder der Ruf bleibt unbeantwortet. Ordne zu.
+  pairs:
+    - [Beide Flugzeuge sind blind, Der Lead ist direktiv und weist die Höhen zu]
+    - [Höhenstaffelung unterhalb von 5.000 ft über Grund, Mindestens 500 Fuß]
+    - [Höhenstaffelung oberhalb von 5.000 ft über Grund, Mindestens 1.000 Fuß]
+    - [Auf den „blind“-Ruf kommt keine Antwort, Der Rufer dreht von der letzten bekannten Position des anderen weg]
+  explain: >-
+    Sind beide blind, ordnet der Lead die Höhen an (mindestens 500 Fuß, oberhalb von 5.000 ft über Grund 1.000 Fuß), und
+    niemand steigt oder sinkt durch die Trennhöhe. Kommt keine Antwort, dreht der Rufer weg (AFMAN 11-2F-16 V3, Abs. 3.12.2).
+
+- id: m4-l7-x-both-blind-call
+  type: call
+  exam: true
+  layer: community
+  call: m4-blind-both
+  as: two
+  transmission: 1
+  show: 1
+  prompt: >-
+    Ihr habt euch in einer Kurve verloren, und der Lead meldet sich blind. Auch du siehst ihn nicht. Du fliegst auf
+    **{a2.feet} Fuß**. Was funkst du?
+  explain: >-
+    Auch der Zweite meldet „blind“ mit seiner Höhe auf hundert Fuß: „{two|spoken}, blind {a2|spoken}“. Dann ordnet der
+    Lead die Höhenstaffelung an (AFMAN 11-2F-16 V3, Abs. 3.12.2.2).
+
+- id: m4-l7-x-who-responsible
+  type: choice
+  exam: true
+  prompt: >-
+    Du bist Wingman in taktischer Formation und hast „blind“ gemeldet. Wer ist jetzt hauptverantwortlich dafür, den
+    Flugweg freizuhalten, bis du den Lead wieder siehst?
+  options:
+    - Der Lead
+    - Du selbst
+    - Der AWACS
+    - Die Flugsicherung
+  answer: 0
+  explain: >-
+    Bei „blind“ geht die Hauptverantwortung für den Flugweg auf den Lead über, bis der Wingman wieder Sicht bestätigt (AFMAN
+    11-2F-16 V3, Abs. 3.12.1). Deshalb melden wir „blind“ sofort.
+
+- id: m4-l7-x-nordo-loose
+  type: choice
+  exam: true
+  prompt: >-
+    Dein Funk fällt komplett aus (NORDO). Du fliegst gerade **nicht** im engen Verband, ein anderes Flugzeug deines Flights
+    ist in der Nähe. Was tust du?
+  options:
+    - Auf etwa 500 Fuß an ein anderes Flugzeug heranrücken, Abstand halten und auf sein Flächenwippen (Wingrock) warten
+    - Sofort in den engen Verband einscheren, damit der Lead dich sieht
+    - Den Transponder ausschalten und geradeaus weiterfliegen
+    - Abwarten und die Flugzeuge in der Nähe ignorieren, bis dich jemand findet
+  answer: 0
+  explain: >-
+    Das Wingrock ist die Freigabe zum Anschluss. Bis dahin bist du selbst für deine Abstände verantwortlich, erst danach
+    schließt du an und gibst deine Zeichen (AFMAN 11-2F-16 V3, Abs. 7.6.1.2).
+
+- id: m4-l7-x-nordo-squawk
+  type: input
+  exam: true
+  prompt: Du hast Funkausfall (NORDO) und stellst am Transponder den passenden Code ein. Welchen?
+  accept: ["7600", "squawk 7600", "seven six zero zero", "squawk seven six zero zero"]
+  placeholder: vierstellig
+  explain: >-
+    7600 steht weltweit für Funkausfall. Zum Vergleich: 7700 ist der Notfall und 7500 eine Entführung.

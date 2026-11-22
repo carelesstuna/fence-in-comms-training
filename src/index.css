@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0a110e;
+  --color-panel: #101a16;
+  --color-panel-2: #15221d;
+  --color-line: #233630;
+  --color-text: #d9e5dd;
+  --color-muted: #8fa69a;
+  --color-phosphor: #7dd87d;
+  --color-phosphor-dim: #3f7a45;
+  --color-amber-hud: #f2c14e;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-mono: 'Cascadia Mono', 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+body {
+  background-image: radial-gradient(circle at 50% -20%, rgba(125, 216, 125, 0.07), transparent 60%);
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(125, 216, 125, 0.3);
+}
+
+/* Markdown-Inhalte */
+.md {
+  line-height: 1.65;
+  font-size: 1rem;
+}
+.md > * + * {
+  margin-top: 0.85em;
+}
+.md h1,
+.md h2,
+.md h3 {
+  color: #f1f6f2;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.md h2 {
+  font-size: 1.35rem;
+}
+.md h3 {
+  font-size: 1.1rem;
+}
+.md strong {
+  color: #f6faf7;
+  font-weight: 650;
+}
+.md em {
+  color: #c5d6cb;
+}
+.md ul,
+.md ol {
+  padding-left: 1.4em;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md li + li {
+  margin-top: 0.3em;
+}
+.md li::marker {
+  color: var(--color-phosphor);
+}
+.md a {
+  color: var(--color-phosphor);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  padding: 0.05em 0.35em;
+}
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.md th,
+.md td {
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+.md th {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.md blockquote {
+  border-left: 3px solid var(--color-phosphor-dim);
+  padding-left: 1em;
+  color: #c5d6cb;
+}
+
+.scanlines {
+  background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px);
+}

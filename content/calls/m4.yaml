@@ -1,0 +1,827 @@
+# Annotierte Funksprüche für Modul 4 (Im Verband).
+# Grundlage: docs/content-plan/m4-im-verband.md. Brevity-Wörter laut ATP 1-02.1 (Umschreibung bei
+# Wikipedia, Stand 25.04.2025, und USAF TPS Appendix B) – die Abläufe drumherum (wer bestätigt wie)
+# sind Staffelpraxis und deshalb meist `layer: community`.
+# Stationen (lead, two, three, four) + perspective: Du spielst zufällig eine Position im Flight.
+# Im 2-ship entfallen Three und Four automatisch.
+# Rufzeichen-Regel (AFMAN 11-2F-16 V3, Abs. 3.30; Korea-BEM von 2005): Auf einen
+# Ruf des Leads antwortet der Wingman nur mit seiner Nummer. Jede selbst begonnene Meldung (joker, bingo,
+# blind, verspätete Antwort) trägt das volle Flight-Rufzeichen. Beim Tippen zählen beide Formen; die Kurzform
+# („Two, joker“) nennt das Korea-BEM ausdrücklich eine schlechte Angewohnheit, die Notizen sagen das.
+
+# ------------------------------------------------------------ Lektion 1: Lead und Wingman
+- id: m4-lead-directive
+  title: Anweisung an den Flight
+  layer: community
+  context: >-
+    Der Lead gibt eine Anweisung an den ganzen Flight. Jeder bestätigt mit seiner Nummer – in der
+    festen Reihenfolge 2, 3, 4.
+  perspective: [two, three, four]
+  vars:
+    directive: { oneOf: [fence in, fence out] }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Der Flight-Name ohne Nummer – gemeint sind alle, die ihn tragen.
+        - text: "{directive}"
+          role: brevity
+          note: >-
+            Eine Anweisung an alle. Was „{directive}“ genau bedeutet, kommt in Lektion 3 – hier zählt
+            erst einmal, wie man darauf antwortet.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - text: Two
+          role: callsign
+          critical: true
+          note: >-
+            Die Nummer allein heißt: verstanden, wird gemacht. Im Flight ersetzt sie „wilco“ – kürzer
+            geht es nicht.
+    - speaker: "{three}"
+      station: three
+      segments:
+        - text: Three
+          role: callsign
+          critical: true
+          note: Three wartet, bis Two fertig ist. So fällt niemand dem anderen ins Wort.
+    - speaker: "{four}"
+      station: four
+      segments:
+        - text: Four
+          role: callsign
+          critical: true
+          note: Erst wenn alle Nummern da sind, weiß der Lead – alle haben es.
+
+- id: m4-push-net
+  title: push – und keiner antwortet
+  context: >-
+    Der Lead schickt den Flight auf ein anderes Netz aus dem Comm Plan. Auf „push“ antwortet niemand:
+    Die Bestätigung ist der Check auf der neuen Frequenz.
+  perspective: [two, three, four]
+  vars:
+    # Kein „Package“: Das Glossar zeigt dazu das Brevity-Wort PACKAGE (Gruppen im Lagebild), nicht den Netznamen.
+    net: { oneOf: [Strike, Tactical, AWACS] }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee, note: Der ganze Flight. }
+        - text: push
+          role: brevity
+          note: >-
+            „Wechselt die Frequenz.“ Laut ATP 1-02.1 ist keine Bestätigung nötig – jeder dreht sofort
+            am Funkgerät.
+        - text: "{net}"
+          role: info
+          note: Der Name des Netzes. Welcher Kanal das ist, steht auf deiner Comm Card.
+
+- id: m4-kio
+  title: Knock it off
+  # KNOCK IT OFF ist core (ATP 1-02.1). Dass jeder mit vollem Rufzeichen wiederholt, ist eine
+  # Trainingsregel (AFI 11-214) – nicht gegen das Original geprüft.
+  layer: community
+  context: >-
+    Im Training geht etwas schief – oder jemand sieht eine Gefahr. Jeder im Flight darf „knock it off“
+    rufen. Danach hört jede Übung sofort auf.
+  perspective: [two, three, four]
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Hier ruft der Lead. Jeder andere im Flight darf und muss es genauso rufen, wenn die Sicherheit es verlangt.
+        - text: knock it off
+          role: brevity
+          note: >-
+            Alle Übungs- bzw. Gefechtsmanöver sofort beenden, Flug stabilisieren, Abstand und Höhe
+            prüfen. In der Praxis wird es oft zweimal gerufen.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - text: "{two|spoken}"
+          role: callsign
+          critical: true
+          note: >-
+            Diesmal nicht nur die Nummer, sondern das volle Rufzeichen. So weiß jeder genau, wer
+            aufgehört hat. ⚠ Form nach Trainingsregeln, je nach SOP verschieden.
+        - text: knock it off
+          role: brevity
+          critical: true
+          note: Das Wort wiederholen – das ist die Bestätigung.
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: "{three|spoken}", role: callsign, critical: true }
+        - { text: knock it off, role: brevity, critical: true }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: "{four|spoken}", role: callsign, critical: true }
+        - { text: knock it off, role: brevity, critical: true }
+
+# ------------------------------------------------------------ Lektion 2: push, check, pushing, ROLEX
+- id: m4-push-missing
+  title: Four fehlt beim Check
+  # Bewusst ohne Stationen: Das Beispiel zeigt immer einen 4-ship, auch wenn dein Flight kleiner ist.
+  layer: community
+  context: >-
+    Ein 4-ship wechselt auf das Strike-Netz. Beim Check meldet sich Four nicht. Der Lead holt ihn über
+    das zweite Funkgerät, auf dem der Flight mithört.
+  vars:
+    net: { oneOf: [Strike, Tactical] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - { text: push, role: brevity, note: Wechseln – ohne Bestätigung. }
+        - { text: "{net}", role: info }
+    - speaker: "{callsign}"
+      you: true
+      note: Auf dem neuen Netz.
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - { text: check, role: request, note: Erster Funkspruch auf der neuen Frequenz – ist jeder angekommen? }
+    - speaker: "{wingman}"
+      segments:
+        - { text: Two, role: callsign }
+    - speaker: "{element}"
+      note: Danach bleibt es still – Four meldet sich nicht.
+      segments:
+        - text: Three
+          role: callsign
+          note: >-
+            Nach Three kommt nichts mehr. Kurz warten und nicht sofort nachrufen – vielleicht drückt
+            Four gerade erst die Sendetaste. ⚠ Wie lange, regelt keine Quelle.
+    - speaker: "{callsign}"
+      you: true
+      note: Auf dem zweiten Funkgerät (Intraflight).
+      segments:
+        - text: "{element2|spoken}"
+          role: addressee
+          note: >-
+            Jetzt gezielt Four – auf dem Intraflight-Funkgerät, das der ganze Flight dauernd mithört.
+            Volles Rufzeichen, weil dort auch andere Flights sein können.
+        - { text: "{callsign|spoken}", role: callsign, note: Wer ruft. }
+        - { text: push, role: brevity, note: Die verpasste Anweisung noch einmal … }
+        - { text: "{net}", role: info, note: … mit dem Netz. }
+    - speaker: "{callsign}"
+      you: true
+      note: Wieder auf dem neuen Netz.
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - { text: check, role: request, note: Neuer Check – jetzt muss der ganze Flight antworten. }
+    - speaker: "{wingman}"
+      segments:
+        - { text: Two, role: callsign }
+    - speaker: "{element}"
+      segments:
+        - { text: Three, role: callsign }
+    - speaker: "{element2}"
+      segments:
+        - { text: Four, role: callsign, note: Komplett. Erst jetzt geht es weiter. }
+
+- id: m4-pushing
+  title: pushing – der Flight verlässt den Push Point
+  # PUSHING ist core. Adressat (AWACS oder Package auf dem Strike-Netz) und Form sind Staffelpraxis.
+  layer: community
+  context: >-
+    Zur gebrieften Push-Zeit verlässt der Flight den vereinbarten Punkt Richtung Einsatzgebiet. Der
+    Lead meldet das – hier dem AWACS, der die Zeitlinie überwacht.
+  vars:
+    awacs: { pool: callsigns.awacs }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{awacs}"
+          role: addressee
+          note: Wer die Zeitlinie überwacht – je nach Briefing der AWACS oder der Package Commander auf dem Strike-Netz.
+        - text: "{flight|spoken}"
+          role: callsign
+          critical: true
+          note: Das Flight-Rufzeichen ohne Position – du meldest für alle.
+        - text: pushing
+          role: brevity
+          critical: true
+          note: >-
+            „Wir verlassen jetzt den festgelegten Punkt.“ Nicht verwechseln mit push – das ist der
+            Frequenzwechsel!
+
+- id: m4-rolex
+  title: ROLEX – die Zeitlinie verschiebt sich
+  # ROLEX ist core (Zeitverschiebung in Minuten, plus = später). Absender und Bestätigung: Staffelpraxis.
+  layer: community
+  context: >-
+    Die Missionsleitung verschiebt alle Zeiten des Einsatzes (wer das ansagt, regelt das Briefing). Dein
+    Flight hört auf dem Strike-Netz mit, du bestätigst für alle.
+  vars:
+    pkg: { pool: callsigns.fighter, distinctFrom: [flightName] }
+    pkgNum: { int: [1, 9] }
+    rx: { int: [5, 15], step: 5 }
+    push: { number: time }
+    pushNew: { derive: sum, of: [push, rx], kind: time }
+  transmissions:
+    - speaker: "{pkg} {pkgNum}"
+      segments:
+        - { text: "{flight|spoken}", role: addressee, note: Die Missionsleitung ruft deinen Flight. }
+        - { text: "{pkg} {pkgNum|spoken}", role: callsign, note: Ihr eigenes Rufzeichen. }
+        - text: "rolex plus {rx|spoken}"
+          role: brevity
+          note: >-
+            Alle Zeiten verschieben sich um {rx} Minuten. Plus heißt später. Aus der Push-Zeit {push}
+            wird {pushNew}. ROLEX läuft in Fünf-Minuten-Schritten (ATP 3-52.4).
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flight|spoken}"
+          role: callsign
+          critical: true
+          note: >-
+            Die Bestätigung mit dem Flight-Rufzeichen. Deine Wingmen hören auf dem Strike-Netz mit und
+            sagen nichts. ⚠ Staffelpraxis.
+
+# ------------------------------------------------------------ Lektion 3: Fence in, fence out
+- id: m4-fence-in
+  title: Fence in
+  layer: community
+  context: >-
+    Kurz vor dem Einsatzgebiet. Der Lead lässt den Flight die Cockpit-Schalter für den Einsatz setzen.
+  perspective: [two, three, four]
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee, note: Alle. }
+        - text: fence in
+          role: brevity
+          note: >-
+            „Setzt die Schalter für das Einsatzgebiet.“ Das Wort ersetzt eine ganze Checkliste – welche
+            Schalter genau, regelt das Briefing.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true, note: "Verstanden – Two arbeitet die Liste ab. Kein „fenced in“, kein „roger“." }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign, critical: true }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign, critical: true }
+
+- id: m4-feet-dry
+  title: Feet dry / feet wet
+  # FEET DRY / FEET WET sind core. Die Meldung an den AWACS ist Staffelpraxis.
+  layer: community
+  context: >-
+    Der Flight überquert die Küstenlinie. Der Lead meldet es dem AWACS, der Buch führt, wer wo ist.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    coast: { oneOf: [feet dry, feet wet] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, note: Der AWACS. }
+        - { text: "{flight|spoken}", role: callsign, critical: true, note: Für den ganzen Flight. }
+        - text: "{coast}"
+          role: brevity
+          critical: true
+          note: >-
+            feet dry = „jetzt über Land“, feet wet = „jetzt über Wasser“. Auf dem Hinweg zu einem Ziel
+            an Land fällt feet dry oft mit fence in zusammen.
+
+- id: m4-fence-out-bd
+  title: Fence out und Battle Damage Check
+  # FENCE OUT und CLEAN sind core. Ablauf und Wortlaut des BD-Checks: Staffelpraxis ⚠.
+  layer: community
+  context: >-
+    Das Einsatzgebiet liegt hinter dem Flight. Erst die Schalter zurück, dann schaut jeder beim
+    Nachbarn nach Schäden.
+  perspective: [two, three, four]
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - text: fence out
+          role: brevity
+          note: Die Liste rückwärts – Master Arm aus, Lichter und IFF für den Rückflug.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign, critical: true }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign, critical: true }
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - text: battle damage check
+          role: request
+          note: >-
+            Jeder schaut sich seinen Element-Partner von außen an, z. B. indem der Wingman einmal unter
+            dem Lead durchkreuzt. ⚠ Ablauf je nach SOP.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - text: One
+          role: addressee
+          critical: true
+          alt: [Lead, "{lead|spoken}"]
+          note: >-
+            Two hat den Lead angeschaut und spricht ihn an. Vorschriftsnäher ist das volle Rufzeichen („{lead|spoken}, you're
+            clean“), denn die Meldung ist keine bloße Quittung (AFMAN 11-2F-16 V3, Abs. 3.30). ⚠ „One“ oder „Lead“ ist
+            verbreitete Praxis – je nach SOP. Alle drei Formen zählen.
+        - text: you're clean
+          role: brevity
+          critical: true
+          alt: [clean]
+          note: >-
+            CLEAN heißt hier – kein sichtbarer Schaden. Dasselbe Wort bedeutet woanders „keine
+            Sensordaten“ (beim AWACS) oder „keine Außenlasten“.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee }
+        - { text: you're clean, role: brevity, note: Die Gegenprobe vom Lead für Two. }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Three, role: addressee, critical: true, alt: ["{three|spoken}"] }
+        - { text: you're clean, role: brevity, critical: true, alt: [clean] }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Four, role: addressee, critical: true, alt: ["{four|spoken}"] }
+        - { text: you're clean, role: brevity, critical: true, alt: [clean] }
+
+# ------------------------------------------------------------ Lektion 4: Treibstoff im Verband
+- id: m4-ops-check-tiger
+  title: Ops Check mit TIGER
+  # OPS CHECK: kein Brevity-Wort der ATP 1-02.1, aber offizieller F-16-Verfahrensbegriff (AFMAN 11-2F-16
+  # V3, Abs. 3.30.4). Den Antwortwortlaut legt die Vorschrift nicht fest: community. TIGER ist core.
+  layer: community
+  context: >-
+    Laut Missionsbriefing meldet beim Ops Check jeder seinen Treibstoff in Tausend Pfund – und
+    „tiger“, wenn er genug Sprit und Waffen hat, um einen Commit anzunehmen.
+  perspective: [two, three, four]
+  vars:
+    # Werte eines Flights liegen nah beieinander (AFMAN 11-2F-16 V3, Abs. 3.30.4.1: der Check soll gerade
+    # Abweichungen wie hängenden Kraftstoff aufdecken) – darum von f2 abgeleitet statt einzeln gewürfelt.
+    f2: { number: fuel, range: [4.5, 8.0] }
+    d3: { oneOf: ["-0.4", "-0.2", "0.1", "0.3", "0.6"] }
+    d4: { oneOf: ["-0.5", "-0.3", "0.2", "0.4", "0.7"] }
+    f3: { derive: sum, of: [f2, d3], kind: fuel }
+    f4: { derive: sum, of: [f2, d4], kind: fuel }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - text: ops check
+          role: request
+          note: >-
+            Wie beim Ops Check davor in dieser Lektion – neu ist, was die Antwort enthalten kann. Der Begriff selbst ist ein offizieller
+            Verfahrensbegriff der F-16; mit Zusatztanks käme noch „tank(s) feeding“ (die Tanks speisen noch) bzw. „dry“ (leer) dazu.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true }
+        - text: "{f2|spoken}"
+          role: value
+          critical: true
+          alt: ["{f2}"]
+          note: Treibstoff in Tausend Pfund – {f2} heißt {f2} × 1.000 lbs.
+        - text: tiger
+          role: brevity
+          note: >-
+            „Genug Sprit und Waffen, um einen Commit anzunehmen.“ So steht es in der ATP 1-02.1. Ob TIGER im
+            Ops Check dazugehört, regelt das Briefing.
+        - text: tanks dry
+          role: info
+          optional: true
+          free: true
+          alt: [tank dry, tanks feeding, tank feeding]
+          note: >-
+            Nur mit Außentanks: „tank(s) feeding“ (die Tanks speisen noch) bzw. „dry“ (leer), bis sie leer gemeldet sind
+            (AFMAN 11-2F-16 V3, Abs. 3.30.4.3.2). Ohne Außentanks lässt du es weg.
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign, critical: true }
+        - { text: "{f3|spoken}", role: value, critical: true, alt: ["{f3}"] }
+        - { text: tiger, role: brevity }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign, critical: true }
+        - { text: "{f4|spoken}", role: value, critical: true, alt: ["{f4}"] }
+        - { text: tiger, role: brevity }
+
+- id: m4-what-state
+  title: WHAT STATE – der AWACS fragt nach dem Stand
+  # WHAT STATE ist core; Antwortformat laut ATP 1-02.1 (2020/21), S. 70: aktive, halbaktive, IR-Raketen,
+  # „minus“ ohne Kanonenmunition, dann „by“ und der Treibstoff in Tausend Pfund („Blue 44 is 3-1-2 by 7 POINT 5“).
+  # Dass der Lead für den Flight mit dem niedrigsten Stand antwortet, ist Verbands- bzw. Briefingpraxis
+  # (die ATP beschreibt die Meldung eines Flugzeugs) – darum community.
+  layer: community
+  context: >-
+    Der AWACS will wissen, was dein Flight noch kann. Laut Missionsbriefing antwortest du als Lead für alle –
+    mit den Werten des schwächsten Flugzeugs.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    ma: { int: [0, 4] }
+    # halbaktive meist keine – darum „0“ doppelt; mit Sprechform, sonst stünde die Ziffer roh im Funkspruch
+    ms: { oneOf: [{ text: "0", spoken: zero }, { text: "0", spoken: zero }, { text: "1", spoken: one }, { text: "2", spoken: two }] }
+    mi: { int: [0, 2] }
+    low: { number: fuel, range: [3.0, 6.5] }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Der AWACS fragt dich als Lead. }
+        - { text: "{awacs}", role: callsign }
+        - text: what state
+          role: brevity
+          note: Bitte um Raketen und Treibstoff. Munition und Sauerstoff meldet man nur auf Nachfrage oder wenn es knapp wird.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: is, role: info, optional: true, note: "Steht im Beispiel der ATP 1-02.1 („Blue 44 is 3-1-2 by 7 point 5“), kann aber entfallen." }
+        - text: "{ma|spoken}"
+          role: value
+          note: Zuerst die Anzahl der aktiven Radarraketen (z. B. AMRAAM) – hier {ma} …
+        - text: "{ms|spoken}"
+          role: value
+          note: … dann die Anzahl der halbaktiven Radarraketen (z. B. Sparrow) – {ms} …
+        - text: "{mi|spoken}"
+          role: value
+          note: >-
+            … dann die Anzahl der Infrarotraketen (z. B. Sidewinder) – {mi}. Keine Rakete einer Sorte heißt „zero“. Hat
+            ein Flugzeug keine oder zu wenig Kanonenmunition, folgt hier noch „minus“. ⚠ Sprechweise je nach SOP.
+        - text: by
+          role: info
+          optional: true
+          note: >-
+            „by“ trennt die Raketen vom Treibstoff – so steht es im Antwortformat der ATP 1-02.1. Damit ist klar, dass
+            jetzt keine Rakete mehr kommt.
+        - text: "{low|spoken}"
+          role: value
+          critical: true
+          alt: ["{low}"]
+          note: >-
+            Zum Schluss der Treibstoff in Tausend Pfund mit einer Nachkommastelle. Laut Missionsbriefing ist es der
+            niedrigste Stand im Flight, nicht deiner – den kennst du aus dem letzten Ops Check. ⚠ Dass der Lead so für
+            den ganzen Flight antwortet, ist Verbandspraxis; die ATP beschreibt die Meldung eines Flugzeugs.
+
+- id: m4-joker
+  title: Two meldet joker
+  layer: community
+  context: >-
+    Ein Wingman spricht ungefragt nur, wenn der Lead etwas wissen muss. Treibstoff gehört dazu.
+  perspective: [two]
+  transmissions:
+    - speaker: "{two}"
+      station: two
+      segments:
+        - text: "{two|spoken}"
+          role: callsign
+          critical: true
+          weak: [Two]
+          weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)"
+          note: >-
+            Wer spricht. Eine selbst begonnene Meldung trägt das volle Flight-Rufzeichen ({two}), damit
+            auch andere Flights auf der Frequenz wissen, dass sie nicht gemeint sind (AFMAN 11-2F-16 V3,
+            Abs. 3.30). Das kurze „Two“ gilt, kostet aber Punkte: Es ist nur eine verbreitete Kurzform, die
+            das Korea-BEM (2005) ausdrücklich eine schlechte Angewohnheit nennt.
+        - text: joker
+          role: brevity
+          critical: true
+          note: >-
+            Die gebriefte Schwelle über Bingo ist erreicht. Ab jetzt beendet der Flight das laufende
+            Ereignis: lösen vom Gefecht bzw. Abbruch, kein neues mehr anfangen.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - text: copy
+          role: proword
+          note: >-
+            Der Lead hat die Meldung und beendet das laufende Ereignis. Wie der Flight den Rest der Mission
+            fliegt, entscheidet er. ⚠ „copy“ ist informell, aber verbreitet.
+
+- id: m4-bingo-rtb
+  title: Bingo – der Flight fliegt nach Hause
+  layer: community
+  context: >-
+    Ein Flugzeug im Flight erreicht Bingo. Der Lead schickt alle nach Hause – denn der niedrigste
+    Stand bestimmt.
+  perspective: [lead]
+  transmissions:
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: "{two|spoken}", role: callsign, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)", note: "Selbst begonnene Meldung – volles Flight-Rufzeichen. „Two“ allein ist eine verbreitete, aber schlechte Kurzform." }
+        - text: bingo
+          role: brevity
+          note: Der gebriefte Stand, den Two für Heimflug und Landung samt Reserve braucht. Spätestens jetzt geht es zurück.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee, critical: true, note: "Alle – auch die, die noch genug Sprit haben." }
+        - text: RTB
+          role: brevity
+          critical: true
+          alt: ["bingo RTB"]
+          note: Return to base. Der Flight bleibt zusammen, also fliegen alle.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign }
+
+# ------------------------------------------------------------ Lektion 5: Formationsfunk
+- id: m4-blind
+  title: blind – Sichtkontakt verloren
+  # VISUAL und BLIND sind core. Das Verfahren (volles Rufzeichen, Höhe auf hundert Fuß, z. B. „blind 16.9“)
+  # steht in AFMAN 11-2F-16 V3, Abs. 3.12.2. Die Höhe nutzt das Zahlenformat `thousands` (16.9 = 16.900 ft);
+  # „angels“ in ganzen Tausend zählt beim Tippen weiter als Alternative (im Checkride m4-s1 nicht). Die Antwort des
+  # Leads (Uhr, Entfernung, high/low) ist Staffelpraxis; er beginnt sie mit vollem Rufzeichen (AFMAN 3.30).
+  layer: community
+  context: >-
+    Beim Kurswechsel hat Two den Lead aus den Augen verloren. Das muss der Lead sofort wissen.
+  perspective: [two]
+  vars:
+    a2: { number: thousands, range: [12, 30] }
+    clk:
+      oneOf:
+        - left ten o'clock
+        - left eight o'clock
+        - left eleven o'clock
+        - right two o'clock
+        - right four o'clock
+        - right one o'clock
+        - six o'clock
+    dist: { oneOf: [{ text: "1 mile", spoken: one mile }, { text: "2 miles", spoken: two miles }, { text: "3 miles", spoken: three miles }] }
+    hl: { oneOf: [high, low, level] }
+  transmissions:
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: "{two|spoken}", role: callsign, critical: true, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)", note: "Selbst begonnene Meldung – volles Flight-Rufzeichen (die Kurzform „Two“ gilt mit Abzug)." }
+        - text: blind
+          role: brevity
+          critical: true
+          note: >-
+            „Ich sehe dich nicht.“ Gilt nur für Freunde – für Gegner heißt es „no joy“.
+        - text: "{a2|spoken}"
+          role: value
+          critical: true
+          weak: ["angels {a2.angels|spoken}"]
+          weakNote: "Vorschrift: Höhe auf hundert Fuß, „{a2}“ (AFMAN 11-2F-16 V3, Abs. 3.12.2) – ganze Tausend verschenken bis zu 500 ft"
+          note: >-
+            Deine Höhe auf hundert Fuß genau, ohne „angels“: {a2} = {a2.feet} ft. Damit sieht der Lead sofort,
+            ob 500 bzw. 1.000 ft Abstand bestehen. „angels {a2.angels}“ (ganze Tausend) gilt mit Abzug,
+            verschenkt aber bis zu 500 ft Genauigkeit – im Checkride zählt nur die genaue Form.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - text: "{lead|spoken}"
+          role: callsign
+          note: >-
+            Der Lead beginnt seine Antwort mit dem vollen Rufzeichen – sie ist mehr als eine Quittung (AFMAN 11-2F-16 V3,
+            Abs. 3.30). ⚠ Kurz „One“ oder „Lead“ hört man in der Praxis auch.
+        - { text: visual, role: brevity, note: "„Ich sehe dich.“ Danach sagt der Lead, wo er steht." }
+        - text: "your {clk}"
+          role: position
+          note: Wo der Lead aus deiner Sicht steht. 12 Uhr ist deine Nase, 6 Uhr hinter dir.
+        - text: "{dist|spoken}"
+          role: position
+          note: Die Entfernung.
+        - text: "{hl}"
+          role: position
+          note: Höhenlage – high (über dir), low (unter dir) oder level (auf deiner Höhe).
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: "{two|spoken}", role: callsign, critical: true, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)" }
+        - text: visual
+          role: brevity
+          critical: true
+          note: Wieder Sicht. Erst jetzt schließt du wieder auf.
+
+- id: m4-check-turn
+  title: CHECK – Kurswechsel um einige Grad
+  layer: community
+  context: >-
+    Der Lead dreht den Flight, ohne einen neuen Kurs zu nennen – er sagt nur, um wie viel.
+  perspective: [two, three, four]
+  vars:
+    # Geschrieben die deutsche Richtung (für die Notiz), gesprochen die englische (für den Funkspruch)
+    lr: { oneOf: [{ text: links, spoken: left }, { text: rechts, spoken: right }] }
+    chk: { oneOf: [{ text: "20", spoken: two zero }, { text: "30", spoken: three zero }, { text: "40", spoken: four zero }, { text: "60", spoken: six zero }] }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - text: "check {lr|spoken} {chk|spoken}"
+          role: brevity
+          note: >-
+            Um {chk} Grad nach {lr} drehen und den neuen Kurs halten. Nicht „auf Kurs {chk}“, sondern
+            um {chk} Grad!
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign, critical: true }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign, critical: true }
+
+- id: m4-posit
+  title: POSIT – wo bist du?
+  layer: community
+  context: >-
+    Lead und Two sind getrennt. Der Lead will wissen, wo Two steckt.
+  perspective: [two]
+  vars:
+    af: { pool: airfields }
+    pdist: { int: [3, 9] }
+    pcard: { oneOf: [north, east, south, west, northeast, northwest, southeast, southwest] }
+    a2: { number: angels, range: [10, 30] }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee, note: Der Lead spricht Two direkt an. }
+        - text: posit
+          role: brevity
+          note: Bitte um die Position eines Freundes.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true, alt: ["{two|spoken}"] }
+        - text: "{pdist|spoken} miles {pcard} of {af.name}"
+          role: position
+          critical: true
+          note: >-
+            Über einen Bezugspunkt, den beide kennen, z. B. einen Flugplatz. Mit dem Bullseye geht das
+            noch einfacher – das kommt in Modul 5.
+        - text: "angels {a2|spoken}"
+          role: value
+          critical: true
+          note: Die Höhe gehört immer dazu.
+
+# ------------------------------------------------------------ Lektion 7: Lost Wingman und NORDO
+- id: m4-lost-wingman
+  title: Lost Wingman – Two ist getrennt
+  # Verfahren: AFMAN 11-2F-16 V3, Abs. 7.9 (PDF-S. 42–43): Wingman informiert den Lead, der Lead bestätigt und
+  # gibt Fluglage, Kurs, Höhe und Geschwindigkeit, Wiederanschluss nur mit Freigabe des Leads (core).
+  # Den Wortlaut der Rufe legt die Quelle nicht fest – er ist community, ebenso das Wort „rejoin“.
+  layer: community
+  context: >-
+    Der Flight fliegt in Wolken, und Two verliert den Anschluss zum Lead. Two geht auf Instrumente,
+    dreht weg und informiert den Lead. Der Lead antwortet mit vier Angaben, damit Two weiß, wo er
+    hin muss. Erst mit Freigabe schließt Two wieder an.
+  perspective: [two, lead]
+  vars:
+    # Gesprochen die volle Form, geschrieben die kurze – beide zählen beim Tippen
+    att:
+      oneOf:
+        - { text: level, spoken: wings level }
+        - { text: left turn, spoken: in a left turn }
+        - { text: right turn, spoken: in a right turn }
+    hdg: { number: heading }
+    # Als `thousands`, damit die Fuß-Angabe deutsch geschrieben erscheint ({alt.feet} = „24.500“)
+    alt: { number: thousands, range: [8, 25], step: 0.5 }
+    spd: { number: speed }
+  transmissions:
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: "{two|spoken}", role: callsign, critical: true, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)", note: "Selbst begonnene Meldung – volles Flight-Rufzeichen." }
+        - text: lost wingman
+          role: info
+          critical: true
+          note: >-
+            „Ich habe den Anschluss verloren.“ Parallel dazu geht Two auf Instrumente und dreht nach dem
+            Verfahren weg. Der Funkspruch ist kurz – Fliegen geht vor.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee, note: "Der Lead bestätigt, indem er Two direkt anspricht." }
+        - text: "{att|spoken}"
+          role: info
+          critical: true
+          alt: ["{att}"]
+          note: Seine Fluglage – Two braucht sie, um auf Instrumenten sicher zu bleiben.
+        - text: "heading {hdg|spoken}"
+          role: value
+          critical: true
+          alt: ["{hdg|spoken}"]
+          note: Sein Steuerkurs.
+        - text: "altitude {alt.feet|spoken}"
+          role: value
+          critical: true
+          alt: ["{alt.feet|spoken}"]
+          note: Seine Höhe in Fuß ({alt.feet} ft).
+        - text: "airspeed {spd|spoken}"
+          role: value
+          critical: true
+          alt: ["{spd|spoken} knots", "{spd|spoken}"]
+          note: >-
+            Seine Geschwindigkeit in Knoten. Fluglage, Steuerkurs, Höhe, Geschwindigkeit – das sind die vier Angaben der
+            Vorschrift. Die Einleitungswörter („heading“, „altitude“, „airspeed“) machen die Zahlen eindeutig.
+    - speaker: "{two}"
+      station: two
+      note: Später, wenn Two wieder Sicht oder eine sichere Lage hat.
+      segments:
+        - { text: "{two|spoken}", role: callsign, critical: true, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)" }
+        - text: request rejoin
+          role: request
+          critical: true
+          note: >-
+            Two bittet um Erlaubnis. Anschließen ohne Freigabe ist nicht erlaubt. ⚠ „rejoin“ ist
+            verbreitete Praxis, kein Eintrag der ATP 1-02.1.
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee }
+        - { text: cleared to rejoin, role: instruction, note: Erst jetzt darf Two wieder an den Lead heran. }
+
+- id: m4-blind-both
+  title: Beide blind – der Lead ordnet die Höhen
+  # Verfahren: AFMAN 11-2F-16 V3, Abs. 3.12.2.2 (PDF-S. 20): beide rufen blind mit Höhe, der Lead ist
+  # direktiv, mindestens 500 ft Staffelung (über 5.000 ft AGL 1.000 ft), keine Steig-/Sinkflüge durch die
+  # Trennhöhe. Der Wortlaut der Anweisung ist community. Höhen wie bei m4-blind im Format `thousands`
+  # (auf hundert Fuß, z. B. „blind 16.9“); „angels“ in ganzen Tausend zählt beim Tippen weiter.
+  layer: community
+  context: >-
+    Der Flight hat sich in einer Kurve aus den Augen verloren – beide Seiten sind blind. Beide melden die
+    Höhe, dann ordnet der Lead die Höhenstaffelung an. Die Höhen liegen mindestens 1.000 Fuß auseinander.
+  perspective: [two, lead]
+  vars:
+    a1: { number: thousands, range: [12, 24] }
+    d: { oneOf: ["1", "2"] }
+    a2: { derive: sum, of: [a1, d], kind: thousands }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{lead|spoken}", role: callsign, critical: true, weak: [One], weakNote: "Vorschrift: volles Flight-Rufzeichen „{lead}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)", note: Der Lead meldet sich selbst blind – volles Rufzeichen. }
+        - { text: blind, role: brevity, critical: true }
+        - text: "{a1|spoken}"
+          role: value
+          critical: true
+          weak: ["angels {a1.angels|spoken}"]
+          weakNote: "Vorschrift: Höhe auf hundert Fuß, „{a1}“ (AFMAN 11-2F-16 V3, Abs. 3.12.2) – ganze Tausend verschenken bis zu 500 ft"
+          note: "Seine Höhe auf hundert Fuß genau, ohne „angels“: {a1} = {a1.feet} ft."
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: "{two|spoken}", role: callsign, critical: true, weak: [Two], weakNote: "Vorschrift: volles Flight-Rufzeichen „{two}“ bei selbst begonnenen Meldungen (AFMAN 11-2F-16 V3, Abs. 3.30)", note: Two ist ebenfalls blind. }
+        - { text: blind, role: brevity, critical: true }
+        - text: "{a2|spoken}"
+          role: value
+          critical: true
+          weak: ["angels {a2.angels|spoken}"]
+          weakNote: "Vorschrift: Höhe auf hundert Fuß, „{a2}“ (AFMAN 11-2F-16 V3, Abs. 3.12.2) – ganze Tausend verschenken bis zu 500 ft"
+          note: "Deine Höhe, ebenso auf hundert Fuß: {a2} = {a2.feet} ft. „angels {a2.angels}“ (ganze Tausend) gilt mit Abzug."
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee }
+        - text: "maintain {a2|spoken}"
+          role: instruction
+          critical: true
+          note: >-
+            Der Lead ist direktiv: Two hält seine Höhe, der Lead die seine. Die Staffelung beträgt hier
+            mindestens 1.000 Fuß. Keiner steigt oder sinkt durch die Höhe des anderen.
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true, note: Antwort auf den Lead – die Nummer genügt. }

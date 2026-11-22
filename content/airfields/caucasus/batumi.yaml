@@ -1,0 +1,22 @@
+id: batumi
+name: Batumi
+map: caucasus
+icao: UGSB
+elevationFt: 33
+runways: ["13/31"]
+atc: { uhf: 260.0, vhf: 131.0, hf: 4.25, vhfLow: 40.4 }
+tacan: 16X
+ils: "ILS 13: 110.30"
+# Mitgelieferte Kneeboard-Karten (DCS zeigt sie auf dieser Karte im Kneeboard an)
+charts:
+  - { sim: dcs, name: "Visual Operation Chart RWY 12/30 (VAD 07)", path: "Mods/terrains/Caucasus/Kneeboard/07_VAD_UGSB_Batumi.png" }
+  - { sim: dcs, name: "Aerodrome Chart (GND 07)", path: "Mods/terrains/Caucasus/Kneeboard/07_GND_UGSB_Batumi_18.png" }
+verified: dcs-data
+notes:
+  - Anflug und Abflug über dem Schwarzen Meer, Gebirge direkt im Nordosten.
+  - Türkische Grenze wenige Meilen südlich – Abflüge Richtung Süden vermeiden.
+  - Kleines Vorfeld mit nur etwa zehn Abstellplätzen.
+  - TACAN und ILS laut DCS-Funkfeuerdaten (Mods/terrains/Caucasus/Beacons.lua) bestätigt.
+  - Platzhöhe 33 ft (10 m) laut mitgelieferter Karte VAD 07, passt zu Beacons.lua (10 m).
+  - "⚠ Die mitgelieferte Karte (Stand 2012, Missweisung 2010) nennt die Bahn 12/30 und das ILS „RWY 12“. Hier steht 13/31 – im F10-Fenster prüfen, wie DCS die Bahn heute nennt."
+  - "HF und tiefes VHF (Flugplatzfenster der F10-Karte) laut DCS-Funkdaten (radio.lua der Karte)."

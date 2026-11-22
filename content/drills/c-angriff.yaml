@@ -1,0 +1,219 @@
+# Spur C, Lektionen 4–7: Talk-on, Laser und IR, Angriff, 5-Line und SEAD-Calls.
+
+# ------------------------------------------------------------------ Lektion 4: Talk-on
+- id: track-c-l4-match
+  type: match
+  prompt: Was meldest du wann?
+  pairs:
+    - [contact, Bezugspunkt gesehen – noch nicht das Ziel]
+    - [tally, Ziel gesehen]
+    - [captured, Ziel im Zielbehälter erfasst und verfolgt]
+    - [looking, Bezugspunkt noch nicht gesehen – bitte weiterbeschreiben]
+    - [no joy, Ziel nicht in Sicht]
+    - [visual, Eigenes Flugzeug oder eigene Stellung gesehen]
+
+- id: track-c-l4-bridge
+  type: choice
+  prompt: Der JTAC beschreibt eine Brücke und dahinter eine Baumreihe mit Fahrzeugen. Du siehst die Brücke, die Fahrzeuge noch nicht. Was sagst du?
+  options: [contact, tally, visual, captured]
+  answer: 0
+  explain: >-
+    CONTACT heißt hier: Bezugspunkt gesehen. TALLY gilt erst für das Ziel selbst, VISUAL für Eigenes, CAPTURED für das
+    Ziel im Sensor.
+
+- id: track-c-l4-contact
+  type: call
+  call: track-c-talkon
+  prompt: Der JTAC beginnt den Talk-on. Den Bezugspunkt hast du gefunden. Was funkst du?
+
+- id: track-c-l4-tally
+  type: call
+  call: track-c-talkon
+  transmission: 3
+  prompt: Jetzt siehst du das Ziel. Was funkst du?
+  explain: Mit der Anzahl zeigst du, dass du das Richtige siehst.
+
+- id: track-c-l4-build-jtac
+  type: build
+  call: track-c-talkon
+  transmission: 0
+  prompt: "Rollentausch: Du bist der JTAC. Bau den Anfang des Talk-on."
+  distractors: [cleared hot, "tally"]
+
+- id: track-c-l4-smoke
+  type: call
+  call: track-c-mark-smoke
+  prompt: Der JTAC meldet, dass die Markierung am Boden liegt. Du siehst den Rauch. Was funkst du?
+  layer: sim
+
+- id: track-c-l4-correction
+  type: choice
+  callsignPool: attack
+  vars:
+    corr: { number: meters, range: [100, 400], step: 50 }
+    corrDir: { number: cardinal }
+  prompt: Der JTAC sagt „from the mark, {corr|spoken} meters {corrDir}“. Wo ist das Ziel?
+  options:
+    - "{corr} m Richtung {corrDir} von der Rauchmarkierung"
+    - "{corr} m Richtung {corrDir} vom JTAC"
+    - "{corr} m Richtung {corrDir} von dir"
+    - "Genau auf der Rauchmarkierung"
+  answer: 0
+  explain: Die Markierung liegt fast nie genau auf dem Ziel. Die Korrektur gilt von der Markierung aus, in Himmelsrichtungen und Metern.
+
+# ------------------------------------------------------------------ Lektion 5: Laser und IR
+- id: track-c-l5-sequence
+  type: sequence
+  prompt: In welcher Reihenfolge läuft eine Laser-Markierung durch den JTAC?
+  items: ["Du: ten seconds", "Du: laser on", "JTAC: lasing", "Du: spot", "Du: cease laser"]
+
+- id: track-c-l5-cease
+  type: choice
+  prompt: Die Waffe ist eingeschlagen, der JTAC soll den Laser abschalten. Was sagst du?
+  options: [cease laser, terminate, knock it off, laser off]
+  answer: 0
+  explain: >-
+    CEASE LASER (ATP 1-02.1, 2020). TERMINATE stand in älteren Quellen für „Laser aus“, heißt aber heute nur noch „im
+    Training das Gefecht beenden“. KNOCK IT OFF beendet jede Übung, „laser off“ ist kein Brevity-Wort.
+
+- id: track-c-l5-who-lasing
+  type: choice
+  prompt: Wer sagt „lasing“?
+  options: [Der JTAC – er beleuchtet das Ziel, Du – dein Zielbehälter lasert, Der Wingman, Der AWACS]
+  answer: 0
+  explain: LASER ON kommt vom Angreifer, LASING ist die Antwort dessen, der beleuchtet.
+
+- id: track-c-l5-laser-on
+  type: call
+  call: track-c-laser
+  transmission: 1
+  show: 0
+  prompt: Line 7 war „laser“, du hast „ten seconds“ gesagt. Jetzt soll der JTAC lasern. Was funkst du?
+
+- id: track-c-l5-spot
+  type: call
+  call: track-c-laser
+  transmission: 3
+  prompt: Der JTAC lasert, dein Zielbehälter zeigt den Laserfleck. Was funkst du?
+
+- id: track-c-l5-ir-match
+  type: match
+  prompt: IR-Pointer bei Nacht – was heißt was?
+  pairs:
+    - [sparkle, Ziel mit dem IR-Pointer markiert]
+    - [snake, Strahl kreist um das Ziel]
+    - [steady, Strahl steht still auf dem Ziel]
+    - [rope, Der Bodentrupp kreist mit dem Strahl um dein Flugzeug]
+
+- id: track-c-l5-code-valid
+  type: generated
+  generator: lasercode-valid
+
+- id: track-c-l5-code-hear
+  type: generated
+  generator: spoken-to-number
+  params: { kind: lasercode }
+  prompt: Line 7 kommt mit Laser-Code. Welchen Code stellst du ein?
+
+# ------------------------------------------------------------------ Lektion 6: Angriff
+- id: track-c-l6-reaction
+  type: match
+  prompt: Du bist IN. Was tust du bei welcher Antwort des JTAC?
+  pairs:
+    - [cleared hot, Auslösen – der Angriff ist freigegeben]
+    - [continue, Weiterfliegen – die Freigabe kommt vielleicht noch]
+    - [continue dry, Weiterfliegen und nicht auslösen]
+    - ["abort, abort, abort", Sofort abbrechen]
+
+- id: track-c-l6-dry
+  type: choice
+  prompt: Du bist im Anflug, der JTAC sagt „continue“. Darfst du auslösen?
+  options:
+    - Nein – CONTINUE ändert nichts an der Freigabe, ausgelöst wird erst nach CLEARED HOT.
+    - Ja – CONTINUE heißt, der Angriff geht weiter.
+    - Nur, wenn du das Ziel siehst.
+    - Nur bei Type 2.
+  answer: 0
+
+- id: track-c-l6-types
+  type: match
+  prompt: Ordne die Control Types zu.
+  pairs:
+    - [Type 1, "JTAC sieht Angreifer und Ziel; jeder Angriff einzeln, CLEARED HOT"]
+    - [Type 2, "Angreifer oder Ziel beim Abwurf nicht sichtbar; jeder Angriff einzeln, CLEARED HOT"]
+    - [Type 3, "mehrere Angriffe innerhalb von Grenzen, CLEARED TO ENGAGE"]
+
+- id: track-c-l6-in
+  type: call
+  call: track-c-attack
+  transmission: 1
+  show: 0
+  prompt: "Du kommst vom IP {cas.ip} mit Kurs {cas.hdg} auf das Ziel zu und beginnst den Angriff. Was funkst du?"
+  explain: Mit Kurs {cas.hdg} fliegst du aus Richtung {cas.inDir} an – IN from the {cas.inDir}.
+
+- id: track-c-l6-off
+  type: call
+  call: track-c-attack
+  transmission: 4
+  prompt: Die Waffe ist draußen. Laut Line 9 geht der Egress nach {cas.egress.dir}. Was funkst du beim Abdrehen?
+
+- id: track-c-l6-abort
+  type: call
+  call: track-c-abort
+  transmission: 2
+  prompt: Der JTAC bricht ab. Was funkst du?
+
+- id: track-c-l6-type3
+  type: call
+  call: track-c-type3
+  prompt: Unter Type 3 hast du deine Waffe ausgeklinkt. Was meldest du dem JTAC?
+
+- id: track-c-l6-checkout
+  type: call
+  call: track-c-bda
+  prompt: Der JTAC hat das BDA gemeldet, deine Munition ist verbraucht. Melde dich ab.
+
+# ------------------------------------------------------------------ Lektion 7: 5-Line und SEAD-Calls
+- id: track-c-l7-decoder
+  type: nineline
+  call: track-c-fiveline
+  format: fiveline
+  readback: track-c-fiveline
+  reveal: all
+  prompt: Du bist im AH-64D. Schreib den 5-Line mit und lies zurück.
+
+- id: track-c-l7-when
+  type: choice
+  prompt: Wann kommt eher ein 5-Line als ein 9-Line?
+  options:
+    - Für Kampfhubschrauber, die tief und nah bei den eigenen Leuten angreifen
+    - Für Bomber in großer Höhe
+    - Immer bei Nacht
+    - Wenn kein Laser-Code vorhanden ist
+  answer: 0
+  explain: Der 5-Line beginnt bei den eigenen Leuten und beschreibt das Ziel von dort aus – passend zum Angriff aus geringer Höhe.
+
+- id: track-c-l7-match
+  type: match
+  prompt: Was meldet wer auf dem Package-Netz?
+  pairs:
+    - [magnum, Eigene Anti-Radar-Rakete ist unterwegs]
+    - [slapshot, Sofort eine Anti-Radar-Rakete auf diese Bedrohung]
+    - [mud, RWR zeigt ein Bodenradar im Track]
+    - [singer, RWR zeigt einen SAM-Start]
+    - [defending, Ich manövriere gegen die Bedrohung]
+
+- id: track-c-l7-magnum
+  type: choice
+  prompt: Auf dem Package-Netz hörst du „Magnum, SA-8, north“. Was heißt das für dich?
+  options:
+    - Eine eigene HARM fliegt auf das SA-8 im Norden – sein Radar soll gleich schweigen.
+    - Ein SA-8 im Norden hat auf dich geschossen.
+    - Du sollst das SA-8 sofort angreifen.
+    - Der Flight hat keine Munition mehr.
+  answer: 0
+
+- id: track-c-l7-singer
+  type: call
+  call: track-c-singer
+  prompt: Dein RWR zeigt den Start eines {samType} aus Richtung {samDir}. Du drehst nach {defDir} ab. Was funkst du?

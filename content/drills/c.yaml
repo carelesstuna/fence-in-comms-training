@@ -1,0 +1,255 @@
+# Spur C – Mud Moving / CAS: Übungen. Konzept: docs/content-plan/spur-c-cas-jtac.md
+
+# ------------------------------------------------------------------ Lektion 1: Check-in
+- id: track-c-l1-order
+  type: sequence
+  prompt: In welcher Reihenfolge meldest du dich beim JTAC an?
+  items:
+    - "Der JTAC, dann dein Rufzeichen"
+    - "Anzahl und Typ („two A-10C“)"
+    - "Position und Höhe (IP, angels)"
+    - Bewaffnung
+    - Playtime
+    - Abort Code
+  explain: >-
+    Erst wer wen ruft, dann was kommt, wo es ist, womit und wie lange. Position und Höhe vor Bewaffnung vor Playtime
+    nennen DCS-Handbücher, der JTAC-Leitfaden der Community und die BMS-Blätter übereinstimmend.
+
+- id: track-c-l1-build
+  type: build
+  call: track-c-checkin
+  prompt: Bau deinen Check-in beim JTAC {jtac}.
+  distractors: [request taxi, bogey dope, ready to copy]
+
+- id: track-c-l1-anatomy-position
+  type: anatomy
+  call: track-c-checkin
+  prompt: Wo im Check-in steht, wo du gerade bist?
+  target: position
+
+- id: track-c-l1-abort-code
+  type: choice
+  prompt: Wofür nennt der Check-in beim JTAC einen **Abort Code**?
+  options:
+    - Ein vorab vereinbartes Codewort, mit dem ein Angriff abgebrochen wird.
+    - Er gibt an, wie lange du noch auf Station bleiben kannst.
+    - Es ist der Laser-Code deines Zielbehälters.
+    - Mit ihm meldest du dich beim AWACS wieder ab.
+  answer: 0
+  explain: >-
+    Der Abort Code gehört zum Check-in (siehe Glossar). Auf verschlüsselten Funkgeräten entfällt er laut den Quellen. Wie
+    er genau benutzt wird, ist dort nicht beschrieben ⚠.
+
+- id: track-c-l1-sitrep-match
+  type: match
+  prompt: Ordne die Teile des Situation Updates ihrer Bedeutung zu.
+  pairs:
+    - ["threat ZSU-23-4, 3 kilometers north", Bedrohung – bestimmt Höhe und Anflug]
+    - ["targets two BMP-2 in the open", Was bekämpft werden soll]
+    - ["friendlies south 1200 meters", Wo die eigenen Leute stehen]
+    - [no artillery, Ob eigene Artillerie schießt]
+    - ["remain at or above angels 14", Mindesthöhe als Restriktion]
+
+- id: track-c-l1-checkin-type
+  type: call
+  call: track-c-checkin
+  prompt: >-
+    Du bist **{callsign}** mit {flightSize} A-10C am IP **{cas.ip}** auf **angels {cas.hold}**. An Bord: {ord}. Playtime
+    {playtime}. Melde dich beim JTAC **{jtac}** an – mit allem, was in den Check-in gehört.
+  hint: Adressat – Rufzeichen – Anzahl und Typ – Position – Höhe – Bewaffnung – Playtime – Abort Code
+  explain: Den Zielbehälter mit Laser-Code darfst du nennen, musst du aber nicht.
+
+- id: track-c-l1-type-control
+  type: choice
+  prompt: Der JTAC sagt „type two in effect“. Was heißt das für dich?
+  options:
+    - Er gibt jeden Angriff einzeln frei – ausgelöst wird erst nach CLEARED HOT.
+    - Du darfst innerhalb seiner Grenzen mehrmals angreifen, ohne neue Freigabe.
+    - Du sollst zwei Anflüge fliegen.
+    - Er wechselt auf ein zweites Funkgerät.
+  answer: 0
+  explain: >-
+    Type 1 und Type 2 geben jeden Angriff einzeln mit CLEARED HOT frei. Bei Type 3 kommt CLEARED TO ENGAGE für mehrere
+    Angriffe innerhalb der Grenzen. Genauer in Lektion 6.
+
+- id: track-c-l1-keyhole
+  type: choice
+  prompt: Der JTAC sagt „hold Charlie eight, angels one six“. Wo hältst du?
+  options:
+    - 8 NM südlich des Ziels auf 16.000 ft
+    - 8 NM nördlich des Ziels auf 16.000 ft
+    - 8 NM östlich des Ziels auf 16.000 ft
+    - Über dem Ziel auf 8.000 ft
+  answer: 0
+  layer: community
+  explain: >-
+    Keyhole: Echo ist das Ziel, Alfa Nord, Bravo Ost, Charlie Süd, Delta West. Die Zahl ist der Abstand in NM. Praxis auf
+    Servern mit menschlichen JTACs (Hoggit-Wiki).
+
+- id: track-c-l1-ready
+  type: call
+  call: track-c-gameplan
+  prompt: Der JTAC hat seinen Game Plan durchgegeben. Du hast dein Kneeboard bereit. Was funkst du?
+
+- id: track-c-l1-holding
+  type: call
+  call: track-c-keyhole
+  prompt: Der JTAC schickt dich auf eine Halteposition. Bestätige sie.
+  layer: community
+
+# ------------------------------------------------------------------ Lektion 2: der 9-Line
+- id: track-c-l2-match-a
+  type: match
+  prompt: Was steht in welcher Zeile? (Teil 1)
+  pairs:
+    - [Line 1, IP – wo dein Anflug beginnt]
+    - [Line 2, Kurs vom IP zum Ziel und Offset]
+    - [Line 3, Distanz vom IP zum Ziel]
+    - [Line 4, Zielhöhe in Fuß]
+    - [Line 5, Zielbeschreibung]
+
+- id: track-c-l2-match-b
+  type: match
+  prompt: Was steht in welcher Zeile? (Teil 2)
+  pairs:
+    - [Line 6, Zielkoordinate (MGRS)]
+    - [Line 7, Markierung]
+    - [Line 8, Richtung und Abstand der eigenen Leute vom Ziel]
+    - [Line 9, Egress – wohin nach dem Angriff]
+    - [Remarks, "Restriktionen, Bedrohung, Time on Target"]
+
+- id: track-c-l2-sequence
+  type: sequence
+  prompt: Bring die neun Zeilen in die richtige Reihenfolge.
+  items: [IP, Heading und Offset, Distance, Target Elevation, Target Description, Target Location, Mark, Friendlies, Egress]
+
+- id: track-c-l2-decoder
+  type: nineline
+  call: track-c-nineline
+  prompt: Der JTAC gibt dir den 9-Line. Schreib jede Zeile mit – Übertragung für Übertragung.
+  reveal: step
+
+- id: track-c-l2-quick
+  type: nineline
+  call: track-c-nineline
+  prompt: Nur die Zahlen, die in die Waffe gehen, und die Freunde. Deck jede Übertragung auf, wenn du bereit bist.
+  fields: [4, 6, 8]
+  reveal: click
+  sketch: false
+
+- id: track-c-l2-line8
+  type: choice
+  callsignPool: attack
+  vars:
+    cas: { casArea: true }
+  prompt: Line 8 lautet „{cas.friend|spoken}“. Wo stehen die eigenen Leute?
+  options:
+    - "{cas.friend.dist} m Richtung {cas.friend.dir}, vom Ziel aus gesehen"
+    - "{cas.friend.dist} m Richtung {cas.friend.dir.opposite}, vom Ziel aus gesehen"
+    - "{cas.friend.dist} m Richtung {cas.friend.dir}, von dir aus gesehen"
+    - "{cas.friend.dist} m Richtung {cas.friend.dir}, vom IP aus gesehen"
+  answer: 0
+  explain: >-
+    Line 8 zeigt immer vom **Ziel** zu den Freunden, in Metern. Der JTAC-Leitfaden der Community warnt: Es ist die
+    Gegenrichtung zur Lage des Ziels vom JTAC aus.
+
+- id: track-c-l2-bp
+  type: choice
+  prompt: Der 9-Line beginnt nicht an einem IP, sondern an einer Battle Position eines Hubschraubers. In welcher Einheit kommt Line 3?
+  options: [Meter, Seemeilen (NM), Kilometer, Fuß]
+  answer: 0
+  explain: Vom IP in NM, von einer Battle Position in Metern (DCS-Handbuch und JTAC-Leitfaden der Community).
+
+- id: track-c-l2-mgrs
+  type: generated
+  generator: mgrs-spoken-to-text
+
+- id: track-c-l2-lasercode
+  type: generated
+  generator: spoken-to-number
+  params: { kind: lasercode }
+
+# ------------------------------------------------------------------ Lektion 3: Readback
+- id: track-c-l3-what
+  type: choice
+  prompt: Was musst du nach dem 9-Line zurücklesen? (Alles Zutreffende)
+  options:
+    - Line 4 – Zielhöhe
+    - Line 6 – Zielkoordinate
+    - Jede Restriktion, z. B. das Final Attack Heading
+    - Line 1 – IP
+    - Line 8 – Freunde
+    - Line 5 – Zielbeschreibung
+  answer: [0, 1, 2]
+  explain: >-
+    Pflicht sind Line 4, Line 6 und die Restriktionen. Mehr darfst du zurücklesen, es kostet aber Zeit auf einem vollen
+    Netz. Höhe und Koordinate sind die Zahlen, die in Navigation und Waffe landen.
+
+- id: track-c-l3-build
+  type: build
+  call: track-c-readback
+  vars:
+    cas: { casArea: true }
+  prompt: Bau den Readback an {jtac}.
+  distractors: ["IP {cas.ip}", "{cas.target}", "{cas.friend|spoken}"]
+
+- id: track-c-l3-readback-type
+  type: call
+  call: track-c-readback
+  vars:
+    cas: { casArea: true }
+  prompt: >-
+    Der 9-Line ist durch: Line 4 **{cas.elev} ft**, Line 6 **{cas.grid}**, in den Remarks Final Attack Heading
+    **{cas.fah.from}–{cas.fah.to}**. Lies dem JTAC {jtac} zurück, was Pflicht ist.
+  explain: Nur die Pflicht – mehr kostet Zeit, und jede Zahl mehr ist eine Gelegenheit für einen Dreher.
+
+- id: track-c-l3-decoder
+  type: nineline
+  call: track-c-nineline
+  readback: track-c-readback
+  prompt: Der ganze Ablauf – mitschreiben, dann zurücklesen.
+  reveal: step
+
+- id: track-c-l3-correction
+  type: choice
+  callsignPool: attack
+  vars:
+    cas: { casArea: true }
+  prompt: >-
+    Rollentausch: Du bist der JTAC. Line 6 war **{cas.grid}**. Der Pilot liest zurück: „{callsign|spoken},
+    {cas.elev|spoken} feet, {cas.gridWrong|spoken}, final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}“.
+    Was sagst du?
+  options:
+    - "{callsign|spoken}, correction, {cas.grid|spoken}"
+    - "{callsign|spoken}, readback correct"
+    - "{callsign|spoken}, say again"
+    - "{callsign|spoken}, abort, abort, abort"
+  answer: 0
+  explain: >-
+    In der Koordinate steckt ein Zahlendreher ({cas.gridWrong} statt {cas.grid}). „Correction“ und gleich der richtige
+    Wert – so steht es im DCS-Handbuch und im JTAC-Leitfaden. „Readback correct“ gibt es erst, wenn alles stimmt.
+
+- id: track-c-l3-correction-call
+  type: call
+  call: track-c-readback-correction
+  transmission: 2
+  prompt: Der JTAC hat deine Koordinate korrigiert. Was funkst du?
+
+- id: track-c-l3-dc
+  type: choice
+  prompt: In den Remarks hörst du „danger close“. Was machst du damit?
+  options:
+    - Mit zurücklesen – es ist eine Restriktion.
+    - Abbrechen – bei Danger Close darf nicht angegriffen werden.
+    - Nur mit „roger“ bestätigen.
+    - Nichts – es betrifft nur den JTAC.
+  answer: 0
+  explain: >-
+    Danger Close heißt: Die eigenen Leute stehen näher am Ziel, als für die Waffe als sicher gilt. Angegriffen wird
+    trotzdem, aber mit besonderer Sorgfalt – und du bestätigst es im Readback.
+
+- id: track-c-l3-dc-call
+  type: call
+  call: track-c-danger-close
+  prompt: Der JTAC hat dir die Remarks gegeben. Lies zurück.
+  explain: Höhe, Koordinate, Final Attack Heading, Danger Close und die Initialen (⚠ Initialen nicht an der JP 3-09.3 geprüft).

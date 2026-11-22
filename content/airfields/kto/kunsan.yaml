@@ -1,0 +1,24 @@
+id: kunsan
+name: Gunsan
+aliases: [Kunsan]
+map: kto
+icao: RKJK
+elevationFt: 22
+runways: ["18/36"]
+atc: { uhf: 292.3, vhf: 126.5 }
+tacan: 75X
+ils: "ILS 18/36: 110.30"
+freqs: { atis: 120.225, ground: 273.525, departure: 292.65, approach: 292.65 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK)_EOR.png" }
+verified: community
+notes:
+  - "Die BMS-ATC spricht „Gunsan“; im Alltag und in echten Quellen heißt der Platz „Kunsan“."
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "Base Ops (UHF 304.8) steht nur in den Simdaten und der EOR-Karte, nicht im Schema. TACAN KUZ 75X laut AGC und Comms & Nav Book."
+  - "Platzhöhe 22 ft laut BMS-AGC; die EOR-Karte nennt 10 ft, das Comms & Nav Book ebenfalls 10 ft. Echte Frequenzen (AIP) liegen nicht eindeutig vor, daher kein realFreqs."
+  - "Pattern in BMS immer über See. Sechs EOR-Parkplätze je Bahnende (EOR-Karte, Stand 2022)."
+  - "Funkname ohne „AB“, wie ihn die BMS-ATC spricht („Gunsan Ground“, vgl. Comms & Nav Book 4.38.2: „Gunsan Approach, Falcon 1 …“). Die BMS-Karten führen den Platz als „Gunsan AB“."

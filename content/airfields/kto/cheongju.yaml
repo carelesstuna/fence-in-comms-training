@@ -1,0 +1,19 @@
+id: cheongju
+name: Cheongju
+map: kto
+icao: RKTU
+elevationFt: 176
+runways: ["06L/24R", "06R/24L"]
+atc: { uhf: 236.6, vhf: 118.7 }
+tacan: 27X
+freqs: { atis: 128.85, ground: 275.85, departure: 265.75, approach: 265.75 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_EOR.png" }
+verified: community
+notes:
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "TACAN CHO 27X laut AGC und AIP-Tabelle. ILS weggelassen: die Simdaten nennen nur 111.70 an einem Bahnende, die Zuordnung ist nicht eindeutig."
+  - "Zivil-militärischer Platz („Intl Airport“); Base Ops UHF 305.5 nur in den Simdaten."

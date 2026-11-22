@@ -1,0 +1,163 @@
+# Modul 3, Szenario S3: Platzrunde ohne ATC – Selbstansagen auf der Platzfrequenz.
+# Grundlage: FAA AIM 4-1-9. Praxis in Sim-Staffeln, wenn kein menschlicher Tower da ist.
+id: m3-s3-ohne-atc
+title: Ohne Tower in {af.name}
+summary: Kein Lotse heute – du sagst Rollen, Start und Rückkehr selbst an und hörst auf die anderen.
+layer: community
+sources:
+  - title: "FAA AIM 4-1-9 – Traffic Advisory Practices at Airports Without Operating Control Towers"
+    url: https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap4_section_1.html
+vars:
+  af: { pool: airfields }
+  wx: { weather: true, airfield: af, sky: vmc }
+  dir: { oneOf: [north, east, south, west] }
+  dirIn: { oneOf: [north, east, south, west] }
+  # Steighöhe in Tausend Fuß (unter FL 180): auf der Platzfrequenz in Fuß gesprochen, nicht in angels
+  ang: { number: angels, range: [6, 16] }
+  oth: { pool: callsigns.fighter, distinctFrom: [flightName] }
+  othNum: { int: [1, 9] }
+sketch: { airfield: af, weather: wx }
+kneeboard:
+  title: "Briefing {af.name} – ohne Tower"
+  rows:
+    - { label: "Platzfrequenz ({af.name} Traffic, {af.twr.band})", value: "{af.twr}" }
+  airfield: af
+  where:
+    dcs: "Missionsbriefing bzw. Comm Card im Kneeboard. Als Platzfrequenz dient hier die ATC-Frequenz des Platzes – die zeigt auch das Flugplatzfenster der F10-Karte."
+    bms: "Comm Plan im Briefing bzw. Line-up-Card im Kneeboard. Als Platzfrequenz dient hier die Tower-Frequenz des Startplatzes (UHF-Preset 3)."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Werte kommen aus Briefing oder Comm Card."
+steps:
+  - stage: Rollen
+    pos: parking
+    tune: { name: "{af.name} Traffic", freq: "{af.twr}" }
+    situation: >-
+      In **{af.name}** sitzt heute niemand im Tower. Laut Missionsbriefing sprechen alle auf der
+      Platzfrequenz und sagen selbst an, was sie tun. Wind laut Windsack und Wetter: {wx.wind} – du
+      rollst zur Runway **{wx.runway}**. Sag dich an.
+    you:
+      mode: build
+      distractors: ["{af.name} Ground", request taxi, please advise]
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - text: "{af.name} Traffic"
+            role: addressee
+            note: Adressat sind alle auf der Frequenz.
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "flight of {flightSize|spoken}", role: info }
+          - text: "taxiing to runway {wx.runway|spoken}"
+            role: intent
+            note: Du sagst an, was du tust – du bittest um nichts.
+          - text: "{af.name}"
+            role: info
+            note: Platzname am Ende – falls jemand den Anfang verpasst hat.
+    explain: Niemand antwortet. Das ist richtig so – Selbstansagen sind Informationen, keine Anfragen.
+
+  - stage: Rollen
+    pos: taxi
+    situation: Du rollst. Auf der Frequenz meldet sich ein anderer Flight.
+    hear:
+      - speaker: "{oth} {othNum}"
+        segments:
+          - { text: "{af.name} Traffic", role: addressee }
+          - { text: "{oth} {othNum|spoken}", role: callsign }
+          - { text: "ten miles {dirIn}", role: position }
+          - { text: inbound for the overhead, role: intent }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: "{af.name}", role: info }
+    silence: true
+    explain: >-
+      Nichts sagen ist richtig. {oth} {othNum} informiert nur. Für dich heißt das: Bevor du auf die Bahn
+      rollst, schaust du in seine Richtung („{dirIn}“) – dort kommt er in wenigen Minuten herein.
+
+  - stage: Start
+    pos: holdshort
+    situation: Du stehst am Rollhalt von Runway **{wx.runway}**, der Anflug ist frei. Was sagst du an, bevor du auf die Bahn rollst?
+    you:
+      mode: choice
+      wrong:
+        - "{af.name} Traffic, {callsign|spoken}, any traffic in the area, please advise"
+        - "{af.name} Tower, {callsign|spoken}, ready for departure"
+        - "{callsign|spoken}, rolling"
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Traffic", role: addressee }
+          - { text: "{callsign|spoken}", role: callsign }
+          - { text: "departing runway {wx.runway|spoken}", role: intent }
+          - { text: "to the {dir}", role: intent }
+          - { text: "{af.name}", role: info }
+    explain: >-
+      „Please advise“ ist laut FAA AIM ausdrücklich nicht vorgesehen, und einen Tower gibt es nicht.
+      Ohne Platzname weiß bei mehreren Plätzen auf einer Frequenz niemand, wo du startest.
+
+  - stage: Abflug
+    pos: airborne
+    situation: Du bist in der Luft und drehst Richtung „{dir}“ ab. Sag an, dass du den Platzbereich verlässt – du steigst auf {ang}.000 ft.
+    you:
+      mode: type
+      hint: Platz Traffic – Rufzeichen – departing to the … – climbing to … – Platzname
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Traffic", role: addressee }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - text: "departing to the {dir}"
+            role: intent
+            critical: true
+            alt: ["leaving to the {dir}", "departing the area to the {dir}"]
+          - text: "climbing to {ang|spoken} thousand"
+            role: value
+            optional: true
+            alt: ["climbing {ang|spoken} thousand", "climbing to {ang}000", "climbing {ang}000", "climbing angels {ang|spoken}", "angels {ang|spoken}"]
+            note: >-
+              Auf der Platzfrequenz sprichst du die Höhe in Fuß wie bei ATC – Fremdverkehr kennt „angels“ nicht
+              (Modul 1, Lektion 3). In Sim-Staffeln hört man trotzdem oft „angels …“; das zählt hier auch.
+          - { text: "{af.name}", role: info }
+    explain: >-
+      Danach verlässt du die Platzfrequenz – erst dann bist du nicht mehr Teil des Platzverkehrs. Die Höhe
+      gehört in Fuß dazu („climbing to {ang|spoken} thousand“): „angels“ ist ein taktisches Wort für AWACS und
+      Flight, auf einer gemeinsamen Platzfrequenz versteht es nicht jeder.
+
+  - stage: Rückkehr
+    pos: pattern
+    tune: { name: "{af.name} Traffic", freq: "{af.twr}" }
+    situation: Die Mission ist vorbei. Schalte zurück auf die Platzfrequenz – du bist etwa zehn Meilen vom Platz, Richtung „{dirIn}“. Dann sag dich für den Overhead an.
+    you:
+      mode: type
+      hint: Platz Traffic – Rufzeichen – Position – Absicht – Runway – Platzname
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Traffic", role: addressee }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - text: "ten miles {dirIn}"
+            role: position
+            critical: true
+            alt: ["one zero miles {dirIn}", "10 miles {dirIn}"]
+          - text: inbound for the overhead
+            role: intent
+            alt: ["inbound overhead", "inbound for the break"]
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true }
+          - { text: "{af.name}", role: info }
+    explain: Wer jetzt rollen will, weiß dank deiner Ansage, dass gleich jemand über der Bahn ist.
+
+  - stage: Landung
+    pos: landed
+    situation: Gelandet und abgerollt. Die Bahn ist wieder frei – das sagst du an.
+    you:
+      mode: type
+      hint: Platz Traffic – Rufzeichen – clear of runway … – Platzname
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Traffic", role: addressee }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - text: "clear of runway {wx.runway|spoken}"
+            role: info
+            critical: true
+            alt: ["clear runway {wx.runway|spoken}"]
+          - { text: "{af.name}", role: info }
+    explain: >-
+      Damit weiß jeder am Rollhalt: Die Bahn ist frei. Ohne Tower ist diese Meldung das Einzige, was den
+      Nächsten losstarten lässt.

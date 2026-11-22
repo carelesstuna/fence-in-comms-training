@@ -1,0 +1,76 @@
+# Rollen der Segmente eines Funkspruchs (Funkspruch-Anatomie). Farben sind feste Paletten-Namen.
+#
+# `more` (optional) ist das Standardziel des Links „Mehr dazu: …“ unter der Erklärung eines Teils.
+# Ein Ziel oder eine Liste von Zielen, es gilt das erste, dessen `when` passt. `to` ist ein Pfad in der
+# App (Glossar oder Themenseite /wissen/<id>), `label` der Linktext, `when` (optional) ein regulärer
+# Ausdruck: Ziel nur, wenn der Text des Teils passt. Das Glossar öffnet in einem neuen Tab, eine Themenseite im
+# selben Fenster. Rollen ohne `more` bekommen keinen Link, solange es kein gutes Ziel gibt – lieber keiner
+# als ein schlechter. Ein Teil kann das Ziel mit `more:` im Funkspruch übersteuern (siehe content/README.md).
+- role: addressee
+  label: Adressat
+  question: Wen rufe ich?
+  color: sky
+  # Nur für Flugsicherungs-Stellen („… Ground“, „… Tower“); AWACS, Tanker und Mitspieler haben kein Ziel
+  more:
+    label: Die ATC-Stellen von Clearance bis Center
+    to: /wissen/atc-stellen
+    when: '\b(clearance|delivery|ground|tower|departure|approach|center|centre)\b'
+- role: callsign
+  label: Rufzeichen
+  question: Wer spricht?
+  color: amber
+- role: position
+  label: Position
+  question: Wo bin ich?
+  color: violet
+- role: intent
+  label: Absicht
+  question: Was habe ich vor?
+  color: teal
+- role: info
+  label: Information
+  question: Was muss der andere wissen?
+  color: slate
+  # Nur für „information Romeo“ & Co.
+  more:
+    label: ATIS – die Platzansage und ihr Kennbuchstabe
+    to: /wissen/atis-platzansage
+    when: '\binformation\b'
+- role: request
+  label: Anfrage
+  question: Was will ich?
+  color: green
+- role: instruction
+  label: Anweisung
+  question: Was soll der andere tun?
+  color: orange
+- role: value
+  label: Zahlenwert
+  question: Welche Zahl, Frequenz, Höhe?
+  color: pink
+  # Squawk und Höhenangaben haben eigene Seiten, alles andere (Frequenzen, Kurse, Zeiten, Treibstoff) steht bei den Zahlen
+  more:
+    - label: Squawk, Transponder und IFF
+      to: /wissen/squawk-transponder-iff
+      when: '\bsquawk\b'
+    - label: Höhen und Höhenmesser – angels, Flight Level, QNH
+      to: /wissen/hoehen-und-hoehenmesser
+      when: '\b(angels|cherubs|flight level|altimeter|qnh|qfe|thousand|hundred)\b'
+    - label: Zahlen im Funk
+      to: /wissen/zahlen-im-funk
+- role: proword
+  label: Standardwort
+  question: Welches feste Funkwort?
+  color: lime
+  more:
+    label: alle Standardwörter
+    to: /glossary?tab=prowords
+- role: brevity
+  label: Brevity-Code
+  question: Welches Codewort?
+  color: red
+  # Die App macht daraus die Liste der Gruppe („Brevity-Gruppe Sicht & Kontakt“), wenn alle erkannten
+  # Codes des Teils in einer Gruppe stehen
+  more:
+    label: alle Brevity-Codes
+    to: /glossary?tab=brevity

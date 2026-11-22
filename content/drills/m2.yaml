@@ -1,0 +1,1302 @@
+# Übungen für Modul 2 (Funkgeräte & Comm Plan).
+# Typen: choice, match, build, anatomy, input, generated – siehe content/README.md
+# Übungen ohne ::drill-Verweis in einer Lektion bleiben bewusst stehen (Einstufung, spätere Nutzung).
+
+# ------------------------------------------------------------ Lektion 1: Funkgeräte im Cockpit
+- id: m2-l1-match-bands
+  type: match
+  prompt: >-
+    Welches Band ist typischerweise wofür da? Ordne zu. (Welches Netz – die Gruppe, die zusammen auf einer
+    Frequenz funkt – im Einsatz auf welchem Gerät liegt, legt der Comm Plan im Briefing fest.)
+  pairs:
+    - [UHF-AM (225–400 MHz), "Militärisches Hauptband: Militärplätze und Tanker"]
+    - [VHF-AM (118–137 MHz), "Zivile Lotsen – im Kampfjet oft auch der Flight-Funk"]
+    - [VHF-FM (30–88 MHz), "Bodentruppen, meist auch der JTAC"]
+  explain: >-
+    UHF ist das militärische Hauptband, VHF-AM das zivile Band, VHF-FM das der Heeresfunkgeräte. Für
+    den eigenen Flight gibt es keine feste Regel: In der F-16 (auch in BMS) läuft er meist über VHF,
+    das DCS-Handbuch der A-10C nennt UHF. Auch beim AWACS hängt es von der Sim ab (BMS: UHF, DCS: laut
+    A-10C-Handbuch eine eigene VHF-AM-Frequenz). Maßgeblich ist der Comm Plan.
+
+- id: m2-l1-match-brevity
+  type: match
+  exam: true
+  prompt: Mit welchem Wort meint man welches Funkgerät?
+  pairs:
+    - [uniform, das UHF-Funkgerät]
+    - [victor, das VHF-AM-Funkgerät]
+    - [fox mike, das VHF-FM-Funkgerät]
+  explain: >-
+    Drei Brevity-Wörter ersparen die Erklärung, welches Gerät gemeint ist: uniform für UHF, victor für VHF-AM, fox mike
+    für VHF-FM.
+
+- id: m2-l1-modulation
+  type: choice
+  prompt: >-
+    Ein JTAC funkt auf einer FM-Frequenz. Du stellst genau diese Frequenz ein – aber auf einem Gerät,
+    das nur AM kann. Was passiert?
+  options:
+    - Du hörst nichts Brauchbares – auch die Modulation muss passen.
+    - Alles normal – entscheidend ist allein die Frequenz, die Modulation spielt keine Rolle.
+    - Du hörst ihn leise und verrauscht, er dich dagegen gar nicht.
+    - Das Funkgerät erkennt die FM-Sendung und schaltet von selbst um.
+  answer: 0
+  explain: >-
+    AM und FM packen die Stimme ganz unterschiedlich in die Funkwelle. Ein AM-Empfänger kann ein
+    FM-Signal nicht sinnvoll entschlüsseln. Frequenz UND Modulation müssen stimmen.
+
+- id: m2-l1-a10-fm
+  type: choice
+  exam: true
+  prompt: Warum hat die A-10C neben UHF und VHF-AM auch ein VHF-FM-Funkgerät?
+  options:
+    - Für Bodentruppen und JTACs, die auf FM funken.
+    - Als Reservegerät, falls das UHF-Funkgerät im Einsatz ausfällt.
+    - Um zivile Fluglotsen zu erreichen, die auf FM funken.
+    - Weil FM im Tiefflug deutlich weiter reicht als UHF.
+  answer: 0
+  explain: >-
+    Die A-10 ist für Luftnahunterstützung gebaut. Die Soldaten am Boden funken mit Heeresfunkgeräten
+    im VHF-FM-Bereich – also braucht das Flugzeug ein passendes Gerät.
+
+- id: m2-l1-f16
+  type: choice
+  layer: sim
+  aircraft: [f16]
+  prompt: In der F-16C (DCS und BMS) – welches Gerät ist COM1, welches COM2?
+  options:
+    - "COM1 = UHF (AN/ARC-164), COM2 = VHF (DCS: AN/ARC-222, BMS: AN/ARC-186)"
+    - COM1 = VHF, COM2 = UHF (AN/ARC-164)
+    - COM1 und COM2 sind zwei baugleiche AN/ARC-210 für alle Bänder
+    - COM1 = UHF, COM2 = ein reines VHF-FM-Gerät nur für JTACs
+  answer: 0
+  explain: >-
+    COM1 ist das UHF-Gerät für den militärischen Hauptfunk, COM2 das VHF-Gerät. Die DCS-F-16 hat dafür das
+    ARC-222 (AM und FM), das BMS-Handbuch nennt das ARC-186. Die Kanalwahl läuft über UFC und DED. Am Gashebel
+    gilt laut DCS-Handbuch: vorn = VHF (COM2), hinten = UHF (COM1). In BMS ist die Schalterrichtung nicht
+    einheitlich dokumentiert – sieh im Cockpit nach.
+
+- id: m2-l1-hornet
+  type: choice
+  layer: sim
+  aircraft: [fa18]
+  prompt: Welche Funkgeräte hat die F/A-18C in DCS?
+  options:
+    - Zwei gleiche AN/ARC-210 (COMM 1 und COMM 2) für VHF und UHF
+    - Ein UHF-Gerät (COMM 1) und ein VHF-Gerät (COMM 2) verschiedener Bauart
+    - Nur ein einziges Funkgerät, das zwei Kanäle gleichzeitig empfängt
+    - "Drei Geräte wie die A-10: UHF, VHF-AM und VHF-FM"
+  answer: 0
+  explain: >-
+    Beide Geräte sind ARC-210 und können dieselben Bänder. Das macht die Hornet flexibel: Jedes Netz
+    kann auf COMM 1 oder COMM 2 liegen. Du musst aber wissen, welches Gerät du gerade tastest.
+
+- id: m2-l1-f14
+  type: choice
+  layer: sim
+  aircraft: [f14]
+  prompt: In der F-14 – wer stellt welches Funkgerät ein, und wer darf darauf senden?
+  options:
+    - Pilot stellt das ARC-159 ein, RIO das ARC-182 – senden können beide auf beiden.
+    - Der Pilot stellt beide Geräte ein und sendet allein, der RIO hat nur das Intercom.
+    - Der RIO stellt beide Geräte ein und sendet allein, der Pilot spricht nur über Intercom.
+    - Pilot stellt das ARC-182 ein, RIO das ARC-159 – jeder sendet nur auf seinem Gerät.
+  answer: 0
+  explain: >-
+    Das ARC-159 („UHF 1“) hat sein Bedienteil beim Piloten, das ARC-182 („V/UHF 2“) beim RIO. Senden
+    können beide auf beiden: der Pilot über den Funkschalter am Gashebel, der RIO über XMTR SEL und
+    Fußtaste. Wer wann spricht, ist Absprachesache – mehr in der später geplanten Spur D.
+
+- id: m2-l1-scr522
+  type: choice
+  layer: sim
+  aircraft: [p51, p47, spitfire, mosquito]
+  prompt: >-
+    Du sitzt in einem Warbird mit den Kanälen A–D. Laut Briefing liegt der Tower auf 124.0 MHz,
+    Kanal B. Wie bekommst du den Tower aufs Gerät?
+  options:
+    - Kanaltaste B drücken – die Frequenz dahinter hat die Mission schon eingestellt.
+    - 124.0 am Frequenzrad einstellen.
+    - Den Moduswähler auf T stellen, dann hört der Tower dich sicher.
+    - Gar nicht – Warbirds erreichen den Tower nur über das Funkmenü.
+  answer: 0
+  explain: >-
+    Die vier Kanäle sind fest belegt; im Flug wählst du nur den Kanal. T heißt Dauersenden und
+    blockiert den Kanal für alle – im Normalbetrieb bleibt der Wähler auf REM (senden nur mit
+    gedrückter Sprechtaste).
+
+- id: m2-l1-fug16
+  type: choice
+  layer: sim
+  aircraft: [bf109, fw190]
+  prompt: Bf 109 oder Fw 190 mit FuG 16ZY – auf welche Stellung schaltest du für den Lotsen am Platz?
+  options:
+    - Δ – Nah-Flugsicherung
+    - I – Y-Führung
+    - II – Gruppenbefehl
+    - □ – Reichsjäger
+  answer: 0
+  explain: >-
+    Δ ist die Nah-Flugsicherung, also der Lotse am Platz. II ist der Gruppenbefehl für mehrere
+    Staffeln, □ die Reichsjägerfrequenz, I die Y-Führung. Welche Frequenz hinter jeder Stellung liegt,
+    legt die Mission fest.
+
+- id: m2-l1-mig15-wave
+  type: input
+  layer: sim
+  aircraft: [mig15]
+  prompt: >-
+    MiG-15bis: Im Briefing steht für die Leitstelle **3.900 kHz**. Welche Wellenzahl stellst du am
+    RSI-6 ein? (Wellenzahl = Frequenz in kHz ÷ 25)
+  accept: ["156"]
+  placeholder: z. B. 150
+  explain: 3.900 ÷ 25 = 156. Zur Probe – Wellenzahl 150 entspricht 3.750 kHz, 200 entspricht 5.000 kHz.
+
+- id: m2-l1-anatomy-foxmike
+  type: anatomy
+  exam: true
+  call: m2-handoff-fm
+  transmission: 0
+  target: brevity
+  prompt: Der AWACS übergibt dich an einen JTAC. Tippe in seinem Funkspruch auf den Teil, der sagt, auf welchem Funkgerät du ihn erreichst.
+  explain: „fox mike“ steht für das VHF-FM-Gerät – genauso wie „uniform“ für UHF und „victor“ für VHF-AM.
+
+- id: m2-l1-build-fm-readback
+  type: build
+  call: m2-handoff-fm
+  prompt: >-
+    {awacs} schickt dich zum JTAC {jtac} auf FM. Lies Gerät und Frequenz zurück.
+  distractors: [uniform, "{jtac}"]
+  explain: Gerät, Frequenz, Rufzeichen. „uniform“ wäre das falsche Gerät – der JTAC funkt auf FM.
+
+- id: m2-l1-input-fm
+  type: form
+  vars:
+    jtac: { pool: callsigns.jtac }
+    fm: { number: vhf-fm }
+  prompt: Du wirst an einen JTAC übergeben. Welches Funkgerät stellst du ein, und auf welcher Frequenz?
+  context: "„{callsign|spoken}, contact {jtac}, fox mike {fm|spoken}.“"
+  fields:
+    - { label: Funkgerät / Band, accept: ["VHF-FM", "FM", "FM-Gerät", "fox mike", "VHF FM radio"], placeholder: Gerät oder Band }
+    - { label: Frequenz (MHz), accept: ["{fm}", "{fm}0", "{fm|spoken}"], placeholder: z. B. 41.5 }
+  explain: >-
+    „fox mike“ ist das VHF-FM-Gerät (30–88 MHz), „uniform“ wäre UHF und „victor“ VHF-AM. Die Frequenz
+    kommt Ziffer für Ziffer: {fm|spoken}.
+
+- id: m2-l1-input-uniform
+  type: form
+  vars:
+    tanker: { pool: callsigns.tanker }
+    f: { number: uhf }
+  prompt: Du wirst an einen Tanker übergeben. Welches Funkgerät stellst du ein, und auf welcher Frequenz?
+  context: "„{callsign|spoken}, contact {tanker}, uniform {f|spoken}.“"
+  fields:
+    - { label: Funkgerät / Band, accept: ["UHF", "UHF-AM", "UHF AM", "uniform"], placeholder: Gerät oder Band }
+    - { label: Frequenz (MHz), accept: ["{f}", "{f|spoken}"], placeholder: z. B. 251.25 }
+  explain: >-
+    „uniform“ ist das UHF-Gerät (225–400 MHz), das Band der militärischen Stellen, auch der Tanker.
+    „victor“ wäre VHF-AM, „fox mike“ VHF-FM. Die Frequenz kommt Ziffer für Ziffer: {f|spoken}.
+
+- id: m2-l1-input-victor
+  type: form
+  vars:
+    awacs: { pool: callsigns.awacs }
+    f: { number: vhf }
+  prompt: Du wirst an den AWACS übergeben. Welches Funkgerät stellst du ein, und auf welcher Frequenz?
+  context: "„{callsign|spoken}, contact {awacs}, victor {f|spoken}.“"
+  fields:
+    - { label: Funkgerät / Band, accept: ["VHF", "VHF-AM", "VHF AM", "victor"], placeholder: Gerät oder Band }
+    - { label: Frequenz (MHz), accept: ["{f}", "{f|spoken}"], placeholder: z. B. 124.5 }
+  explain: >-
+    „victor“ ist das VHF-AM-Gerät (Flugfunkband 118–137 MHz, das Gerät selbst kann mehr). Das DCS-Handbuch der A-10C legt AWACS und ATC auf VHF-AM, in BMS
+    liegt der AWACS-Controller dagegen auf UHF. Hier sagt dir die Übergabe selbst, welches Gerät gemeint ist.
+    „uniform“ wäre UHF, „fox mike“ VHF-FM. Die Frequenz kommt Ziffer für Ziffer: {f|spoken}.
+
+# ------------------------------------------------------------ Lektion 2: Kanäle, Comm Card, push
+- id: m2-l2-why-presets
+  type: choice
+  exam: true
+  prompt: Warum sagt man im Flight „push button 5“ statt der Frequenz?
+  options:
+    - Kürzer, alle haben dieselben Presets, und die Frequenz bleibt geheim.
+    - Weil Frequenzen im Militärfunk grundsätzlich nie laut ausgesprochen werden dürfen.
+    - Weil gespeicherte Kanäle technisch besser klingen als frei eingestellte Frequenzen.
+    - Damit der Tower mithören kann, auf welchen Kanal der Flight gerade wechselt.
+  answer: 0
+  explain: >-
+    Ein Preset ist eine gespeicherte Frequenz. Eine Ziffer ist schneller gesagt und eingestellt als
+    sechs, und wer mithört, erfährt nur „Kanal 5“.
+
+- id: m2-l2-push-meaning
+  type: choice
+  vars:
+    ch: { number: channel }
+  prompt: Dein Lead sagt „{flightName}, push button {ch|spoken}.“ Was tust du als Wingman?
+  options:
+    - "Ohne Antwort auf Kanal {ch} schalten und dort auf den Check warten."
+    - "Erst „wilco“ sagen, damit der Lead weiß, dass du es gehört hast, dann umschalten."
+    - "Kanal {ch} wählen und dort sofort mit vollem Rufzeichen die neue Stelle rufen."
+    - "Den Lead fragen, welche Frequenz hinter Kanal {ch} steckt."
+  answer: 0
+  explain: >-
+    PUSH heißt „wechseln, keine Bestätigung nötig“. Auf dem neuen Kanal meldet sich der Flight mit dem
+    Check: „{flightName}, check“ – „Two“ – „Three“ – „Four“. Manche SOPs (Hausregeln eines Verbands oder Servers)
+    lassen „push“ trotzdem kurz mit „Two“ bestätigen – das steht dann im Briefing.
+
+- id: m2-l2-build-push
+  type: build
+  call: m2-push-button
+  transmission: 0
+  prompt: Schick deinen Flight auf Kanal {ch}.
+  distractors: [switch, over]
+  explain: Flight-Name, „push“, Kanal. Mehr braucht es nicht.
+
+- id: m2-l2-input-push
+  type: input
+  vars:
+    ch: { number: channel }
+  prompt: Du bist Lead von {flightName}. Schick deinen Flight auf Kanal **{ch}**. Was sagst du – mit dem passenden Stichwort?
+  accept:
+    - "{flightName} push button {ch|spoken}"
+    - "{flightName} push channel {ch|spoken}"
+    - "{flightName} push {ch|spoken}"
+    - "{flightName} push button {ch}"
+    - "{flightName} push channel {ch}"
+  explain: >-
+    „{flightName}, push button {ch|spoken}.“ Statt „button“ geht auch „channel“. Die Ziffern wie
+    immer einzeln.
+
+- id: m2-l2-after-push
+  type: choice
+  prompt: Dein Flight ist nach einem „push“ auf dem neuen Kanal. Was kommt als Erstes?
+  options:
+    - "Der Lead: „{flightName}, check“ – die anderen antworten mit ihrer Nummer."
+    - Jeder meldet sich mit vollem Rufzeichen und Lesbarkeit beim Lead.
+    - Der Wingman ruft sofort die Stelle auf dem neuen Kanal, damit keine Zeit verloren geht.
+    - Nichts – man wartet, bis jemand etwas sagt.
+  answer: 0
+  explain: Erst wenn alle „check“ beantwortet haben, weiß der Lead, dass niemand auf dem alten Kanal hängt.
+
+- id: m2-l2-commcard-net
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    awacs: { pool: callsigns.awacs }
+    tanker: { pool: callsigns.tanker }
+    cp: { commplan: true, airfield: airfield }
+  prompt: |
+    Deine Comm Card:
+
+    | Kanal | Netz | Frequenz |
+    |---|---|---|
+    | {cp.ground.channel} | {airfield.name} Ground | {cp.ground.freq} |
+    | {cp.tower.channel} | {airfield.name} Tower | {cp.tower.freq} |
+    | {cp.departure.channel} | Departure | {cp.departure.freq} |
+    | {cp.strike.channel} | Strike ({awacs}) | {cp.strike.freq} |
+    | {cp.tanker.channel} | Tanker ({tanker}) | {cp.tanker.freq} |
+
+    Der Lead sagt: „{flightName}, push Strike.“ Welchen Kanal wählst du?
+  options:
+    - "Kanal {cp.strike.channel}"
+    - "Kanal {cp.departure.channel}"
+    - "Kanal {cp.tanker.channel}"
+    - "Kanal {cp.tower.channel}"
+  answer: 0
+  explain: >-
+    „Strike“ ist ein Netzname aus dem Comm Plan. Die Comm Card übersetzt ihn in den Kanal – darum
+    hast du sie auf dem Knie.
+
+- id: m2-l2-commcard-button
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+    awacs: { pool: callsigns.awacs }
+    tanker: { pool: callsigns.tanker }
+    cp: { commplan: true, airfield: airfield }
+  prompt: |
+    Deine Comm Card:
+
+    | Kanal | Netz | Frequenz |
+    |---|---|---|
+    | {cp.ground.channel} | {airfield.name} Ground | {cp.ground.freq} |
+    | {cp.tower.channel} | {airfield.name} Tower | {cp.tower.freq} |
+    | {cp.departure.channel} | Departure | {cp.departure.freq} |
+    | {cp.strike.channel} | Strike ({awacs}) | {cp.strike.freq} |
+    | {cp.tanker.channel} | Tanker ({tanker}) | {cp.tanker.freq} |
+
+    Der Lead sagt: „{flightName}, push button {cp.tanker.channel|spoken}.“ Mit wem spricht der Flight dort?
+  options:
+    - "Mit dem Tanker {tanker}"
+    - "Mit {awacs}"
+    - "Mit Departure"
+    - "Mit {airfield.name} Tower"
+  answer: 0
+  explain: Kanal {cp.tanker.channel} ist laut Comm Card das Tankernetz. Vor dem Umschalten weißt du also schon, wer dich dort erwartet.
+
+- id: m2-l2-anatomy-net
+  type: anatomy
+  exam: true
+  call: m2-push-named
+  transmission: 0
+  target: info
+  prompt: Der Lead schickt den Flight auf ein Netz. Tippe in seinem Funkspruch auf den Teil, für den du deine Comm Card brauchst.
+  explain: Der Netzname. Erst die Comm Card sagt dir, welcher Kanal und welche Frequenz dahinterstecken.
+
+# ------------------------------------------------------------ Lektion 3: Guard
+- id: m2-l3-guard-freqs
+  type: choice
+  prompt: Welche beiden Frequenzen sind „Guard“?
+  options:
+    - 243.0 MHz (UHF, militärisch) und 121.5 MHz (VHF, zivil)
+    - 251.0 MHz (UHF, Militärplätze) und 121.5 MHz (VHF, zivil)
+    - 243.0 MHz (UHF, militärisch) und 118.0 MHz (VHF, zivil)
+    - 339.75 MHz (UHF Common) und 123.5 MHz (VHF Common)
+  answer: 0
+  explain: >-
+    243.0 und 121.5 sind die Notfrequenzen. Sie sind weltweit gleich und werden von vielen Stellen
+    ständig abgehört. Übrigens: 243.0 ist genau das Doppelte von 121.5.
+
+- id: m2-l3-what-for
+  type: choice
+  prompt: Wofür sendest du auf Guard?
+  options:
+    - Für Notfälle – und für Stationen, die auf keiner anderen Frequenz erreichbar sind.
+    - Für Radio Checks, weil dort garantiert jemand zuhört und antwortet.
+    - Für kurze Absprachen zwischen zwei Flights auf verschiedenen Frequenzen.
+    - Um nach einem push zu bestätigen, dass der ganze Flight umgeschaltet hat.
+  answer: 0
+  explain: >-
+    Guard ist die Frequenz, die alle mithören. Wer dort plaudert, stört womöglich jemanden, der gerade
+    um Hilfe ruft.
+
+- id: m2-l3-monitor
+  type: choice
+  exam: true
+  prompt: Warum hörst du einen Ruf auf Guard, obwohl du gerade auf der Tower-Frequenz bist?
+  options:
+    - Viele Funkgeräte haben einen eigenen Guard-Empfänger, der parallel mithört.
+    - Guard-Sendungen sind so stark, dass sie jede andere Frequenz im Band überlagern.
+    - Der Tower leitet Rufe auf Guard automatisch auf seine eigene Frequenz weiter.
+    - Gar nicht – Guard hörst du nur, wenn du die Frequenz extra einstellst.
+  answer: 0
+  explain: >-
+    Das ARC-164 zum Beispiel hat einen zweiten Empfänger nur für 243.0. Solange er eingeschaltet ist,
+    hörst du Guard zusätzlich zu deiner eingestellten Frequenz.
+
+- id: m2-l3-reply
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    app: { number: uhf }
+  prompt: >-
+    {airfield.name} Approach ruft dich auf Guard: „… contact {airfield.name} Approach {app|spoken}.“ Wo
+    meldest du dich?
+  options:
+    - "Auf {app}, damit Guard für Notrufe frei bleibt."
+    - Auf Guard, damit Approach sicher weiß, dass du es gehört hast.
+    - Auf Guard und auf {app} gleichzeitig.
+    - Gar nicht – Rufe auf Guard sind nur Information.
+  answer: 0
+  explain: >-
+    Der Ruf auf Guard ist nur der Weg, dich zu erreichen. Antworte auf der genannten Frequenz. Nur wenn
+    das nicht klappt, kurz auf Guard.
+
+- id: m2-l3-anatomy-guard
+  type: anatomy
+  exam: true
+  call: m2-guard-contact
+  transmission: 0
+  target: info
+  prompt: Approach ruft dich über die Notfrequenz. Tippe auf den Teil, an dem jeder Mithörer erkennt, dass der Ruf über Guard kam.
+  explain: „on guard“ kennzeichnet den Ruf. Danach folgt meist eine Frequenz, auf die du wechseln sollst.
+
+- id: m2-l3-mayday-pan
+  type: match
+  exam: true
+  prompt: Ordne die beiden Notrufe zu.
+  pairs:
+    - [mayday, „Ich bin in unmittelbarer Gefahr und brauche sofort Hilfe.“]
+    - [pan pan, "„Dringend, aber keine unmittelbare Gefahr.“"]
+  explain: >-
+    Mayday meldet eine Notlage: unmittelbare Gefahr für Flugzeug oder Besatzung. Pan pan meldet Dringlichkeit: ein
+    ernstes Problem, aber keine unmittelbare Gefahr. Beide sprichst du dreimal.
+
+- id: m2-l3-mayday-or-pan
+  type: choice
+  prompt: >-
+    Nach einem Vogelschlag vibriert dein Triebwerk leicht. Alle Anzeigen sind im grünen Bereich, du
+    hältst die Höhe und willst vorsorglich zum nächsten Platz. Welcher Ruf passt?
+  options:
+    - „pan pan“, dreimal – dringend, aber keine unmittelbare Gefahr
+    - „mayday“, dreimal – jeder Vogelschlag ist automatisch eine Notlage
+    - Gar keiner – Notrufe sind erst bei Feuer oder Triebwerksausfall vorgesehen
+    - „mayday, pan pan“ – erst die Notlage melden, dann abstufen
+  answer: 0
+  explain: >-
+    Pan pan meldet Dringlichkeit: ein ernstes Problem, aber keine unmittelbare Gefahr. Fällt das
+    Triebwerk aus oder brennt es, wird daraus mayday – hochstufen kannst du jederzeit. Beide Rufe
+    sprichst du dreimal.
+
+- id: m2-l3-build-mayday
+  type: build
+  call: m2-mayday
+  prompt: >-
+    Ernster Notfall, und du erreichst deine zuständige Stelle nicht – also Guard. Setze den Notruf
+    zusammen, in der Reihenfolge nach ICAO.
+  distractors: [pan pan, please help]
+  explain: >-
+    Mayday dreimal, wer, was ist los, was hast du vor, wo bist du, Höhe. Wenn Zeit bleibt, setzt du
+    die gerufene Stelle noch davor.
+
+# ------------------------------------------------------------ Lektion 4: Funkdisziplin
+- id: m2-l4-what-you-hear
+  type: choice
+  exam: true
+  prompt: >-
+    In einem echten Flugfunkgerät sendest du, und im selben Moment sendet ein anderer Pilot auf derselben
+    Frequenz. Was hörst du selbst davon?
+  options:
+    - Nichts – solange du sendest, empfängst du nicht.
+    - Ein lautes Pfeifen, das dir die Überlagerung sofort anzeigt.
+    - Die Stimme des anderen etwas leiser unter deiner eigenen.
+    - Eine Warnung im Cockpit, dass die Frequenz gerade belegt ist.
+  answer: 0
+  explain: >-
+    Ein Flugfunkgerät sendet oder empfängt, beides gleichzeitig geht nicht. Deshalb merken die beiden
+    Sender nichts. Nur alle anderen hören das Durcheinander.
+
+- id: m2-l4-what-tower-hears
+  type: choice
+  prompt: >-
+    Zwei Piloten drücken im selben Moment die Sprechtaste, beide auf derselben AM-Frequenz. Was kommt
+    beim Tower an?
+  options:
+    - Pfeifen und Wortfetzen – keine der beiden Sendungen ist verständlich.
+    - Nur der stärkere Sender, klar und deutlich – der schwächere geht unbemerkt unter.
+    - Beide Stimmen sauber übereinander, wie zwei Leute, die gleichzeitig reden.
+    - Gar nichts – sein Empfänger schaltet bei Überlagerung stumm.
+  answer: 0
+  explain: >-
+    Bei AM addieren sich beide Signale. Die Stimmen vermischen sich, und die leicht verschiedenen
+    Trägerfrequenzen erzeugen einen Pfeifton. Die beiden Sender selbst merken nichts – wer sendet,
+    empfängt nicht. Man nennt das „stepped on“ oder „blocked“.
+
+- id: m2-l4-why-am
+  type: choice
+  prompt: >-
+    Der Flugfunk nutzt bis heute AM, obwohl FM rauschärmer klingt. Welchen Vorteil hat AM, wenn zwei
+    Stationen gleichzeitig auf derselben Frequenz senden?
+  options:
+    - Jeder merkt die Überlagerung. Bei FM bliebe nur der stärkere Sender übrig, der schwächere ginge unbemerkt verloren.
+    - Bei FM würden die Empfänger durch die Überlagerung beschädigt, bei AM passiert den Geräten nichts.
+    - Bei AM setzt sich immer die Bodenstation durch, weil sie die stärkere Antenne hat – so behält der Tower Vorrang.
+    - Es ist kein Vorteil – mit FM wären beide Sender sauber übereinander zu hören.
+  answer: 0
+  explain: >-
+    Der „Capture-Effekt“ bei FM klingt sauber – aber ein Notruf, der vom stärkeren Sender verdrängt
+    wird, verschwindet spurlos. Bei AM weiß wenigstens jeder: Da ist gerade etwas schiefgegangen.
+
+- id: m2-l4-blocked-reply
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Du hast gerade eine Anfrage gestellt. {airfield.name} Tower antwortet: „blocked, say again.“ Was tust
+    du?
+  options:
+    - Kurz hineinhören, dann den Funkspruch vollständig wiederholen.
+    - Sofort wiederholen, bevor der andere Pilot wieder dazwischenfunkt.
+    - Warten, bis der Tower dich ausdrücklich mit deinem Rufzeichen anspricht.
+    - Auf Guard wechseln, weil die Frequenz offenbar gestört ist.
+  answer: 0
+  explain: >-
+    Der Tower hat niemanden aufgerufen, also sind beide gemeint. Wer sofort wiederholt, kollidiert oft wieder mit
+    dem anderen Piloten – der denkt dasselbe. Kurz hineinhören löst das Problem. Ruft der Tower dagegen gezielt
+    einen auf („{callsign|spoken}, say again“), wiederholt nur der, und alle anderen warten.
+
+- id: m2-l4-build-repeat
+  type: build
+  call: m2-blocked
+  prompt: >-
+    Deine Anfrage „{req}“ an {airfield.name} Tower ging unter, der Tower meldet „blocked, say again“.
+    Wiederhole sie.
+  distractors: [sorry, as I was saying]
+  explain: Vollständig und unverändert. Entschuldigungen und Füllwörter verlängern nur die Belegung der Frequenz.
+
+- id: m2-l4-best-call
+  type: choice
+  vars:
+    awacs: { pool: callsigns.awacs }
+  prompt: >-
+    Volle Frequenz, viel Verkehr. Du willst vom AWACS wissen, wo die nächste Gruppe von Flugzeugen steht – dafür gibt es das
+    Brevity-Wort „bogey dope“ (mehr dazu in Modul 5). Welcher Funkspruch ist am besten?
+  options:
+    - "{awacs}, {callsign|spoken}, bogey dope."
+    - "Äh, {awacs}, hier ist {callsign|spoken}, hört ihr mich? Wir hätten gern einen bogey dope, wenn's geht."
+    - "{callsign|spoken} an {awacs}, bitte kommen."
+    - "{awacs}, bogey dope, over."
+  answer: 0
+  explain: >-
+    Adressat, Rufzeichen, Anliegen – und Schluss. Ein Brevity-Wort ersetzt einen ganzen Satz („bogey dope“
+    fragt den AWACS nach der nächsten Gruppe, mehr dazu in Modul 5, Lektion 3). Beim letzten Beispiel fehlt dein Rufzeichen.
+
+- id: m2-l4-stuck-mic
+  type: choice
+  layer: community
+  prompt: Auf der Frequenz hörst du minutenlang Atmen und Cockpitgeräusche. Was ist am wahrscheinlichsten los?
+  options:
+    - Jemand hat eine hängende Sprechtaste oder die Sprachaktivierung (VOX) an.
+    - Der Server simuliert Funkrauschen und Cockpitgeräusche, weil die Funkeffekte eingeschaltet sind.
+    - Ein AWACS hält die Frequenz offen, um gleich ein Lagebild durchzugeben.
+    - Jemand sendet auf Guard, und dein Guard-Empfänger mischt es in die Frequenz.
+  answer: 0
+  explain: >-
+    Solange einer dauerhaft sendet, ist die Frequenz für alle anderen tot. Wer es merkt, sagt es dem
+    Betroffenen auf einem anderen Kanal oder im Text-Chat – auf derselben Frequenz hört er dich nicht.
+
+- id: m2-l4-match-discipline
+  type: match
+  exam: true
+  prompt: Ordne die Regel für volle Frequenzen ihrem Grund zu.
+  pairs:
+    - [Erst hineinhören, Vielleicht wartet gerade jemand auf eine Antwort.]
+    - ["Erst denken, dann drücken", Jedes „äh“ blockiert die Frequenz für alle.]
+    - [Nach dem Drücken kurz warten, Sonst fehlt beim Empfänger die erste Silbe.]
+    - [Nur der Lead spricht nach außen, "Weniger Stimmen, weniger Kollisionen."]
+  explain: >-
+    Jede Regel hat einen praktischen Grund: Auf einer vollen Frequenz kostet jede Sekunde Belegung andere die Chance zu
+    senden, und die erste Silbe, die abgeschnitten wird, ist oft der Adressat.
+
+# ------------------------------------------------------------ Lektion 5: SRS in der Praxis
+- id: m2-l5-ptt
+  type: choice
+  layer: sim
+  sims: [srs]
+  prompt: >-
+    In SRS hast du eine PTT-Taste und Tasten zum Wählen von Funkgerät 1 bis 10. Wie funkst du auf
+    Funkgerät 2?
+  options:
+    - Gerät 2 wählen, dann PTT – oder mit „Radio Switch works as PTT“ die Taste für Gerät 2 halten.
+    - PTT zweimal kurz antippen – SRS schaltet dann automatisch auf das nächste Funkgerät weiter und sendet dort.
+    - Gar nicht gezielt – SRS sendet immer gleichzeitig auf allen eingeschalteten Funkgeräten deines Cockpits.
+    - Im DCS-Funkmenü F2 drücken – SRS übernimmt die Gerätewahl aus dem Menü.
+  answer: 0
+  explain: >-
+    Normalerweise wählst du erst das Gerät und drückst dann PTT. Mit der Option „Radio Switch works as
+    Push To Talk (PTT)“ wird jede Wahltaste selbst zur Sprechtaste. Viele legen so Funkgerät 1 und 2 auf
+    die beiden Richtungen des Funkschalters am HOTAS.
+
+- id: m2-l5-wrong-modulation
+  type: choice
+  layer: sim
+  sims: [srs]
+  prompt: >-
+    Dein Wingman hört dich nicht, obwohl ihr laut SRS-Overlay dieselbe Frequenz habt. Bei dir steht AM,
+    bei ihm FM. Was ist los?
+  options:
+    - SRS verbindet nur Geräte mit gleicher Frequenz UND gleicher Modulation.
+    - SRS hat die Verbindung zum Server verloren – ihr müsst beide den Client neu verbinden.
+    - Seine Lautstärke für dieses Funkgerät ist im Overlay auf null gedreht.
+    - Ihr seid für die Sichtlinien-Simulation des Servers zu weit voneinander entfernt.
+  answer: 0
+  explain: >-
+    SRS bildet die Physik hier nach: Ein Gerät auf AM empfängt keine FM-Sendung auf derselben Frequenz.
+    Einer von euch muss die Modulation umstellen.
+
+- id: m2-l5-no-answer
+  type: choice
+  layer: community
+  prompt: >-
+    Du rufst „{flightName}, check“. Three und Four antworten, Two nicht. Im Text-Chat schreibt Two,
+    dass er dich gut hört. Was ist die häufigste Ursache?
+  options:
+    - Two sendet auf einem anderen Funkgerät als dem, auf dem er dich hört.
+    - Two hat die Lautstärke seines Funkgeräts zu weit heruntergedreht.
+    - Two ist außerhalb der Sichtlinie, und nur seine Sendungen werden deshalb abgeschnitten.
+    - Two hat seinen Guard-Empfänger ausgeschaltet und ist deshalb nicht zu hören.
+  answer: 0
+  explain: >-
+    Gehört wird auf allen Funkgeräten gleichzeitig, gesendet nur auf dem gewählten – im Cockpit (auch in BMS mit
+    IVC) über den Funkschalter am Gashebel, in SRS über die Gerätewahl (das Overlay zeigt sie). Two hört dich auf
+    dem Flight-Gerät und funkt auf dem anderen.
+
+- id: m2-l5-intercom
+  type: choice
+  layer: sim
+  sims: [srs]
+  prompt: >-
+    Du fliegst die F-14 mit einem menschlichen RIO über SRS. Wie sprecht ihr miteinander, ohne dass
+    der ganze Flight mithört?
+  options:
+    - Über das SRS-Intercom – „Intercom Select“ und PTT oder, falls aktiviert, Sprachaktivierung (VOX).
+    - Über Guard – den hört zwar jeder, aber dort ist meistens wenig los und niemand stört sich daran.
+    - Über das V/UHF-Gerät des RIO auf einer freien Frequenz, die nur ihr beide eingestellt habt.
+    - Gar nicht über SRS – dafür nutzt man einen privaten Discord- oder Teamspeak-Kanal.
+  answer: 0
+  explain: >-
+    Für Mehrsitzer hat SRS einen eigenen Intercom-Kanal, den nur die Besatzung hört. Viele nutzen dafür
+    eine eigene Taste oder VOX – damit der Funk nach außen nicht versehentlich mitläuft.
+
+- id: m2-l5-match-errors
+  type: match
+  layer: community
+  sims: [srs]
+  prompt: Typische SRS-Fehler – ordne das Symptom der Ursache zu.
+  pairs:
+    - ["Keiner antwortet, im Overlay ist das falsche Gerät markiert", Falsches Funkgerät zum Senden gewählt]
+    - ["Frequenz stimmt, aber kein Empfang", Falsche Modulation (AM statt FM oder umgekehrt)]
+    - [Alle hören dich atmen, Sprachaktivierung (VOX) oder hängende Taste]
+    - [Der Tower hinter dem Berg hört dich nicht, Sichtlinien-Simulation des Servers ist aktiv]
+
+- id: m2-l5-horizon
+  type: choice
+  exam: true
+  vars:
+    # text = Flughöhe, spoken = die Reichweite 1,23 · √Höhe, gerundet (die richtige Antwort)
+    alt:
+      oneOf:
+        - { text: "4.900", spoken: "86" }
+        - { text: "6.400", spoken: "98" }
+        - { text: "8.100", spoken: "111" }
+        - { text: "10.000", spoken: "123" }
+        - { text: "14.400", spoken: "148" }
+        - { text: "19.600", spoken: "172" }
+    # Falschantworten, die nie mit einer richtigen zusammenfallen
+    w1: { oneOf: ["12", "30", "250", "500"] }
+    w2: { oneOf: ["1.200", "2.500", "5.000"] }
+  prompt: >-
+    Du fliegst auf {alt} ft, die Bodenstation hat ihre Antenne nahe am Boden. Wie weit reicht der
+    Funk ungefähr (Faustformel 1,23 · √Höhe in ft)?
+  options:
+    - Rund {alt|spoken} NM
+    - Rund {w1} NM
+    - Rund {w2} NM
+    - Unbegrenzt, solange das Funkgerät stark genug ist
+  answer: 0
+  explain: >-
+    1,23 · √{alt} ergibt etwa {alt|spoken} NM. VHF und UHF reichen kaum über den Horizont hinaus. Wer
+    tief fliegt oder hinter Bergen steckt, ist schnell außer Reichweite.
+
+- id: m2-l5-horizon-low
+  type: choice
+  prompt: >-
+    Du rufst im Tiefflug auf 100 ft einen Tower, der 30 NM entfernt ist. Er antwortet nicht. Warum
+    vermutlich? (Faustformel Funkhorizont: 1,23 · √Höhe in ft, in NM)
+  options:
+    - Du bist unter seinem Funkhorizont – steig, dann klappt es.
+    - Der Tower ist um diese Uhrzeit nicht mehr besetzt und antwortet erst wieder morgen früh.
+    - Dein Funkgerät hat für 30 NM zu wenig Sendeleistung, es reicht nur etwa 20 NM weit.
+    - Im Tiefflug unter 500 ft ist Funkverkehr mit dem Tower grundsätzlich nicht erlaubt.
+  answer: 0
+  explain: >-
+    1,23 · √100 ≈ 12 NM. Selbst mit der Antennenhöhe des Towers kommst du nicht auf 30 NM. Ein paar
+    tausend Fuß mehr lösen das Problem. Auf SRS-Servern mit Sichtlinien-Simulation und in BMS
+    (Reichweite nach Sichtlinie) passiert genau das.
+
+# ------------------------------------------------------------ Lektion 6: Welche Frequenz wann?
+- id: m2-l6-sequence-plan
+  type: sequence
+  prompt: Bring die Stellen eines normalen Flugs in die Reihenfolge, in der du sie anfunkst.
+  items:
+    - ATIS des Startplatzes hören
+    - "Ground: Anlassen und Rollen"
+    - "Tower: Start"
+    - Departure
+    - "AWACS bzw. Einsatzfrequenz (Strike)"
+    - ATIS des Zielplatzes hören
+    - Approach
+    - "Tower: Landung"
+    - "Ground: Rollen zum Abstellplatz"
+  explain: >-
+    Das ist dein Frequenzfahrplan. Am Boden Ground, auf und über der Bahn Tower, im Umfeld des Platzes
+    Departure bzw. Approach, dazwischen die taktischen Netze. Die ATIS des Zielplatzes hörst du, bevor
+    du Approach rufst – dann weißt du schon Bahn und Luftdruck.
+
+- id: m2-l6-match-sources
+  type: match
+  exam: true
+  prompt: Vier Quellen liefern dir Frequenzen. Was liefert welche Quelle?
+  pairs:
+    - [Platzkarte, "Feste Platzfrequenzen, Bahnen und Navigationshilfen eines Flugplatzes"]
+    - [Briefing und Comm Card, Alle Netze der Mission mit Kanal und Frequenz]
+    - [Übergabe durch einen Lotsen, Die nächste Frequenz genau in diesem Moment]
+    - [Nachfragen („say again frequency“), "Die Rückfrage, wenn keine andere Quelle weiterhilft – Guard nur als letztes Mittel"]
+  explain: >-
+    Von der Platzkarte bis zur Rückfrage werden die Quellen aktueller und besser auf deinen Flug zugeschnitten. Bei
+    Widerspruch gilt die weiter unten stehende: Lotse vor Comm Card vor Platzkarte.
+
+- id: m2-l6-conflict-handoff
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    cp: { commplan: true, airfield: airfield }
+    other: { number: uhf }
+  prompt: >-
+    Laut deiner Comm Card liegt Departure auf Kanal {cp.departure.channel} ({cp.departure.freq}). Kurz
+    nach dem Start sagt {airfield.name} Tower: „{callsign|spoken}, contact departure {other|spoken}.“
+    Was tust du?
+  options:
+    - "Zurücklesen und {other} einstellen – die aktuelle Anweisung gilt."
+    - "Kanal {cp.departure.channel} wählen – die Comm Card ist für die ganze Mission verbindlich."
+    - Auf Guard nachfragen, welche der beiden Frequenzen die richtige ist.
+    - "Ohne Antwort auf Kanal {cp.departure.channel} schalten und es dort versuchen."
+  answer: 0
+  explain: >-
+    Was dir ein Lotse gerade sagt, ist die neueste Quelle – sie schlägt die Comm Card. Das Zurücklesen
+    gibt ihm die Chance, einen Versprecher zu korrigieren. Steht die Frequenz nicht auf der Comm Card,
+    drehst du sie manuell ein.
+
+- id: m2-l6-lookup
+  type: form
+  call: m2-handoff-lookup
+  prompt: |
+    Deine Comm Card:
+
+    | Kanal | Netz | Frequenz |
+    |---|---|---|
+    | {cp.ground.channel} | {airfield.name} Ground | {cp.ground.freq} |
+    | {cp.tower.channel} | {airfield.name} Tower | {cp.tower.freq} |
+    | {cp.departure.channel} | Departure | {cp.departure.freq} |
+    | {cp.approach.channel} | Approach | {cp.approach.freq} |
+    | {cp.strike.channel} | Strike | {cp.strike.freq} |
+
+    Kurz nach dem Start schickt dich der Tower mit einer Frequenz weiter (siehe Funkspruch). Welchen
+    Kanal wählst du?
+  fields:
+    - { label: Kanal, accept: ["{cp.departure.channel}", "channel {cp.departure.channel}", "button {cp.departure.channel}"], placeholder: z. B. 4 }
+  explain: >-
+    Kanal {cp.departure.channel} ist Departure mit {cp.departure.freq}. Wer die Frequenz auf der Comm
+    Card wiederfindet, schaltet nur den Kanal – schneller und ohne Zahlendreher.
+
+- id: m2-l6-two-radios
+  type: choice
+  prompt: Du hast zwei Funkgeräte. Wie teilst du sie sinnvoll auf?
+  options:
+    - Gerät 1 folgt dem Frequenzfahrplan (Ground, Tower, AWACS …), Gerät 2 bleibt auf der Flight-Frequenz.
+    - Beide Geräte immer auf dieselbe Frequenz stellen, damit garantiert keine Sendung verloren geht.
+    - Gerät 1 zum Senden, Gerät 2 nur für Guard – mehr braucht man im Flug nicht.
+    - Jeder im Flight teilt sie anders auf, das ist reine Geschmackssache.
+  answer: 0
+  explain: >-
+    So bleibt der Flight immer erreichbar, während du mit den Stellen außen sprichst. Welches Gerät
+    welche Rolle hat, legt das Briefing fest – in der F-16 (auch in BMS) ist VHF meist das
+    Flight-Gerät, das DCS-Handbuch der A-10C nennt dafür UHF.
+
+- id: m2-l6-preselect
+  type: choice
+  exam: true
+  prompt: Was hilft am meisten, damit der nächste Frequenzwechsel schnell und sauber klappt?
+  options:
+    - Die nächste Frequenz vorher auf der Comm Card heraussuchen.
+    - Erst nach der Anweisung in Ruhe auf der Karte nach der richtigen Frequenz suchen.
+    - Alle Frequenzen des Flugs auswendig lernen und sie jedes Mal frei eindrehen.
+    - Auf der alten Frequenz bleiben, bis jemand auf Guard nach dir ruft.
+  answer: 0
+  explain: >-
+    Wer weiß, welche Stelle als Nächstes kommt, hat den Kanal schon im Kopf oder auf dem Knie. Dann
+    heißt es nach dem „contact …“ nur noch: zurücklesen, umschalten, melden.
+
+- id: m2-l6-wrong-freq
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Du meldest dich am Rollhalt „ready for departure“ – und es antwortet {airfield.name} Ground mit
+    „contact tower …“. Was jetzt?
+  options:
+    - Kurz zurücklesen, auf Tower umschalten und dort alles wiederholen.
+    - Einfach losrollen – Ground hat es ja gehört und gibt es an den Tower weiter.
+    - Auf der Ground-Frequenz bleiben und dort auf die Startfreigabe warten.
+    - Auf Guard den Tower rufen, damit es schneller geht als über die Frequenz.
+  answer: 0
+  explain: >-
+    Lotsen leiten nichts weiter. Deine Meldung zählt erst, wenn sie bei der zuständigen Stelle auf
+    deren Frequenz angekommen ist.
+
+- id: m2-l6-lost
+  type: choice
+  prompt: Du hast umgeschaltet, meldest dich – und niemand antwortet, auch nach dem zweiten Versuch. Was tust du?
+  options:
+    - Frequenz gegen die Comm Card prüfen, sonst zurück zur letzten Stelle und nachfragen.
+    - Weiter auf der neuen Frequenz rufen, bis irgendwann jemand antwortet.
+    - Sofort auf Guard „mayday“ rufen, damit dich jemand findet und dir die Frequenz sagt.
+    - Funkgerät aus- und wieder einschalten und dann einfach abwarten.
+  answer: 0
+  explain: >-
+    Meist ist es ein Zahlendreher oder das falsche Gerät. Die letzte Stelle kennt dich und nennt dir die
+    Frequenz noch einmal. Guard ist das letzte Mittel – und ein Notruf ist es erst recht nicht.
+
+- id: m2-l6-build-wrong-freq
+  type: build
+  call: m2-wrong-frequency
+  transmission: 2
+  prompt: >-
+    Du hast dich am Rollhalt abflugbereit gemeldet – aber {airfield.name} Ground antwortet: „contact
+    tower {cp.tower.freq|spoken}“. Bestätige kurz, bevor du umschaltest.
+  distractors: [ready for departure, roger wilco]
+  explain: Frequenz und Rufzeichen genügen. Den eigentlichen Funkspruch wiederholst du dann beim Tower.
+
+# ------------------------------------------------------------ Lektion 7: Karten lesen
+- id: m2-l7-diagram-purpose
+  type: choice
+  exam: true
+  prompt: Wofür ist die Platzkarte (Airport Diagram) gedacht?
+  options:
+    - Für die Bewegungen am Boden, dazu die Platzfrequenzen.
+    - Für den Instrumentenanflug bei schlechtem Wetter, mit Höhen und Gleitpfad.
+    - Für die Navigation auf dem Weg zum Einsatzgebiet und zurück zum Platz.
+    - Nur für die Bodencrew, Piloten brauchen sie im Cockpit nicht.
+  answer: 0
+  explain: >-
+    Die Platzkarte ist für die Bewegungen am Boden gemacht: Bahnen, Rollwege, Parkplätze, oben der Funkblock. So weißt
+    du, wo du am Boden bist, und musst nicht ständig nach dem Weg fragen. Den Instrumentenanflug zeigt die Anflugkarte.
+
+- id: m2-l7-airport-form
+  type: form
+  vars:
+    airfield: { pool: airfields }
+    cp: { commplan: true, airfield: airfield }
+  prompt: Lies den Funkblock der Platzkarte.
+  context: |
+    **{airfield.name} ({airfield.icao})** – Funkblock der Platzkarte
+
+    | ATIS | GND CON | TOWER | APP/DEP CON |
+    |---|---|---|---|
+    | {cp.atis.freq} | {cp.ground.freq} | {cp.tower.freq} | {cp.approach.freq} |
+  fields:
+    - { label: "Rollfreigabe – welche Frequenz?", accept: ["{cp.ground.freq}", "{cp.ground.freq}0", "{cp.ground.freq|spoken}"] }
+    - { label: "Startfreigabe – welche Frequenz?", accept: ["{cp.tower.freq}", "{cp.tower.freq}0", "{cp.tower.freq|spoken}"] }
+    - { label: "Wetter und aktive Bahn – welche Frequenz?", accept: ["{cp.atis.freq}", "{cp.atis.freq}0", "{cp.atis.freq|spoken}"] }
+  explain: >-
+    Ground (GND CON) für alles am Boden, Tower für Start und Landung, ATIS für Wetter und Bahn. APP/DEP
+    CON brauchst du erst in der Luft.
+
+- id: m2-l7-match-abbr
+  type: match
+  prompt: Was bedeuten die Abkürzungen auf Platz- und Anflugkarten?
+  pairs:
+    - [ATIS, Automatische Ansage mit Wetter und aktiver Bahn]
+    - [CLNC DEL, Clearance Delivery – Freigabe für die geplante Route]
+    - [GND CON, Ground Control – Rollverkehr am Boden]
+    - [TOWER, Bahn und Platzrunde]
+    - [APP CON / DEP CON, Radarstelle für Anflug bzw. Abflug]
+    - [PMSV, Wetterberatung für Militärpiloten (Pilot-to-Metro Service)]
+
+- id: m2-l7-strip-order
+  type: sequence
+  prompt: In welcher Reihenfolge stehen die Frequenzen im Kopf einer FAA-Anflugkarte?
+  items:
+    - ATIS
+    - APP CON (Approach)
+    - TOWER
+    - GND CON (Ground)
+    - CLNC DEL (Clearance Delivery)
+  explain: >-
+    In der Reihenfolge, in der du sie beim Anflug brauchst: erst Wetter, dann Approach, dann Tower zur
+    Landung, danach Ground zum Rollen. Die Tower-Frequenz ist fett gedruckt.
+
+- id: m2-l7-tap-tower
+  type: chart-tap
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+    apc: { chart: approach, airfield: af, commplan: cp }
+  chart: apc
+  prompt: >-
+    Du fliegst den Instrumentenanflug auf **{af.name}**. Kurz vor dem FAF übergibt dich Approach an die
+    Stelle, die dir die Landefreigabe gibt. Tippe auf der Anflugkarte auf die Frequenz, die du dafür
+    vorbereitet hast.
+  target: tower
+  explain: >-
+    Ungefähr am FAF (Malteserkreuz im Profil) geht es von Approach zum Tower. Im Kopf der Karte stehen
+    die Frequenzen in der Reihenfolge des Anflugs – ATIS, Approach, Tower, Ground –, der Tower fett.
+
+- id: m2-l7-tower-bold
+  type: choice
+  prompt: Im Kommunikationsstreifen einer FAA-Anflugkarte ist eine Frequenz fett gedruckt. Welche?
+  options:
+    - Die Tower-Frequenz
+    - Die ATIS-Frequenz
+    - Die Notfrequenz Guard
+    - Die Frequenz von Approach
+  answer: 0
+  explain: Der Tower ist im Anflug die Stelle, die dir die Landefreigabe gibt – deshalb hebt die Karte ihn hervor.
+
+- id: m2-l7-match-parts
+  type: match
+  exam: true
+  prompt: Ordne die Teile einer Anflugkarte zu.
+  pairs:
+    - [Kopf (Briefing Strip), "Navigationshilfe, Anflugkurs, Höhen, Fehlanflug, Frequenzen"]
+    - [Draufsicht (Plan View), "Der Weg von oben mit Fixes, Warteschleife und MSA-Kreis"]
+    - [Profil, "Höhen entlang des Anflugs, Gleitpfad und FAF"]
+    - [Minima, Entscheidungshöhe und Sicht je Flugzeugkategorie]
+  explain: >-
+    Eine Anflugkarte hat vier Teile von oben nach unten: den Kopf mit Navigationshilfe, Fehlanflug und Frequenzen, die
+    Draufsicht, das Profil mit dem FAF und die Minima. Für den Funk zählt der Kopf.
+
+- id: m2-l7-faf
+  type: choice
+  prompt: Wann wechselst du im Instrumentenanflug in der Regel von Approach zum Tower?
+  options:
+    - Etwa am FAF, dem Beginn des Endanflugs.
+    - Schon vor dem Sinkflug, damit der Tower möglichst früh Bescheid weiß.
+    - Erst nach dem Aufsetzen, wenn du zum Abstellplatz rollst.
+    - Gar nicht – Approach gibt auch die Landefreigabe.
+  answer: 0
+  explain: >-
+    Der FAF ist auf der Karte als Malteserkreuz eingezeichnet. Ungefähr dort übergibt Approach an den
+    Tower, der dir die Landefreigabe gibt.
+
+- id: m2-l7-msa
+  type: choice
+  exam: true
+  prompt: Was zeigt der MSA-Kreis auf einer Anflugkarte?
+  options:
+    - Die Mindesthöhen für Notfälle rund um die Navigationshilfe.
+    - Die Höhe, auf der du den Endanflug beginnen musst, um den Gleitpfad zu treffen.
+    - Den Bereich, in dem du mit dem Tower funken darfst, ohne Approach zu fragen.
+    - Die maximale Höhe für die Platzrunde.
+  answer: 0
+  explain: >-
+    MSA heißt Minimum Safe Altitude: Wer die Orientierung verliert, steigt mindestens auf diese Höhe und
+    ist über allen Hindernissen im Kreis.
+
+- id: m2-l7-conflict
+  type: choice
+  exam: true
+  prompt: >-
+    Die echte Platzkarte im Kneeboard nennt eine andere Tower-Frequenz als dein Missionsbriefing. Welche
+    stellst du ein?
+  options:
+    - Die aus Briefing bzw. Comm Card der Mission.
+    - Die aus der echten Platzkarte – sie ist offiziell und deshalb immer maßgeblich.
+    - Abwechselnd beide, bis einer antwortet.
+    - Guard, dort hört der Tower sicher mit.
+  answer: 0
+  explain: >-
+    Sims und Missionen weichen oft von der echten Welt ab. Die Rangfolge: Briefing und Comm Card vor der
+    Karte der Sim vor der echten Karte. Im Zweifel antwortet dir die letzte Stelle mit der richtigen
+    Frequenz.
+
+# ------------------------------------------------------------ Lektion 9: Platzinfos in deiner Sim
+- id: m2-l9-match-sources
+  type: match
+  exam: true
+  prompt: Ein echter Militärpilot hat vor dem Flug einen Stapel Unterlagen. Was steht wo? Ordne zu.
+  pairs:
+    - [AIP / eAIP, Offizielle Verfahren und Frequenzen der Plätze eines Landes]
+    - [NOTAM, "Kurzfristige Änderungen, z. B. gesperrte Bahn oder ausgefallenes ILS"]
+    - [SPINS, Besondere Anweisungen für einen Einsatz oder eine Übung]
+    - [Comm Card / Briefing, Netze und Kanäle deiner Mission]
+    - [Local SOP, Hausregeln eines Platzes oder Verbands]
+  explain: >-
+    AIP und NOTAM sind der offizielle Rahmen eines Landes, SPINS und SOP regeln Einsatz und Hausregeln, und die Comm Card
+    gilt für genau diesen Flug. In der Sim gibt es davon meist nur Briefing und ein paar Karten.
+
+- id: m2-l9-source-priority
+  type: sequence
+  prompt: >-
+    Vier Quellen nennen dir für denselben Platz verschiedene Tower-Frequenzen. Ordne sie: oben die
+    Quelle, die gilt.
+  items:
+    - Was dir der Lotse gerade per Funk sagt
+    - Briefing, Kneeboard und Comm Card der Mission
+    - "Standarddaten der Sim (z. B. F10-Flugplatzfenster, BMS-Platzkarte)"
+    - Echte Karte oder AIP des Landes
+  explain: >-
+    Missionsunterlagen vor Sim-Daten vor echter Welt – und was dir ein Lotse gerade sagt, schlägt alles
+    Gedruckte. Im Zweifel liest du zurück: Dann kann der Lotse einen Versprecher noch korrigieren.
+
+- id: m2-l9-mission-wins
+  type: choice
+  exam: true
+  prompt: >-
+    Eine DCS-Kampagne weist an, nicht die Frequenzen aus der F10-Karte oder dem Briefing-Fenster
+    zu verwenden, sondern die vom Kneeboard. Warum?
+  options:
+    - Die Mission legt eigene Netze und Presets fest – maßgeblich sind ihre Unterlagen.
+    - Weil die F10-Karte grundsätzlich falsche Frequenzen anzeigt und nie benutzt werden sollte.
+    - Weil das Kneeboard verschlüsselte Frequenzen enthält, die der Gegner nicht kennt.
+    - Das ist nur eine Stilfrage des Missionsbauers ohne praktische Bedeutung.
+  answer: 0
+  explain: >-
+    Tanker, AWACS, JTAC und die Flight-Frequenzen legt der Missionsbauer fest. Die Standarddaten der Sim
+    kennen sie nicht. Deshalb: erst die Missionsunterlagen.
+
+- id: m2-l9-dcs-one-freq
+  type: choice
+  sims: [dcs]
+  layer: sim
+  prompt: >-
+    Du rufst in DCS den Ground auf der Ground-Frequenz der echten Platzkarte im Kneeboard. Niemand
+    antwortet. Was ist der wahrscheinlichste Grund?
+  options:
+    - DCS-Lotsen haben pro Platz nur eine Frequenz je Band – für Ground, Tower und Approach zusammen.
+    - Ground ist in DCS nur nachts besetzt und tagsüber über den Tower erreichbar.
+    - Die echte Platzkarte ist verschlüsselt und muss erst im Mission Editor freigeschaltet werden.
+    - DCS-Lotsen antworten nur, wenn Easy Communication ausgeschaltet ist.
+  answer: 0
+  explain: >-
+    Die KI-ATC in DCS kennt pro Platz eine Frequenz je Band. Getrennte Ground- oder ATIS-Frequenzen
+    gibt es nur, wenn die Mission sie per Skript baut oder ein Mensch Ground spielt.
+
+- id: m2-l9-bms-tower
+  type: input
+  sims: [bms]
+  layer: sim
+  prompt: In Falcon BMS – welches UHF-Preset ist der Tower deines Startplatzes?
+  accept: ["3", "channel 3", "button 3", "preset 3"]
+  placeholder: Nummer eintippen …
+  explain: >-
+    Fester Comm Plan: UHF 2 Ground, 3 Tower, 4 Departure/Approach, 6 Tactical. Merkhilfe: raus 2-3-4,
+    zurück 4-3-2.
+
+- id: m2-l9-bms-chain
+  type: choice
+  sims: [bms]
+  layer: sim
+  prompt: Was ist in Falcon BMS die verlässlichste Quelle für die Frequenzen deines Flugs?
+  options:
+    - "Die Comm Ladder im Briefing – über den DTC landet sie als Presets im Cockpit."
+    - Die echten Anflugkarten im KTO-Kartenordner, weil sie direkt aus dem koreanischen AIP stammen.
+    - Die ATIS des Startplatzes, denn sie nennt alle Frequenzen des Platzes in einer einzigen Ansage.
+    - Der Flight Lead – nur er bekommt die vollständige Liste.
+  answer: 0
+  explain: >-
+    Briefing, DTC und UFC hängen zusammen: Die Comm Ladder listet alle Frequenzen und Presets deines
+    Flugs, der DTC lädt sie standardmäßig. Die echten Karten im Ordner nennen teils andere Frequenzen,
+    als die BMS-Lotsen benutzen.
+
+- id: m2-l9-il2
+  type: choice
+  sims: [il2]
+  layer: sim
+  prompt: Wie sprichst du in IL-2 Great Battles mit deinem Heimatplatz?
+  options:
+    - Über das Befehlsmenü (Bodenleitstelle) – ohne Frequenzen.
+    - Auf der Tower-Frequenz aus dem Briefing, die du im Funkgerät selbst einstellst.
+    - Über Guard, weil alle Flugplätze der Karte dort ständig mithören.
+    - Gar nicht – in IL-2 kann man den eigenen Flugplatz grundsätzlich nicht ansprechen.
+  answer: 0
+  explain: >-
+    IL-2 Great Battles hat kein ATC mit Frequenzen. Die Bodenleitstelle gibt Kurs zur Basis sowie Start-
+    und Landefreigabe – nur für den Heimatplatz der Mission. In IL-2 Korea kommt GCI dazu.
+
+- id: m2-l9-srs-server
+  type: choice
+  layer: community
+  prompt: Multiplayer-Abend, aber niemand hat eine Comm Card verteilt. Wie findest du die Frequenzen?
+  options:
+    - Server-Briefing, Discord oder SOP des Servers lesen – und im Zweifel im Text-Chat fragen.
+    - Auf Guard fragen, dort hört der ganze Server mit und kann dir antworten.
+    - Die Standardfrequenzen der Sim nehmen, sie gelten auf jedem Server gleich.
+    - Frequenzen der Reihe nach durchprobieren, bis man irgendwo jemanden hört.
+  answer: 0
+  explain: >-
+    Viele Server veröffentlichen ihren Comm Plan im Briefing oder auf Discord. Wer fragen muss, fragt im
+    Chat – Guard bleibt für Notfälle frei.
+
+# ------------------------------------------------------------ Lektion 8: Die Karte in deiner Sim
+- id: m2-l8-match-questions
+  type: match
+  exam: true
+  prompt: Die Karte deiner Sim hilft dir bei drei Fragen, bei der vierten meist nicht. Welche Frage beantwortest du womit?
+  pairs:
+    - [Wo bin ich?, "Eigenes Symbol, Koordinate oder Planquadrat"]
+    - [Wohin muss ich?, "Lineal von dir zum Ziel – Kurs und Entfernung"]
+    - [Wo ist der Kontakt?, "Bullseye-Anzeige im Cockpit oder Lineal vom Bullseye (umgerechnet)"]
+    - [Mit wem funke ich?, "Briefing, Comm Card – in BMS der Tooltip eigener Flights"]
+  explain: >-
+    Wo bin ich, wohin muss ich, wo ist der andere: Dafür ist die Karte da. Mit wem du auf welcher Frequenz funkst,
+    steht meist im Briefing und auf der Comm Card. Nur DCS zeigt Platzfrequenzen an der Karte, und BMS verrät die
+    Frequenzen eigener Flights im Tooltip.
+
+- id: m2-l8-north
+  type: choice
+  exam: true
+  prompt: >-
+    Du misst auf der Planungskarte einen Kurs zum Ausweichplatz und willst ihn nach dem Kompass fliegen.
+    Was musst du beachten?
+  options:
+    - Die Karte zeigt in der Regel rechtweisend, der Kompass magnetisch – dazwischen liegt die Missweisung.
+    - Nichts, Karte und Kompass zeigen in jeder Sim immer genau dieselbe Richtung an.
+    - Die Karte zeigt Kurse immer in Grad über Grund, der Kompass in Grad über dem Meer.
+    - Der Kompass ist nur am Boden genau, in der Luft nimmt man deshalb das HSD.
+  answer: 0
+  explain: >-
+    Planungskarten sind nach geografisch Nord ausgerichtet, der Kompass nach magnetisch Nord. Die
+    Differenz ist die Missweisung – je nach Gegend ein paar Grad bis über zehn Grad.
+
+- id: m2-l8-ruler-variation
+  type: choice
+  vars:
+    tru: { number: bearing }
+    mag: { derive: offset, from: tru, add: -6 }
+    magW: { derive: offset, from: tru, add: 6 }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Auf der Planungskarte ziehst du das Lineal vom Bullseye zu einem Kontakt: **{tru}°** (rechtweisend),
+    **{rng} NM**. Die Missweisung im Gebiet beträgt laut Platzkarte **6° Ost**. Bullseye-Calls sind
+    magnetisch. Was sagst du im Funk?
+  options:
+    - "„bullseye {mag}/{rng}“"
+    - "„bullseye {tru}/{rng}“"
+    - "„bullseye {magW}/{rng}“"
+    - "„bullseye {rng}/{mag}“"
+  answer: 0
+  explain: >-
+    Bei östlicher Missweisung ist der magnetische Wert kleiner: {tru}° minus 6° ergibt {mag}°
+    („east is least, west is best“). Den Linealwert unverändert zu nehmen, wäre 6° daneben – auf 50 NM
+    sind das gut 5 NM. Peilung zuerst, dann Entfernung.
+
+- id: m2-l8-bullseye-call
+  type: choice
+  vars:
+    brg: { number: bearing }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Die Bullseye-Anzeige im Cockpit zeigt für einen Kontakt **{brg}°** und **{rng} NM** – schon
+    magnetisch, so wie Bullseye-Calls gemeint sind. Was sagst du im Funk?
+  options:
+    - "„bullseye {brg}/{rng}“"
+    - "„bullseye {rng}/{brg}“"
+    - "„BRAA {brg}/{rng}“"
+    - "„{brg} for {rng} from my position“"
+  answer: 0
+  explain: >-
+    Bullseye-Angaben sind magnetische Peilung und Entfernung **vom Bullseye aus**, die Peilung zuerst.
+    BRAA (Bearing, Range, Altitude, Aspect) dagegen misst von dir aus. Mehr dazu in Modul 5, Lektion 3.
+
+- id: m2-l8-dcs-mode
+  type: choice
+  sims: [dcs]
+  layer: sim
+  prompt: Auf der F10-Karte in DCS siehst du dein eigenes Flugzeug nicht. Was ist der wahrscheinlichste Grund?
+  options:
+    - Die Mission erzwingt einen Anzeigemodus wie „Map Only“ oder „Fog of War“.
+    - Dein Flugzeug steht noch am Boden – erst nach dem Start erscheint es auf der F10-Karte.
+    - Die F10-Karte zeigt grundsätzlich nur Feinde, eigene Flugzeuge stehen im Kneeboard.
+    - Das Symbol ist nur im Satellitenmodus sichtbar.
+  answer: 0
+  explain: >-
+    Die Modi Map Only, My A/C, Fog of War, Allies Only und All kann die Mission vorschreiben. Viele
+    realistische Server zeigen dich nicht auf der Karte – dann hilft nur Navigation mit den
+    Instrumenten.
+
+- id: m2-l8-bms-tooltip
+  type: choice
+  sims: [bms]
+  layer: sim
+  prompt: Wie findest du auf der BMS-Planungskarte die Frequenz eines anderen eigenen Flights?
+  options:
+    - Mit der Maus über sein Symbol fahren – der Tooltip zeigt UHF und VHF.
+    - Gar nicht – Frequenzen anderer Flights stehen ausschließlich im Briefing des jeweiligen Flights.
+    - Doppelklick auf den Heimatflugplatz, dort stehen alle Frequenzen der Basis.
+    - Über den Ruler, der neben Peilung und Entfernung auch die Frequenz zeigt.
+  answer: 0
+  explain: >-
+    Der Tooltip zeigt bei eigenen Flights UHF und VHF, „Object Labels“ auch die TACAN der Tanker.
+    Platzfrequenzen zeigt die UI-Karte dagegen bewusst nicht – die stehen auf den Charts und im Briefing.
+
+- id: m2-l8-il2-position
+  type: choice
+  sims: [il2]
+  layer: sim
+  prompt: Wie gibst du in IL-2 Great Battles deine Position auf der Karte am einfachsten an?
+  options:
+    - Über das Planquadrat – die Karte ist in nummerierte 10-km-Quadrate eingeteilt.
+    - Mit Lat/Long-Koordinaten aus dem Cockpit, wie in modernen Jets.
+    - Als Bullseye-Peilung und -Entfernung, wie es das Missionsbriefing vorgibt.
+    - Mit der Frequenz des nächstgelegenen Flugplatzes.
+  answer: 0
+  explain: >-
+    IL-2 Great Battles arbeitet mit nummerierten Planquadraten. Ob dein Flugzeug auf der Karte erscheint,
+    hängt von der Realismus-Einstellung „Navigationsmarker“ ab.
+
+# ---- DCS: Flugplatzfenster der F10-Karte (Werte aus Radio.lua/Beacons.lua der Karte Caucasus)
+- id: m2-l8-dcs-atc-line
+  type: choice
+  exam: true
+  sims: [dcs]
+  layer: sim
+  vars:
+    # Kurzwelle und tiefes VHF aus den Platzdaten (DCS Caucasus/radio.lua), wie im F10-Fenster (P1-07)
+    airfield: { pool: airfields, where: { map: caucasus }, require: [atc.uhf, atc.hf, atc.vhfLow] }
+  prompt: >-
+    Im F10-Flugplatzfenster eines Platzes im Kaukasus steht in der Zeile **ATC (MHz, AM)**: {airfield.hf}, {airfield.vhfLow},
+    {airfield.vhf}, {airfield.uhf}. Was bedeutet das?
+  options:
+    - Eine Lotsenstelle auf vier Bändern – du nimmst die Frequenz, die dein Funkgerät kann.
+    - Vier Stellen nacheinander – Ground, Tower, Approach und Departure des Platzes.
+    - Die ersten beiden sind ATIS-Frequenzen, die letzten beiden Tower-Frequenzen.
+    - Vier verschiedene Flugplätze in der Umgebung, die du von hier aus erreichen kannst.
+  answer: 0
+  explain: >-
+    DCS-Lotsen sind pro Platz eine Stelle (Ground, Tower, Approach zusammen), erreichbar auf Kurzwelle,
+    tiefem VHF, VHF-AM und UHF. Für westliche Jets zählen UHF ({airfield.uhf}) und VHF-AM
+    ({airfield.vhf}).
+
+- id: m2-l8-dcs-atc-pick
+  type: form
+  sims: [dcs]
+  layer: sim
+  vars:
+    # Kurzwelle und tiefes VHF aus den Platzdaten (DCS Caucasus/radio.lua), wie im F10-Fenster (P1-07)
+    airfield: { pool: airfields, where: { map: caucasus }, require: [atc.uhf, atc.hf, atc.vhfLow] }
+  prompt: >-
+    Im DCS-Flugplatzfenster (Klick auf den Platznamen in der F10-Karte) stehen vier ATC-Frequenzen.
+    Welche stellst du ein?
+  context: |
+    **{airfield.name}** – Airdrome Data
+
+    | Feld | Wert |
+    |---|---|
+    | ATC (MHz, AM) | {airfield.hf}, {airfield.vhfLow}, {airfield.vhf}, {airfield.uhf} |
+    | TACAN | {airfield.tacan} |
+    | RWYs | {airfield.runway} |
+  fields:
+    - { label: "Mit dem UHF-Gerät (z. B. F-16 COM1, F-4E)", accept: ["{airfield.uhf}", "{airfield.uhf}0", "{airfield.uhf}00", "{airfield.uhf|spoken}"] }
+    - { label: "Mit VHF-AM (z. B. F-16 COM2, A-10 VHF-AM)", accept: ["{airfield.vhf}", "{airfield.vhf}0", "{airfield.vhf}00", "{airfield.vhf|spoken}"] }
+  explain: >-
+    UHF liegt zwischen 225 und 400 MHz ({airfield.uhf}), VHF-AM zwischen 118 und rund 143 MHz
+    ({airfield.vhf}). Die anderen beiden Werte sind dieselbe Stelle auf Kurzwelle und tiefem VHF.
+
+- id: m2-l8-dcs-match-fields
+  type: match
+  exam: true
+  sims: [dcs]
+  layer: sim
+  vars:
+    airfield: { pool: airfields, where: { map: caucasus } }
+    ils: { oneOf: ["108.90", "109.75", "110.30", "111.50"] }
+    ndb: { oneOf: ["408", "430", "443", "477"] }
+    ch: { int: [20, 40] }
+  prompt: Was steckt hinter welcher Zeile im F10-Flugplatzfenster von DCS?
+  pairs:
+    - ["TACAN {airfield.tacan}", Kanal für Peilung und Entfernung zum Platz]
+    - ["ILS {ils}", Instrumentenlandesystem für eine Bahnrichtung]
+    - ["OUTER NDB {ndb} kHz", Funkfeuer vor der Bahn für den Funkkompass]
+    - ["RSBN / PRMG {ch}", Russische Navigations- und Landesysteme]
+  explain: >-
+    TACAN gibt Richtung und Entfernung zum Platz, das ILS führt auf eine Bahnrichtung, die NDB sind Funkfeuer für den
+    Funkkompass (ADF), und RSBN/PRMG sind russische Systeme, die nur russische Muster (MiG-29, Su-27 …) nutzen.
+
+- id: m2-l8-dcs-columns
+  type: choice
+  sims: [dcs]
+  layer: sim
+  prompt: >-
+    Im F10-Flugplatzfenster stehen bei ILS zwei Spalten. In der einen steht eine Frequenz, die andere
+    ist leer. Was heißt das?
+  options:
+    - Die Spalten gehören zu den beiden Bahnrichtungen – nur eine hat ein ILS.
+    - Das ILS ist ausgefallen und wird gerade repariert, bis dahin bleibt die Spalte leer.
+    - Die zweite Spalte ist für Hubschrauber, die kein ILS brauchen.
+    - Die leere Spalte zeigt, dass du das ILS erst im Mission Editor freischalten musst.
+  answer: 0
+  explain: >-
+    Eine Bahn hat zwei Richtungen (z. B. 13 und 31). ILS, Outer und Inner NDB und PRMG stehen je
+    Richtung in einer eigenen Spalte. Oft hat nur eine Richtung ein ILS.

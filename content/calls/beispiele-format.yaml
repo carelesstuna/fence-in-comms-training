@@ -1,0 +1,65 @@
+# Beispiele für die erweiterten Funkspruch-Formate (Perspektive, Lagegeometrie, Tipp-Bewertung).
+# Sie hängen in keiner Lektion und dienen als Vorlage – siehe content/README.md.
+
+- id: beispiel-flight-checkin
+  title: Check-in im Flight
+  context: Neue Frequenz. Der Lead prüft, ob alle da sind.
+  freq: "{ch} · Flight"
+  # Du spielst zufällig Two, Three oder Four. Im 2-ship entfallen Three und Four automatisch.
+  perspective: [two, three, four]
+  vars:
+    ch: { number: uhf }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee, note: "Der Lead ruft seinen ganzen Flight – nur mit dem Flight-Namen." }
+        - { text: check, role: request, note: "„Meldet euch“. Keine Frequenz, kein Rufzeichen – alle wissen, wer gemeint ist." }
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true, note: "Innerhalb des Flights reicht die eigene Nummer. Mehr nicht." }
+    - speaker: "{three}"
+      station: three
+      segments:
+        - { text: Three, role: callsign, critical: true, note: "Der Element Lead meldet sich als Drei." }
+    - speaker: "{four}"
+      station: four
+      segments:
+        - { text: Four, role: callsign, critical: true, note: "Und Vier als letzter." }
+
+- id: beispiel-push
+  title: Frequenzwechsel im Flight
+  context: Der Lead schickt den Flight auf eine neue Frequenz.
+  perspective: [two]
+  vars:
+    btn: { number: channel }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - { text: "push button {btn|spoken}", role: instruction, note: "„Push“ heißt – sofort wechseln, NICHT bestätigen. Auf der neuen Frequenz folgt der Check-in." }
+
+- id: beispiel-bogey-dope
+  title: Bogey Dope
+  context: Du willst wissen, wo die nächste Gruppe steht.
+  freq: "AWACS"
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: bogey dope, role: brevity, note: "„Gib mir BRAA zur nächsten Gruppe“ – Peilung, Entfernung, Höhe, Aspekt von DIR aus." }
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign, optional: true }
+        - { text: "group BRAA {pic.near.braa|spoken}", role: value, tolerance: 3, note: "Peilung von dir aus, dann Entfernung in Meilen: {pic.near.braa}." }
+        - { text: "{pic.near.alt|spoken}", role: value, note: "Höhe: {pic.near.alt}." }
+        - { text: "{pic.near.aspect}", role: brevity, note: "Aspekt – wie die Gruppe relativ zu dir fliegt (hot = direkt auf dich zu)." }
+        - { text: "{pic.near.id}", role: brevity, note: "Identifikation – hostile heißt feindlich und zum Bekämpfen freigegeben." }

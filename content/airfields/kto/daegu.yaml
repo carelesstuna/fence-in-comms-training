@@ -1,0 +1,19 @@
+id: daegu
+name: Daegu
+map: kto
+icao: RKTN
+elevationFt: 120
+runways: ["13L/31R", "13R/31L"]
+atc: { uhf: 365.0, vhf: 126.2 }
+freqs: { atis: 127.65, ground: 275.8, departure: 346.3, approach: 346.3 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_EOR.png" }
+verified: community
+notes:
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "TACAN weggelassen: AGC nennt DOC 112X, die AIP-Platztabelle 125X. ILS weggelassen: die Simdaten führen mehrere Frequenzen ohne klare Zuordnung zu den Bahnenden."
+  - "Die echte Visual-Karte nennt andere Approach- und Tower-Frequenzen als die BMS-AGC; hier zählen die BMS-Werte."
+  - "Funkname ohne „AB“, wie ihn die BMS-ATC spricht („Daegu Ground“, vgl. Comms & Nav Book 4.38.2: „Gunsan Approach, Falcon 1 …“). Die BMS-Karten führen den Platz als „Daegu AB“."

@@ -1,0 +1,276 @@
+# Lehrplan: Ränge, gemeinsamer Kern, Spuren, spätere Spuren.
+# status: available = spielbar, planned = sichtbar, aber noch in Vorbereitung.
+# Lektionen werden über ihre ID referenziert (Frontmatter "id" in content/lessons/**.md).
+
+ranks:
+  - id: cadet
+    name: Kadett
+    xp: 0
+    description: Der erste Rang. Mit genug XP und dem Checkride nach Modul 4 wirst du Wingman.
+  - id: wingman
+    name: Wingman
+    xp: 400
+    description: Du hältst Funkdisziplin und antwortest sauber im Verband.
+    # Checkride: der ganze Einsatz aus Lektion m4-l6 als Two, ohne Hilfen
+    checkride:
+      scenario: m4-s1-checkride-wingman
+      requires: [m4]
+      passScore: 0.8
+      noCritical: true
+  - id: element-lead
+    name: Element Lead
+    xp: 1200
+    description: Du führst ein Element und sprichst mit Bodenstellen und AWACS.
+  - id: flight-lead
+    name: Flight Lead
+    xp: 2500
+    description: Du führst den Flight durch alle Funkphasen einer Mission.
+  - id: mission-commander
+    name: Mission Commander
+    xp: 5000
+    description: Du koordinierst ganze Pakete – und bringst anderen das Funken bei.
+
+modules:
+  # ---------------------------------------------------------------- Kern
+  - id: m1
+    code: "1"
+    title: Grundausbildung
+    subtitle: Aufbau eines Funkspruchs, Alphabet, Zahlen, Rufzeichen, Funk und Physik, Standardwörter, Readback
+    group: core
+    status: available
+    description: >-
+      Das Fundament: Wer ruft wen, wie buchstabiert und zählt man im Funk, wie sind Rufzeichen
+      aufgebaut, warum der Funk nur bis zum Horizont trägt, was bedeuten roger, wilco & Co. – und warum man Anweisungen
+      zurückliest.
+    lessons: [m1-l1, m1-l2, m1-l3, m1-l4, m1-l7, m1-l5, m1-l6]
+    placement:
+      drills:
+        - m1-l1-order
+        - m1-l1-build-startup
+        - m1-l2-letter-to-word
+        - m1-l3-spoken-to-number
+        - m1-l3-input-angels
+        - m1-l4-check-wrong
+        - m1-l7-mountain
+        - m1-l5-roger-vs-wilco
+        - m1-l5-repeat
+        - m1-l6-what-readback
+        - m1-l6-build-taxi-readback
+      passScore: 0.8
+    # Modulprüfung (S-15): Pool = Übungen mit exam: true, ID beginnt mit der Lektions-ID
+    exam:
+      size: 14
+
+  - id: m2
+    code: "2"
+    title: Funkgeräte & Comm Plan
+    subtitle: UHF/VHF/FM, Presets, „push“, Guard, Funkdisziplin, SRS und IVC, Karten und Frequenzquellen
+    group: core
+    status: available
+    description: >-
+      Welche Funkgeräte du im Cockpit hast, wie Kanäle und Comm Plan funktionieren, wofür Guard da ist,
+      wie man auf vollen Frequenzen diszipliniert funkt und wie das Ganze in SRS bzw. im BMS-Sprechfunk IVC aussieht. Dazu: welche
+      Frequenz wann, wie man Platz- und Anflugkarten und die Karte der eigenen Sim liest – und woher
+      Frequenzen und Verfahren in DCS, BMS und IL-2 kommen.
+    lessons: [m2-l1, m2-l2, m2-l3, m2-l4, m2-l5, m2-l6, m2-l7, m2-l8, m2-l9]
+    placement:
+      drills:
+        - m2-l1-match-bands
+        - m2-l1-modulation
+        - m2-l2-push-meaning
+        - m2-l2-commcard-net
+        - m2-l3-guard-freqs
+        - m2-l3-what-for
+        - m2-l4-what-tower-hears
+        # eine Frage je Thema: blocked statt der zweiten AM-Frage (m2-l4-why-am)
+        - m2-l4-blocked-reply
+        - m2-l5-no-answer
+        - m2-l6-sequence-plan
+        - m2-l7-strip-order
+        # nur mit BMS im Profil (sims: [bms]), sonst übersprungen
+        - m2-l9-bms-tower
+      passScore: 0.8
+    # Modulprüfung (S-15): Pool = Übungen mit exam: true, ID beginnt mit der Lektions-ID
+    exam:
+      size: 15
+
+  - id: m3
+    code: "3"
+    title: Am Boden & Bodencrew
+    subtitle: Crew Chief, ATIS, Startup, Taxi, Arming, Tower, Departure
+    group: core
+    status: available
+    description: >-
+      Vom Kaltstart mit dem Crew Chief über ATIS, Ground und Tower bis zum Wechsel zu Departure – und
+      wie man ohne Tower funkt. Auf wechselnden Flugplätzen, mit drei kompletten Szenarien.
+    lessons: [m3-l1, m3-l2, m3-l3, m3-l4, m3-l5, m3-l6, m3-l7]
+    placement:
+      drills:
+        - m3-l1-atis-form
+        # m3-l1-build-initial und m3-l6-input-fl sind jetzt Prüfungsfragen (exam: true) – Ersatz in der Einstufung
+        - m3-l1-atis-letter
+        - m3-l1-update
+        - m3-l2-match-cc
+        - m3-l3-match-ground
+        - m3-l3-input-hold
+        - m3-l5-line-up
+        - m3-l5-build-ready
+        - m3-l5-unsure
+        - m3-l6-build-checkin
+        - m3-l7-build-taxi
+      passScore: 0.8
+    # Modulprüfung (S-15): Pool = Übungen mit exam: true, ID beginnt mit der Lektions-ID
+    exam:
+      size: 14
+
+  - id: m4
+    code: "4"
+    title: Im Verband
+    subtitle: Lead und Wingman, push, Fence in/out, Ops Check, Joker/Bingo, Formationsfunk, lost wingman, NORDO
+    group: core
+    status: available
+    description: >-
+      Funken innerhalb des eigenen Flights: wer spricht und wer bestätigt, Frequenzwechsel ohne
+      Verluste, Fence-Checks, Treibstoff im Verband und Formationsfunk, dazu lost wingman, beide blind und Funkausfall – zum Schluss ein Checkride als
+      Two und derselbe Einsatz als Lead.
+    # m4-l6 ist der Checkride für den Rang Wingman (Checkride-Modus baut die Haupt-Session).
+    # m4-l7 (lost wingman, beide blind, NORDO) steht vor dem Checkride; die ID blieb, damit Fortschritt
+    # und Verweise auf m4-l6 gültig sind.
+    lessons: [m4-l1, m4-l2, m4-l3, m4-l4, m4-l5, m4-l7, m4-l6]
+    placement:
+      drills:
+        # je Thema eine Frage, davon drei getippte Funksprüche (call)
+        - m4-l1-three-fence
+        - m4-l1-no-answer
+        - m4-l2-push-pushing
+        - m4-l2-rolex-plus
+        - m4-l3-call-feet
+        - m4-l3-clean-match
+        - m4-l4-match
+        - m4-l4-decide-joker
+        - m4-l4-ops-two
+        - m4-l5-blind-call
+        - m4-l5-check-right
+        - m4-l7-priorities
+      passScore: 0.8
+    # Modulprüfung (S-15): Pool = Übungen mit exam: true, ID beginnt mit der Lektions-ID
+    exam:
+      size: 14
+
+  - id: m5
+    code: "5"
+    title: AWACS-Grundlagen
+    subtitle: Check-in, Bullseye, BRAA und Bogey Dope, Picture, Declare, CAP-Station
+    group: core
+    status: available
+    description: >-
+      Die wichtigsten Gespräche mit AWACS und GCI – und wie man Lagebilder in BRAA- und
+      Bullseye-Format versteht, auf der Karte verortet und mit Declare klärt, wer Freund und wer Feind
+      ist. Zum Schluss eine ganze CAP-Station.
+    lessons: [m5-l1, m5-l2, m5-l3, m5-l4, m5-l5, m5-l6]
+    placement:
+      drills:
+        # mit getipptem Check-in und Declare, Gruppe setzen und BRAA ablesen am Scope
+        - m5-l1-call-checkin
+        - m5-l1-angels
+        - m5-l2-where-am-i
+        - m5-l2-to-bulls
+        - m5-l3-aspect-match
+        - m5-l3-plot-braa
+        - m5-l3-angels-error
+        - m5-l4-label-match
+        - m5-l4-plot-g1
+        - m5-l5-call-declare
+        - m5-l5-bandit
+      passScore: 0.8
+    # Modulprüfung (S-15): Pool = Übungen mit exam: true, ID beginnt mit der Lektions-ID
+    exam:
+      size: 12
+
+  # ---------------------------------------------------------------- Spuren
+  - id: track-a
+    code: A
+    title: Air Force Ops
+    subtitle: Militär-ATC, Overhead Break, Boom-Tanker, Joker/Bingo, Notfälle
+    group: track
+    status: planned
+    plannedFor: Iteration 6+
+    aircraft: [f16, f15e]
+    description: Land-Jet-Betrieb nach USAF-Art – vom Departure bis zum Overhead Break und Notfällen.
+    lessons: []
+
+  - id: track-b
+    code: B
+    title: Navy / Träger
+    subtitle: Deckcrew, Case I/II/III, Marshal, Ball Call, LSO, Drogue-Tanker
+    group: track
+    status: planned
+    plannedFor: Iteration 6+
+    aircraft: [fa18, f14]
+    description: Trägerbetrieb vom Katapult bis zum Ball Call – inklusive Marshal-Stack und LSO.
+    lessons: []
+
+  - id: track-c
+    code: C
+    title: Mud Moving / CAS
+    subtitle: JTAC-Check-in, 9-Line, Talk-on, In/Off, Cleared Hot
+    group: track
+    status: available
+    aircraft: [a10, f16, ah64, fa18]
+    description: >-
+      Luftnahunterstützung mit JTAC – Check-in auf fox mike, 9-Line mitschreiben und zurücklesen, Zielansprache,
+      Laser und Angriff. Schwerpunkt ist die A-10C, so wie heute in DCS und über SRS gefunkt wird.
+    lessons: [track-c-l1, track-c-l2, track-c-l3, track-c-l4, track-c-l5, track-c-l6, track-c-l7, track-c-l8]
+
+  - id: track-d
+    code: D
+    title: Crew-Intercom
+    subtitle: Pilot ↔ RIO/WSO, Rollenverteilung, Callouts, Defensiv-Kommandos
+    group: track
+    status: planned
+    plannedFor: Iteration 5
+    aircraft: [f14, f4, f15e]
+    description: Zusammenarbeit im Mehrsitzer – wer spricht wann, auf welchem Gerät, mit welchen Worten.
+    lessons: []
+
+  - id: track-e
+    code: E
+    title: Luftkampf
+    subtitle: BVR/WVR-Brevity, Engaged/Support, Spiked, Fox, Splash
+    group: track
+    status: planned
+    plannedFor: Iteration 6+
+    description: Funk im Gefecht – kurz, eindeutig und unter Druck.
+    lessons: []
+
+  - id: track-f
+    code: F
+    title: Gesamtmissionen
+    subtitle: Kaltstart → Mission → Landung, gewürfelt und spurübergreifend
+    group: track
+    status: planned
+    plannedFor: Iteration 6+
+    description: Komplette Missionen, in denen alles Gelernte zusammenkommt.
+    lessons: []
+
+  - id: track-w
+    code: W
+    title: Warbirds & Kalter Krieg
+    subtitle: Kanäle statt Presets, IL-2 ohne Funkgerät, Leitstelle statt AWACS
+    group: track
+    status: available
+    aircraft: [p51, bf109, spitfire, f86, mig15]
+    description: Was beim Funken in älteren Mustern anders ist – feste Kanäle im Warbird, SRS in IL-2 und die Führung durch ein Bodenradar. Gesprochen wird dieselbe Brevity wie heute.
+    lessons: [w-l1, w-l2, w-l3]
+
+  # ---------------------------------------------------------------- Später
+  - id: later-bms
+    code: K
+    title: BMS Korea
+    subtitle: BMS-Comm-Plan, Kunsan, Osan, BMS-Menüs
+    group: later
+    status: planned
+    plannedFor: später
+    description: Funkverfahren in Falcon BMS im Korea-Theater.
+    lessons: []
+

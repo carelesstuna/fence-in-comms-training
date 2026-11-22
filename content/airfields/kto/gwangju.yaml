@@ -1,0 +1,20 @@
+id: gwangju
+name: Gwangju
+map: kto
+icao: RKJJ
+elevationFt: 42
+runways: ["04L/22R", "04R/22L"]
+atc: { uhf: 254.6, vhf: 126.2 }
+ils: "ILS 04/22: 111.10"
+freqs: { atis: 128.875, ground: 275.8, departure: 268.0, approach: 268.0 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_EOR.png" }
+verified: community
+notes:
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "TACAN weggelassen: AGC nennt KWJ 88X, die AIP-Platztabelle und die Simdaten 91X."
+  - "Base Ops UHF 234.7 nur in den Simdaten. Die ILS-Frequenz 111.10 gilt laut Simdaten für zwei Bahnenden; welche, ist nicht geprüft."
+  - "Funkname ohne „AB“, wie ihn die BMS-ATC spricht („Gwangju Ground“, vgl. Comms & Nav Book 4.38.2: „Gunsan Approach, Falcon 1 …“). Die BMS-Karten führen den Platz als „Gwangju AB“."

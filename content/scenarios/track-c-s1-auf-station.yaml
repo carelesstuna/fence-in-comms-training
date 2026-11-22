@@ -1,0 +1,273 @@
+# Spur C, Szenario S1 (Lektion track-c-l3): erster Check-in beim JTAC bis zum Readback und zur Halteposition.
+# Ablauf: AWACS übergibt (fox mike) → FM einstellen → Check-in → Situation Update → Game Plan → 9-Line und Remarks
+# → mitschreiben → Readback → Keyhole.
+# Wortlaut: DCS-Handbücher (A-10C S. 784–788, P-51D S. 174, F-5E), DCS JFO/JTAC Pilot Guide, Recherche Abschnitt 8.
+# Gewürfelt: AWACS, JTAC, Frequenzen, Einsatzraum (casArea), Bewaffnung, Playtime.
+id: track-c-s1-auf-station
+title: Auf Station bei {jtac}
+summary: Vom AWACS auf das FM-Netz, Check-in, Lage, 9-Line mitschreiben, zurücklesen und warten, bis du dran bist.
+layer: core
+as: lead
+callsignPool: attack
+sources:
+  - title: "DCS A-10C Flight Manual, S. 784–788 (JTAC-Ablauf)"
+  - title: "DCS JFO/JTAC Pilot Guide (Community, 562nd Tactical School)"
+  - title: "Sekundärquellen zur Joint Publication 3-09.3, Close Air Support (2019)"
+  - title: "Hoggit-Wiki: JTAC (Keyhole)"
+    url: https://wiki.hoggitworld.com/view/JTAC
+vars:
+  awacs: { pool: callsigns.awacs }
+  jtac: { pool: callsigns.jtac }
+  aw: { number: uhf }
+  fm: { number: vhf-fm }
+  cas: { casArea: true }
+  ord:
+    oneOf:
+      - { text: "4 GBU-12, 2 Maverick, 30 mm", spoken: "four GBU-12, two Maverick, thirty millimeter" }
+      - { text: "2 GBU-38, 2 GBU-12, rockets, 30 mm", spoken: "two GBU-38, two GBU-12, rockets, thirty millimeter" }
+      - { text: "4 Mk-82, 2 Maverick, 30 mm", spoken: "four Mk-82, two Maverick, thirty millimeter" }
+  playtime: { number: playtime, range: [40, 90], step: 10 }
+kneeboard:
+  title: "Line-up-Card {flight} – CAS"
+  rows:
+    - { label: "AWACS", value: "{awacs}" }
+    - { label: "AWACS (UHF)", value: "{aw}" }
+    - { label: "JTAC", value: "{jtac}" }
+    - { label: "JTAC (VHF-FM)", value: "{fm}" }
+    - { label: "Flight", value: "{flightSize}× A-10C" }
+    - { label: "IP", value: "{cas.ip}" }
+    - { label: "Bewaffnung (Flight)", value: "{ord}" }
+    - { label: "Playtime", value: "{playtime}" }
+  where:
+    dcs: "Missionsbriefing bzw. Kneeboard der Mission. In der A-10C stellst du den JTAC am VHF-FM-Gerät ein."
+    bms: "Comm Plan im Briefing; in BMS liegt der JTAC auf dem Tactical-Netz (UHF-Preset 6)."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Frequenz steht im Briefing oder in der Serverinfo."
+steps:
+  - stage: Übergabe
+    freq: "{aw} · {awacs}"
+    situation: >-
+      Dein Flight ({flightSize}× A-10C) ist auf dem Weg ins Einsatzgebiet und hört den AWACS. Laut Missionsbriefing
+      übernimmt dich gleich ein JTAC am Boden.
+    hear:
+      - speaker: "{awacs}"
+        radio: uhf
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: "contact {jtac}", role: instruction, note: Wechsle zum JTAC und melde dich dort. }
+          - { text: fox mike, role: brevity, note: "Auf dem VHF-FM-Gerät. Die Frequenz steht auf deiner Line-up-Card." }
+    you:
+      mode: type
+      hint: Gerät bestätigen, dann dein Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        radio: uhf
+        segments:
+          - { text: fox mike, role: brevity, critical: true, alt: ["contact {jtac} fox mike", "{jtac} fox mike"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Wie bei der Übergabe in Modul 2: Gerät bestätigen, Rufzeichen. Die Frequenz suchst du dir von der Line-up-Card.
+
+  - stage: Check-in
+    tune: { name: "{jtac} (JTAC, VHF-FM)", freq: "{fm}" }
+    situation: >-
+      Du bist am IP {cas.ip} auf angels {cas.hold}. Melde dich beim JTAC an – Bewaffnung und Playtime stehen auf deiner
+      Line-up-Card.
+    you:
+      mode: type
+      hint: JTAC – Rufzeichen – Anzahl und Typ – Position – Höhe – Bewaffnung – Playtime – Abort Code
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{jtac}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "{flightSize|spoken} A-10C", role: info, alt: ["{flightSize} A-10C", "{flightSize} A-10"] }
+          - { text: "IP {cas.ip}", role: position }
+          - { text: "angels {cas.hold|spoken}", role: value, alt: ["angels {cas.hold}"] }
+          - { text: "{ord|spoken}", role: info, alt: ["{ord}"] }
+          - { text: "playtime {playtime|spoken}", role: value, alt: ["playtime {playtime}"] }
+          - { text: "targeting pod", role: info, optional: true, free: true }
+          - { text: abort code in the clear, role: info }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{jtac}", role: callsign }
+          - { text: copy all, role: proword }
+          - { text: ready to copy situation update?, role: request }
+
+  - stage: Lage
+    situation: Der JTAC will dir die Lage geben. Du hast das Kneeboard bereit.
+    you:
+      mode: choice
+      wrong:
+        - "{callsign|spoken}, wilco"
+        - "{jtac}, {callsign|spoken}, request situation update"
+        - "{callsign|spoken}, say again"
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign }
+          - { text: ready to copy, role: request }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{jtac}", role: callsign }
+          - { text: "threat {cas.threat}, {cas.threat.dist|spoken} kilometers {cas.threat.dir} of the target area", role: info }
+          - { text: "targets {cas.target}", role: info }
+          - { text: "friendlies {cas.friend.dir} {cas.friend.dist|spoken} meters", role: position }
+          - { text: no artillery, role: info }
+          - { text: "remain at or above angels {cas.minAlt|spoken}", role: instruction }
+    explain: >-
+      „Ready to copy“ – bereit zum Mitschreiben. „Wilco“ hieße, du führst eine Anweisung aus; um die Lage hast du nicht
+      gebeten, sie kommt ohnehin.
+
+  - stage: Lage
+    situation: Der JTAC hat die Lage durchgegeben. Bestätige kurz.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Im laufenden Gespräch reicht das Rufzeichen. Merk dir die Mindesthöhe: angels {cas.minAlt} wegen {cas.threat}.
+
+  - stage: Game Plan
+    situation: Der JTAC gibt seinen Game Plan durch.
+    hear:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{jtac}", role: callsign }
+          - { text: "type {cas.ctrl|spoken} in effect", role: info }
+          - { text: "{cas.attack}", role: info, when: cas.bomb }
+          - { text: "{cas.weapon.effect}", role: request }
+          - { text: advise when ready for nine-line, role: request }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ready to copy, role: request, critical: true }
+
+  - stage: 9-Line
+    situation: Der 9-Line kommt. Hör zu – mitschreiben kannst du gleich, das Funk-Log bleibt stehen.
+    hear:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{jtac}", role: callsign }
+          - { text: "IP {cas.ip}", role: position, note: Line 1 }
+          - { text: "{cas.hdg|spoken} offset {cas.offset}", role: value, note: Line 2 }
+          - { text: "{cas.dist|spoken}", role: value, note: Line 3 }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{cas.elev|spoken} feet", role: value, note: Line 4 }
+          - { text: "{cas.target}", role: info, note: Line 5 }
+          - { text: "{cas.grid|spoken}", role: position, note: Line 6 }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{cas.mark|spoken}", role: info, note: Line 7 }
+          - { text: "{cas.friend|spoken}", role: position, note: Line 8 }
+          - { text: "egress {cas.egress}", role: instruction, note: Line 9 }
+          - { text: advise when ready for remarks, role: request }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ready to copy remarks, role: request, critical: true, alt: [ready for remarks, ready to copy] }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}", role: instruction }
+          - { text: "laser-target line {cas.ltl|spoken}", role: value, when: cas.laser }
+          - { text: "threat {cas.threat} {cas.threat.dir} {cas.threat.dist|spoken} kilometers", role: info }
+          - { text: "time on target {cas.tot|spoken}", role: instruction }
+
+  - stage: Mitschrift
+    situation: Trag den 9-Line und die Remarks in dein Kneeboard ein – alles steht im Funk-Log.
+    decode: { area: cas }
+    explain: >-
+      Line 2 ist der Kurs vom IP zum Ziel, Line 8 die Richtung vom Ziel zu den Freunden. Die Lageskizze zeigt, wie alles
+      zusammenhängt – der Anflug läuft quer zur Linie zu den Freunden.
+
+  - stage: Readback
+    situation: Lies dem JTAC zurück, was Pflicht ist.
+    you:
+      mode: type
+      hint: Rufzeichen – Line 4 – Line 6 – Final Attack Heading
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{jtac}", role: addressee, optional: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "{cas.elev|spoken} feet", role: value, critical: true, alt: ["{cas.elev}", "{cas.elev} feet", "{cas.elev} ft", "elevation {cas.elev}"] }
+          - { text: "{cas.grid|spoken}", role: position, critical: true, alt: ["{cas.grid}", "grid {cas.grid}"] }
+          - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+            role: instruction
+            critical: true
+            alt:
+              - "final attack heading {cas.fah.from} to {cas.fah.to}"
+              - "final attack heading {cas.fah.from}, {cas.fah.to}"
+              - "FAH {cas.fah.from} to {cas.fah.to}"
+              - "FAH {cas.fah.from}, {cas.fah.to}"
+          # Was man zusätzlich zurücklesen darf – zählt nicht als Fehler
+          - { text: "IP {cas.ip}", role: position, optional: true, free: true }
+          - { text: "{cas.hdg|spoken} offset {cas.offset}", role: value, optional: true, free: true }
+          - { text: "{cas.dist|spoken}", role: value, optional: true, free: true }
+          - { text: "{cas.target}", role: info, optional: true, free: true }
+          - { text: "{cas.mark|spoken}", role: info, optional: true, free: true }
+          - { text: "{cas.friend|spoken}", role: position, optional: true, free: true }
+          - { text: "egress {cas.egress}", role: instruction, optional: true, free: true }
+          - { text: "laser-target line {cas.ltl|spoken}", role: value, optional: true, free: true, when: cas.laser }
+          - { text: "time on target {cas.tot|spoken}", role: instruction, optional: true, free: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: readback correct, role: proword }
+    explain: >-
+      Pflicht: Line 4 ({cas.elev} ft), Line 6 ({cas.grid}) und die Restriktion (Final Attack Heading
+      {cas.fah.from}–{cas.fah.to}). Mehr darfst du zurücklesen – es kostet nur Zeit.
+
+  - stage: Halten
+    situation: Vor dir ist noch ein anderer Flight dran. Der JTAC parkt dich.
+    hear:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "hold {cas.keyhole|spoken}", role: instruction }
+          - { text: "angels {cas.hold|spoken}", role: value }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "holding {cas.keyhole|spoken}", role: position, critical: true, alt: ["holding {cas.keyhole}"] }
+          - { text: "angels {cas.hold|spoken}", role: value, critical: true, alt: ["angels {cas.hold}"] }
+    explain: >-
+      Keyhole {cas.keyhole}: Alfa Nord, Bravo Ost, Charlie Süd, Delta West, die Zahl in NM. Weiter geht es in den nächsten
+      Lektionen mit Talk-on, Markierung und Angriff.

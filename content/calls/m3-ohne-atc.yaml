@@ -1,0 +1,92 @@
+# Selbstansagen ohne ATC („Traffic“-Calls) – Modul 3, S3.
+# Grundlage: FAA AIM 4-1-9 (Traffic Advisory Practices at Airports Without Operating Control Towers).
+# In Sim-Staffeln ohne menschlichen Tower ist das gängige Praxis (layer: community).
+
+- id: m3-traffic-taxi
+  title: Selbstansage vor dem Rollen
+  layer: community
+  context: >-
+    Heute gibt es keinen Tower. Alle Piloten sprechen auf derselben Platzfrequenz und sagen selbst an,
+    was sie tun. Bevor du losrollst, sagst du dich an.
+  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  vars:
+    af: { pool: airfields }
+    wx: { weather: true, airfield: af }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{af.name} Traffic"
+          role: addressee
+          note: >-
+            Adressat sind alle, die auf dieser Frequenz zuhören. Der Platzname steht vorn, damit jeder
+            sofort weiß, um welchen Platz es geht.
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Wer spricht – damit die anderen dich später wiedererkennen.
+        - text: "flight of {flightSize|spoken}"
+          role: info
+          note: Wie viele Flugzeuge gleich rollen. Wer nach dir kommt, weiß dann, wie lange die Bahn belegt ist.
+        - text: "taxiing to runway {wx.runway|spoken}"
+          role: intent
+          critical: true
+          note: Was du vorhast. Die Runway wählst du selbst – gegen den Wind, wie es die ATIS bzw. der Windsack zeigt.
+        - text: "{af.name}"
+          role: info
+          note: >-
+            Der Platzname noch einmal am Ende. Benachbarte Plätze nutzen oft dieselbe Frequenz – wer den
+            Anfang verpasst hat, hört so trotzdem, welcher Platz gemeint ist.
+
+- id: m3-traffic-departure
+  title: Selbstansage vor dem Start
+  layer: community
+  context: Du stehst am Rollhalt. Bevor du auf die Bahn rollst, sagst du an, dass du startest.
+  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  vars:
+    af: { pool: airfields }
+    wx: { weather: true, airfield: af }
+    dir: { oneOf: [north, east, south, west] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{af.name} Traffic", role: addressee }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: "flight of {flightSize|spoken}", role: info, optional: true }
+        - text: "departing runway {wx.runway|spoken}"
+          role: intent
+          critical: true
+          note: Die wichtigste Information für alle anderen – ab jetzt ist die Bahn belegt.
+        - text: "to the {dir}"
+          role: intent
+          optional: true
+          note: Wohin du nach dem Start abfliegst – dann weiß jeder im Anflug, wo er dich suchen muss.
+        - { text: "{af.name}", role: info }
+
+- id: m3-traffic-inbound
+  title: Ein anderer Flight im Anflug
+  layer: community
+  context: Ein anderer Flight sagt sich an. Er spricht nicht mit dir – er informiert alle.
+  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  vars:
+    af: { pool: airfields }
+    wx: { weather: true, airfield: af }
+    oth: { pool: callsigns.fighter, distinctFrom: [flightName] }
+    othNum: { int: [1, 9] }
+    dir: { oneOf: [north, east, south, west] }
+  transmissions:
+    - speaker: "{oth} {othNum}"
+      segments:
+        - { text: "{af.name} Traffic", role: addressee }
+        - text: "{oth} {othNum|spoken}"
+          role: callsign
+          note: Ein Flight – ohne Position dahinter, weil der Lead für alle spricht.
+        - text: "ten miles {dir}"
+          role: position
+          note: Wo er ist. Etwa zehn Meilen vor dem Platz ist ein typischer Ansagepunkt.
+        - text: "inbound for the overhead"
+          role: intent
+          note: Was er vorhat – er kommt zur Landung über den Platz (Overhead Break – erst geradeaus auf die Bahn zu, dann am Break-Punkt die erste 180-Grad-Kurve in die Platzrunde).
+        - { text: "runway {wx.runway|spoken}", role: value }
+        - { text: "{af.name}", role: info }

@@ -1,0 +1,86 @@
+# Übungen zu Selbstansagen ohne ATC (Modul 3, S3). Grundlage: FAA AIM 4-1-9.
+
+- id: m3-l7-why-name-twice
+  type: choice
+  layer: community
+  prompt: Warum steht in einer Selbstansage der Platzname am Anfang **und** am Ende?
+  options:
+    - Plätze teilen sich oft eine Frequenz – wer den Anfang verpasst, hört am Ende, welcher gemeint ist.
+    - Der Name am Ende ersetzt das „over“ – so wissen alle, dass der Funkspruch zu Ende ist und sie senden dürfen.
+    - Weil der Platzname gleichzeitig das Rufzeichen des Towers ist.
+    - Das ist ein Fehler – der Name gehört nur an den Anfang.
+  answer: 0
+  explain: >-
+    Das FAA AIM empfiehlt genau das: Platzname vorn und hinten. In Multiplayer-Missionen hören oft
+    mehrere Plätze auf derselben Frequenz mit.
+
+- id: m3-l7-build-taxi
+  type: build
+  call: m3-traffic-taxi
+  prompt: Kein Tower heute. Bau deine Selbstansage, bevor du losrollst.
+  distractors: ["{af.name} Tower", request taxi, please advise]
+  explain: >-
+    Ohne Tower bittest du um nichts – du sagst an. Deshalb „taxiing“ statt „request taxi“, und der
+    Adressat ist „Traffic“, nicht „Tower“.
+
+- id: m3-l7-call-departure
+  type: call
+  call: m3-traffic-departure
+  prompt: Du stehst am Rollhalt von Runway **{wx.runway}** in **{af.name}** und willst Richtung „{dir}“ abfliegen. Sag dich an.
+  hint: Platz Traffic – Rufzeichen – departing runway … – Platzname
+  explain: Kurz, mit Platzname am Anfang und am Ende. Eine Antwort erwartest du nicht.
+
+- id: m3-l7-silence-inbound
+  type: call
+  call: m3-traffic-inbound
+  expect: silence
+  prompt: Kein Tower heute. Du stehst noch auf dem Vorfeld, als sich ein anderer Flight auf der Platzfrequenz ansagt. Was antwortest du?
+  explain: >-
+    Nichts. Selbstansagen sind keine Fragen. Du merkst dir: Da kommt ein Flight zur Bahn {wx.runway}
+    herein – also schaust du beim Auffahren auf die Bahn besonders genau in den Anflug.
+
+- id: m3-l7-please-advise
+  type: choice
+  exam: true
+  layer: community
+  vars:
+    af: { pool: airfields }
+  prompt: Ein Mitspieler funkt „{af.name} Traffic, any traffic in the area, please advise“. Was ist daran falsch?
+  options:
+    - Er fordert alle zum Antworten auf und blockiert so die Frequenz.
+    - Nichts – so fragt man ohne Tower nach anderem Verkehr, damit sich alle in der Nähe kurz melden.
+    - Es fehlt nur das Rufzeichen, sonst ist es richtig.
+    - Er hätte „{af.name} Tower“ rufen müssen.
+  answer: 0
+  explain: >-
+    Das FAA AIM verbietet die Formulierung ausdrücklich. Wer wissen will, wer unterwegs ist, hört zu.
+    Jeder sagt sich selbst an – deshalb braucht niemand zu fragen.
+
+- id: m3-l7-when
+  type: choice
+  layer: community
+  prompt: Wann sagst du dich ohne Tower an? (Alles Zutreffende)
+  options:
+    - Bevor du losrollst
+    - Bevor du auf die Bahn rollst bzw. startest
+    - Etwa zehn Meilen vor dem Platz
+    - In der Platzrunde bzw. beim Overhead
+    - Nach dem Verlassen der Bahn
+    - Jede Minute, damit alle wissen, dass du noch da bist
+  answer: [0, 1, 2, 3, 4]
+  explain: >-
+    Angesagt wird an den Punkten, an denen du anderen in die Quere kommen kannst. Dauernde Meldungen
+    blockieren nur die Frequenz.
+
+- id: m3-l7-order
+  type: sequence
+  exam: true
+  layer: community
+  prompt: Bring die Selbstansagen einer Platzrunde in die richtige Reihenfolge.
+  items:
+    - taxiing to runway …
+    - departing runway …
+    - ten miles …, inbound for the overhead
+    - initial runway …
+    - clear of runway …
+  explain: Rollen, Start, Rückkehr, Anflug, Bahn frei – jede Ansage an einem Punkt, an dem andere dich kennen müssen.

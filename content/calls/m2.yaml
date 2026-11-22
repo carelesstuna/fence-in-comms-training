@@ -1,0 +1,400 @@
+# Annotierte Funksprüche für Modul 2 (Funkgeräte & Comm Plan).
+# Platzhalter und Rollen: siehe content/README.md
+
+# ------------------------------------------------------------ Lektion 1: Funkgeräte im Cockpit
+- id: m2-handoff-fm
+  title: Übergabe an den JTAC auf FM
+  context: >-
+    Der AWACS schickt dich zu einem JTAC am Boden. Der funkt hier, wie meist, mit einem Heeresfunkgerät auf
+    VHF-FM – also brauchst du im Cockpit das passende Gerät.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    jtac: { pool: callsigns.jtac }
+    fm: { number: vhf-fm }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der AWACS ruft dich.
+        - text: "{awacs}"
+          role: callsign
+          note: Und nennt sich selbst.
+        - text: "contact {jtac}"
+          role: instruction
+          note: Wechsle zum JTAC und melde dich dort.
+        - text: fox mike
+          role: brevity
+          note: >-
+            Brevity für das VHF-FM-Funkgerät. Entsprechend heißt das UHF-Gerät „uniform“ und das
+            VHF-AM-Gerät „victor“. So weißt du sofort, welches Gerät gemeint ist.
+        - text: "{fm|spoken}"
+          role: value
+          note: Eine Frequenz zwischen 30 und 88 MHz – der Bereich, in dem Bodentruppen funken.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: fox mike
+          role: brevity
+          note: Du bestätigst das Gerät …
+        - text: "{fm|spoken}"
+          role: value
+          note: … und die Frequenz. Ein Zahlendreher hier, und du findest den JTAC nie.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Rufzeichen zum Schluss.
+
+# ------------------------------------------------------------ Lektion 2: Kanäle, Comm Card, push
+- id: m2-push-button
+  title: push – Kanalwechsel im Flight
+  context: >-
+    Der Lead schickt den Flight auf einen anderen Preset-Kanal. Auf der neuen Frequenz prüft er, ob
+    alle angekommen sind.
+  vars:
+    ch: { number: channel }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Der ganze Flight ist gemeint.
+        - text: push
+          role: brevity
+          note: >-
+            Brevity: „Wechselt auf die genannte Frequenz.“ Eine Bestätigung ist nicht nötig – jeder
+            schaltet einfach um.
+        - text: "button {ch|spoken}"
+          role: value
+          alt: ["channel {ch|spoken}"]
+          note: >-
+            Der Preset-Kanal {ch}. „button“ und „channel“ meinen dasselbe. Welche Frequenz dahinter
+            steckt, steht auf der Comm Card.
+    - speaker: "{callsign}"
+      you: true
+      note: Auf der neuen Frequenz.
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Erster Funkspruch auf dem neuen Kanal …
+        - text: check
+          role: request
+          note: … der Check – ist jeder angekommen?
+    - speaker: "{wingman}"
+      segments:
+        - { text: Two, role: callsign, note: Two ist da. }
+    - speaker: "{element}"
+      segments:
+        - { text: Three, role: callsign }
+    - speaker: "{element2}"
+      segments:
+        - { text: Four, role: callsign, note: Alle da – der Flight ist komplett auf der neuen Frequenz. }
+
+- id: m2-push-named
+  title: push mit Netz-Namen
+  context: >-
+    Statt einer Kanalnummer nennt der Lead den Namen eines Netzes aus dem Comm Plan. Welcher Kanal
+    das ist, steht auf deiner Comm Card.
+  vars:
+    net: { oneOf: [Strike, Package, Tactical, Tanker] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Der ganze Flight.
+        - text: push
+          role: brevity
+          note: Wechseln, ohne Bestätigung.
+        - text: "{net}"
+          role: info
+          note: >-
+            Der Name des Netzes. Wer den Comm Plan im Kopf (oder auf dem Knie) hat, weiß, welcher Kanal
+            gemeint ist. Für Mithörer bleibt die Frequenz verborgen.
+    - speaker: "{callsign}"
+      you: true
+      note: Auf dem neuen Netz.
+      segments:
+        - { text: "{flightName}", role: addressee }
+        - { text: check, role: request }
+    - speaker: "{wingman}"
+      segments:
+        - { text: Two, role: callsign }
+
+# ------------------------------------------------------------ Lektion 3: Guard
+- id: m2-guard-contact
+  title: Ruf auf Guard
+  context: >-
+    Approach erreicht dich auf der zugewiesenen Frequenz nicht mehr – vielleicht hast du dich
+    verschaltet. Also ruft er dich auf Guard, der Frequenz, die jeder mithört.
+  freq: "243.0 UHF (Guard)"
+  vars:
+    airfield: { pool: airfields }
+    app: { number: uhf }
+  transmissions:
+    - speaker: "{airfield.name} Approach"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Approach ruft dich.
+        - text: "{airfield.name} Approach"
+          role: callsign
+          note: Auf Guard nennt sich die Station immer – dort hören Dutzende Flugzeuge mit.
+        - text: on guard
+          role: info
+          note: >-
+            Kennzeichnet, dass der Ruf über die Notfrequenz kommt. Für dich heißt das: Du bist
+            offenbar nicht da, wo du sein solltest.
+        - text: "contact {airfield.name} Approach {app|spoken}"
+          role: instruction
+          note: Die Frequenz, auf der du dich melden sollst.
+    - speaker: "{callsign}"
+      you: true
+      note: Schon auf der genannten Frequenz – nicht auf Guard.
+      segments:
+        - text: "{airfield.name} Approach"
+          role: addressee
+          note: Du rufst Approach auf der normalen Frequenz. Guard bleibt so frei für echte Notfälle.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer sich meldet.
+        - text: "on {app|spoken}"
+          role: value
+          optional: true
+          note: Bestätigt, dass du jetzt richtig eingestellt bist. Üblich, aber kein Muss.
+
+- id: m2-mayday
+  title: Notruf auf Guard – Mayday
+  context: >-
+    Ein ernster Notfall. Wenn du deine zuständige Stelle nicht erreichst oder nicht weißt, wer
+    zuständig ist, ist Guard die richtige Wahl: Dort hört jeder mit.
+  freq: "243.0 UHF (Guard)"
+  vars:
+    airfield: { pool: airfields }
+    emerg: { oneOf: [engine failure, fire light, dual hydraulic failure] }
+    intent: { oneOf: [returning to base, diverting to the nearest airfield, preparing to eject] }
+    dist: { int: [10, 40] }
+    dir: { oneOf: [north, east, south, west] }
+    altK: { int: [5, 25] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: mayday, mayday, mayday
+          role: proword
+          note: >-
+            Der internationale Notruf, immer dreimal. Ab jetzt hat dein Funkverkehr Vorrang, und alle
+            anderen halten sich zurück.
+        - text: "{callsign|spoken}"
+          role: callsign
+          alt: ["this is {callsign|spoken}", "this is {callsign|spoken} on guard"]
+          note: >-
+            Wer ist in Not? Auf Guard sagt man im Muster der F-14-NATOPS-Checkliste für Suche und Rettung
+            (SAR) auch „This is {callsign|spoken} on guard“ (inoffizielle Sim-Aufbereitung). Die USAF-Vorschrift für die F-16
+            beschreibt nur das Verfahren, keinen Wortlaut.
+        - text: "{emerg}"
+          role: info
+          note: >-
+            Was ist los – so knapp wie möglich: „engine failure“ (Triebwerksausfall), „fire light“ (die
+            Feuerwarnleuchte brennt) oder „dual hydraulic failure“ (beide Hydrauliksysteme ausgefallen).
+        - text: "{intent}"
+          role: intent
+          note: Was hast du vor? Danach richten sich alle, die dir helfen wollen.
+        - text: "{dist|spoken} miles {dir} of {airfield.name}"
+          role: position
+          note: Wo bist du? Ein bekannter Bezugspunkt plus Richtung und Entfernung.
+        - text: "passing {altK|spoken} thousand"
+          role: value
+          alt: ["{altK|spoken} thousand"]
+          note: Deine Höhe – hier sinkend („passing“ = gerade durchfliegend).
+
+# ------------------------------------------------------------ Lektion 4: Funkdisziplin
+- id: m2-blocked
+  title: Zwei auf einmal – blocked
+  context: >-
+    Du und ein anderer Pilot drückt im selben Moment die Sprechtaste. Keiner von euch merkt etwas –
+    aber beim Tower kommt nur Pfeifen und Wortsalat an.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+    # Nur Anliegen, die zum Tower gehören (Anlassen und Rollen laufen über Ground)
+    req: { oneOf: [ready for departure, request landing, request closed traffic] }
+  transmissions:
+    - speaker: zwei Stationen gleichzeitig
+      segments:
+        - text: "[Pfeifton und Wortfetzen]"
+          role: info
+          note: >-
+            Zwei AM-Sender auf derselben Frequenz: Beide Stimmen kommen verstümmelt an, dazu ein
+            Pfeifton. Die Sender selbst hören davon nichts – wer sendet, empfängt nicht.
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: blocked
+          role: proword
+          note: „Zwei haben gleichzeitig gesendet, keiner kam durch.“
+        - text: say again
+          role: instruction
+          note: >-
+            Noch einmal – hier ohne Rufzeichen, also an beide. Meist ruft der Lotse gezielt einen auf
+            („{callsign|spoken}, say again“), dann wiederholt nur der. Ruft er niemanden auf: kurz hineinhören,
+            dann vollständig wiederholen.
+    - speaker: "{callsign}"
+      you: true
+      note: Nach kurzem Hineinhören – damit ihr nicht wieder gleichzeitig loslegt.
+      segments:
+        - text: "{airfield.name} Tower"
+          role: addressee
+          note: Noch einmal von vorn, vollständig.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer du bist.
+        - text: "{req}"
+          role: request
+          note: Dein Anliegen – unverändert, nicht ausgeschmückt.
+
+# ------------------------------------------------------------ Lektion 5: SRS in der Praxis
+- id: m2-intercom-check
+  title: Intercom-Check im Zweisitzer
+  layer: community
+  context: >-
+    Im Zweisitzer (z. B. F-14 oder F-4) sprecht ihr über einen eigenen Intercom-Kanal miteinander.
+    Bevor ihr nach außen funkt, prüft ihr, ob er funktioniert – und ob ihr nicht versehentlich auf
+    dem Funk landet.
+  transmissions:
+    - speaker: Pilot
+      you: true
+      channel: intercom
+      segments:
+        - text: Back seat
+          role: addressee
+          alt: [rear seat]
+          note: Wen du ansprichst – im Zweisitzer reicht die Position.
+        - text: intercom check
+          role: request
+          note: Hörst du mich auf dem Bordsprechkanal?
+    - speaker: Hinterer Sitz
+      channel: intercom
+      segments:
+        - text: loud and clear
+          role: info
+          note: >-
+            Lesbarkeit wie beim Radio Check. Hat dein Flight-Lead das auch gehört, ging es über das
+            falsche Gerät hinaus.
+
+- id: m2-flight-radio-check
+  title: Funkcheck im Flight vor dem Anlassen
+  layer: community
+  context: >-
+    Auf dem Vorfeld, vor dem Anlassen: Der Lead prüft, ob alle im Flight auf der internen
+    Frequenz sind und gut lesbar senden.
+  vars:
+    f: { number: vhf }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Der ganze Flight.
+        - text: radio check
+          role: request
+          note: Diesmal mit Lesbarkeit – jeder sagt, wie er den Lead hört.
+        - text: "victor {f|spoken}"
+          role: value
+          optional: true
+          note: Gerät und Frequenz. So merkt jeder, ob er auf dem richtigen Gerät ist. Darf auch fehlen.
+    - speaker: "{wingman}"
+      segments:
+        - { text: Two, role: callsign }
+        - text: five by five
+          role: info
+          note: >-
+            Perfekt lesbar – Slang für Stärke 5, Lesbarkeit 5. Militärisch heißt das „loud and clear“, nach ICAO
+            „read you five“.
+    - speaker: "{element}"
+      segments:
+        - { text: Three, role: callsign }
+        - text: weak but readable
+          role: info
+          note: >-
+            „Schwach, aber verständlich“: Three hört den Lead leise, versteht ihn aber. Ehrlich gemeldet – Three
+            sollte Lautstärke, Frequenz und Gerät prüfen.
+
+# ------------------------------------------------------------ Lektion 6: Welche Frequenz wann?
+- id: m2-handoff-lookup
+  title: Übergabe mit Frequenz – und der Blick auf die Comm Card
+  context: >-
+    Kurz nach dem Start gibt dich der Tower an Departure ab und nennt die Frequenz. Den passenden Kanal
+    suchst du auf deiner Comm Card – und schaltest ihn, statt die Frequenz einzudrehen.
+  freq: "{cp.tower.freq} {cp.tower.band}"
+  vars:
+    airfield: { pool: airfields }
+    cp: { commplan: true, airfield: airfield }
+  transmissions:
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Tower ruft dich.
+        - text: contact departure
+          role: instruction
+          note: Die nächste Stelle in deinem Frequenzfahrplan.
+        - text: "{cp.departure.freq|spoken}"
+          role: value
+          note: >-
+            Die Frequenz. Findest du sie auf der Comm Card, schaltest du einfach den zugehörigen Kanal.
+            Steht sie nicht drauf, drehst du sie manuell ein.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "departure {cp.departure.freq|spoken}"
+          role: value
+          alt: ["{cp.departure.freq|spoken}"]
+          note: Zurücklesen – erst dann umschalten. Die Frequenz allein genügt auch.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dein Rufzeichen. Danach den Departure-Kanal wählen und dich dort melden.
+
+- id: m2-wrong-frequency
+  title: Falsche Frequenz erwischt
+  context: >-
+    Du stehst am Rollhalt und meldest dich abflugbereit – aber du hast noch Ground eingestellt statt
+    Tower. Ground merkt es und schickt dich weiter.
+  freq: "{cp.ground.freq} {cp.ground.band}"
+  vars:
+    airfield: { pool: airfields }
+    cp: { commplan: true, airfield: airfield }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Tower"
+          role: addressee
+          note: Du glaubst, du sprichst mit dem Tower …
+        - text: "{callsign|spoken}"
+          role: callsign
+        - text: "holding short runway {airfield.runway|spoken}"
+          role: position
+        - text: ready for departure
+          role: request
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "{airfield.name} Ground"
+          role: callsign
+          note: … aber es antwortet Ground. Spätestens jetzt weißt du, dass du falsch bist.
+        - text: "contact tower {cp.tower.freq|spoken}"
+          role: instruction
+          note: Ground nennt dir die richtige Frequenz.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "tower {cp.tower.freq|spoken}"
+          role: value
+          alt: ["{cp.tower.freq|spoken}"]
+          note: Kurz zurücklesen …
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: … umschalten und den Funkspruch beim Tower vollständig wiederholen.

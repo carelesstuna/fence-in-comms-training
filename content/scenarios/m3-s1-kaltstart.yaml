@@ -1,0 +1,218 @@
+# Szenario S1 (Modul 3): Kaltstart mit Crew Chief – vom kalten Cockpit bis zur Rollfreigabe.
+# Gewürfelt: Flugplatz, Wetter (Runway gegen den Wind), ATIS-Buchstabe und -Zeit, Comm Plan, Rollwege, Rufzeichen,
+# Flight-Größe (steht in der Situation und auf dem Kneeboard).
+# Der Wortlaut mit dem Crew Chief ist Staffelpraxis (Ablauf belegt durch F-4E- und F-16-Checklisten in DCS).
+id: m3-s1-kaltstart
+title: Kaltstart in {af.name}
+summary: Intercom-Check mit dem Crew Chief, ATIS, Anlassfreigabe, Anlassen, Bremsklötze – bis zur Rollfreigabe.
+layer: community
+vars:
+  af: { pool: airfields }
+  wx: { weather: true, airfield: af, sky: vmc }
+  info: { letter: true }
+  t: { number: time }
+  cp: { commplan: true, airfield: af }
+  twA: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel] }
+  twB: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel], distinctFrom: [twA] }
+sketch: { airfield: af, weather: wx }
+kneeboard:
+  title: "Comm Card {af.name}"
+  commplan: cp
+  stations: [atis, ground, tower, departure]
+  airfield: af
+  rows:
+    - { label: Flight, value: "{flight} – {flightSize} Flugzeuge, du bist Lead" }
+  where:
+    dcs: "Missionsbriefing bzw. Comm Card im Kneeboard. Die Tower-Frequenz zeigt auch das Flugplatzfenster der F10-Karte; ATIS, Ground und Departure kommen hier aus der Comm Card der Mission."
+    bms: "Comm Plan im Briefing bzw. Line-up-Card im Kneeboard. Am Startplatz: UHF-Preset 2 Ground, 3 Tower, 4 Departure/Approach; die ATIS liegt auf VHF 2 – so auch die Comm Card hier."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Werte kommen aus Briefing oder Comm Card."
+sources:
+  - title: "Heatblur F-4E Manual, S. 812–817, 833, 836 – Crew Chief, Startcheckliste"
+  - title: "DCS F-16C Early Access Guide, S. 135 – Startcheckliste (Bodencrew, Chocks)"
+  - title: "FAA JO 7110.65 – 3-7-2 Taxi and Ground Movement Operations"
+    url: https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap3_section_7.html
+steps:
+  - stage: Intercom
+    pos: parking
+    freq: "Intercom · Crew Chief"
+    situation: >-
+      Du sitzt im kalten Cockpit auf dem Vorfeld von **{af.name}**, Batterie an – als Lead von **{flight}**,
+      einem Flight aus **{flightSize} Flugzeugen**. Der Crew Chief hat sein Headset per Kabel am Flugzeug
+      eingesteckt. Prüf zuerst die Verbindung.
+    you:
+      mode: build
+      distractors: ["{af.name} Ground", radio check]
+      transmission:
+        speaker: Pilot
+        channel: intercom
+        segments:
+          - { text: Chief, role: addressee, note: "Auf dem Kabel-Intercom seid ihr zu zweit – die Anrede reicht." }
+          - { text: intercom check, role: request }
+    reply:
+      - speaker: Crew Chief
+        channel: intercom
+        segments:
+          - { text: loud and clear, role: info }
+    explain: >-
+      Mit dem Crew Chief sprichst du über das Kabel-Intercom, nicht über Funk. Ground und „radio check“
+      gehören auf die Funkfrequenz.
+
+  - stage: ATIS
+    pos: parking
+    tune: { name: "{af.name} ATIS", freq: "{cp.atis.freq}", channel: "{cp.atis.channel}" }
+    situation: Während der Crew Chief außen prüft, hörst du auf dem zweiten Funkgerät die ATIS ab.
+    hear:
+      - speaker: "{af.name} ATIS"
+        segments:
+          - { text: "{af.name} information {info}", role: info, note: "Den Buchstaben brauchst du gleich bei Ground." }
+          - { text: "{t|spoken} Zulu", role: value, note: "Uhrzeit der Wetterbeobachtung." }
+          - { text: "wind {wx.wind|spoken}", role: value }
+          - { text: "{wx.visibility|spoken}", role: value, note: "Sicht in {wx.vis.unit}." }
+          - { text: "{wx.clouds|spoken}", role: info }
+          - { text: "temperature {wx.temp|spoken}, dew point {wx.dew|spoken}", role: value }
+          - { text: "{wx.pressure.word} {wx.pressure|spoken}", role: value, note: "Der Luftdruck in {wx.pressure.unit} – in {af.name} gilt die {af.phraseology.here}." }
+          - { text: "runway {wx.runway|spoken} in use", role: info, note: "Die Bahn liegt gegen den Wind ({wx.wind})." }
+          - { text: "advise on initial contact you have information {info}", role: instruction }
+    explain: Kneeboard-Notiz – Buchstabe {info}, Runway {wx.runway}, {wx.pressure.word} {wx.pressure}, Wind {wx.windShort}.
+
+  - stage: Ground
+    pos: parking
+    tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
+    situation: Du bittest Ground ums Anlassen – als Lead für deinen ganzen Flight ({flightSize} Flugzeuge).
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – ATIS – Anfrage
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Ground", role: addressee, alt: ["{af.alias} Ground"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "flight of {flightSize|spoken}", role: info, optional: true, note: "Ground weiß dann gleich, für wie viele Flugzeuge du sprichst." }
+          - { text: "information {info}", role: info, critical: true, free: true, alt: ["with {info}", "with information {info}"] }
+          - { text: request startup, role: request, critical: true, alt: ["request start up"] }
+    reply:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: startup approved, role: instruction }
+          - { text: "{wx.pressure.word} {wx.pressure|spoken}", role: value, note: "Den Höhenmesser liest du zurück – gleich im nächsten Schritt." }
+    explain: >-
+      Adressat, Rufzeichen, ATIS-Buchstabe, Anfrage. Ob „information {info}“ oder „with {info}“, vor oder
+      nach der Anfrage – Hauptsache, der Buchstabe ist dabei. Die Anlassfreigabe erlaubt noch kein Rollen.
+      Übrigens stellst du Ground schon zum Anlassen ein und keine Zwischenfrequenz: Geht dabei etwas schief,
+      kannst du sofort Hilfe anfordern (Korea-BEM, ältere Quelle).
+
+  - stage: Ground
+    pos: parking
+    situation: Ground hat das Anlassen freigegeben und dir den Höhenmesser genannt. Lies zurück.
+    you:
+      mode: type
+      hint: (Freigabe) – Luftdruck – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: startup approved, role: instruction, optional: true }
+          - { text: "{wx.pressure.word} {wx.pressure|spoken}", role: value, critical: true, alt: ["{wx.pressure.word} {wx.pressure}"], weak: ["{wx.pressure.other} {wx.pressure|spoken}", "{wx.pressure.other} {wx.pressure}"], weakNote: "In der {af.phraseology.form} heißt der Luftdruck „{wx.pressure.word}“" }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Den Höhenmesser liest du immer zurück (Modul 1, Lektion 6) – mit einem Zahlendreher stimmt später jede
+      Höhenangabe nicht. Die Freigabe selbst darfst du mitlesen, Pflicht ist der Wert.
+
+  - stage: Anlassen
+    pos: parking
+    freq: "Intercom · Crew Chief"
+    situation: Zurück auf dem Intercom. Du bist mit den Checks durch und willst anlassen.
+    you:
+      mode: choice
+      wrong:
+        - "Chief, request taxi"
+        - "{af.name} Ground, {callsign|spoken}, ready for engine start"
+        - "Chief, starting engine"
+      transmission:
+        speaker: Pilot
+        channel: intercom
+        segments:
+          - { text: Chief, role: addressee }
+          - { text: ready for engine start, role: request, note: "Du fragst – der Crew Chief prüft draußen, ob alles frei ist." }
+    reply:
+      - speaker: Crew Chief
+        channel: intercom
+        segments:
+          - { text: clear fore and aft, role: info, note: "Vor dem Einlauf und hinter der Düse ist niemand." }
+          - { text: fire guard posted, role: info, note: "Ein Helfer steht mit dem Feuerlöscher bereit." }
+          - { text: chocks in place, role: info }
+          - { text: clear to start, role: instruction }
+    explain: >-
+      Erst fragen, dann anlassen. „Starting engine“ ohne Freigabe wäre zu früh – der Crew Chief muss erst
+      prüfen, ob niemand vor dem Einlauf oder hinter der Düse steht.
+
+  - stage: Anlassen
+    pos: parking
+    freq: "Intercom · Crew Chief"
+    situation: Triebwerk läuft, die Checks mit dem Crew Chief sind durch. Die Bremsklötze müssen weg.
+    you:
+      mode: type
+      hint: Anrede – Bitte
+      transmission:
+        speaker: Pilot
+        channel: intercom
+        segments:
+          - { text: Chief, role: addressee }
+          - { text: pull chocks, role: request, critical: true, alt: ["remove chocks"] }
+    reply:
+      - speaker: Crew Chief
+        channel: intercom
+        segments:
+          - { text: chocks removed, role: info }
+          - { text: disconnecting, role: intent, note: "Er zieht das Kabel ab. Ab jetzt nur noch Handzeichen." }
+
+  - stage: Anlassen
+    pos: parking
+    freq: "Intercom · getrennt"
+    situation: >-
+      Das Kabel ist ab, der Crew Chief steht vor dem Flugzeug und salutiert. Willst du ihm noch etwas
+      sagen?
+    silence: true
+    explain: >-
+      Nichts sagen – ihr seid nicht mehr verbunden. Ab jetzt läuft alles per Handzeichen. Du erwiderst den
+      Salut, der Rest kommt über Ground.
+
+  - stage: Ground
+    pos: parking
+    situation: Bitte Ground um die Rollfreigabe für deinen Flight ({flightSize} Flugzeuge).
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – Anzahl – Anfrage
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{af.name} Ground", role: addressee, alt: ["{af.alias} Ground"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "flight of {flightSize|spoken}", role: info, optional: true }
+          - { text: request taxi, role: request, critical: true, alt: ["ready to taxi"] }
+    reply:
+      - speaker: "{af.name} Ground"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "runway {wx.runway|spoken}", role: value }
+          - { text: "taxi via {twA}, {twB}", role: instruction, note: "Die Rollfreigabe mit Weg: erst {twA}, dann {twB} (FAA JO 7110.65, 3-7-2)." }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, note: "Rollen bis vor die Bahn und dort halten. Wie es weitergeht, übst du im Szenario „Rollen und Abflug“." }
+
+  - stage: Ground
+    pos: parking
+    situation: Lies die Rollfreigabe zurück.
+    you:
+      mode: type
+      hint: Runway – Rollweg – hold short – Rufzeichen
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "via {twA}, {twB}", role: instruction, alt: ["taxi via {twA}, {twB}"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      „hold short“ liest du immer zurück, mit der Bahn – ein „hold short“ ohne Bahn reicht nicht. Den Rollweg
+      liest du mit, damit Ground einen Fehler sofort hört. Geschafft: vom kalten Cockpit bis zur Rollfreigabe.
+      Mit dem Crew Chief über Kabel-Intercom, mit Ground über Funk – und dazwischen Schweigen, sobald das
+      Kabel ab ist.

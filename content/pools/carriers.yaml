@@ -1,0 +1,41 @@
+# Flugzeugträger als Würfelpool (Variable: { pool: carriers }).
+# Nimitz-Klasse-Träger aus DCS: CVN-71, -72, -73 und -75 gehören zum Modul Supercarrier, CVN-70 Carl Vinson und
+# CVN-74 John C. Stennis sind die älteren Träger des Grundspiels und auch ohne das Modul fliegbar (Supercarrier
+# Operations Guide, „Ship Selection and Placement“; Mods/tech/Supercarrier/entry.lua). Welches Modul, steht in
+# `notes`. TACAN, ICLS und BRC legt in DCS die Mission fest – sie werden deshalb gewürfelt (Felder tacan, icls, brc).
+- id: cvn-70
+  name: USS Carl Vinson
+  hull: CVN-70
+  short: Vinson
+  class: Nimitz
+  notes: ["DCS-Grundspiel (ohne Supercarrier fliegbar)"]
+- id: cvn-71
+  name: USS Theodore Roosevelt
+  hull: CVN-71
+  short: Roosevelt
+  class: Nimitz
+  notes: [DCS Supercarrier]
+- id: cvn-72
+  name: USS Abraham Lincoln
+  hull: CVN-72
+  short: Lincoln
+  class: Nimitz
+  notes: [DCS Supercarrier]
+- id: cvn-73
+  name: USS George Washington
+  hull: CVN-73
+  short: Washington
+  class: Nimitz
+  notes: [DCS Supercarrier]
+- id: cvn-74
+  name: USS John C. Stennis
+  hull: CVN-74
+  short: Stennis
+  class: Nimitz
+  notes: ["DCS-Grundspiel (ohne Supercarrier fliegbar)"]
+- id: cvn-75
+  name: USS Harry S. Truman
+  hull: CVN-75
+  short: Truman
+  class: Nimitz
+  notes: [DCS Supercarrier]

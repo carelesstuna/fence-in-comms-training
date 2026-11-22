@@ -1,0 +1,337 @@
+# Flugzeuge – die einzige Quelle der Flugzeugliste.
+# Genutzt für: Auswahl im Profil (gruppiert nach Epoche, gefiltert nach Sims), Flugzeug-Kästen
+# (:::aircraft{aircraft=f16} oder mit Liste p51,p47), Epochen-Kästen (:::era) und den Würfelpool
+# (Variable: { pool: aircraft, where: { service: usn, era: modern } }).
+#
+# Regel (docs/content-plan/flugzeuge-und-epochen.md): Ein eigener Eintrag nur für Muster, die in DCS,
+# BMS oder IL-2 fliegbar sind und sich im Funk spürbar unterscheiden (Gerät, Besatzung mit Intercom,
+# eigenes Verfahren). Alles andere steht im Sammel-Eintrag der Epoche (group: true, nie gewürfelt).
+# Funkgeräte laut Recherche 07 (DCS-VoIP-Dateien, Modul-Handbücher, BMS-Handbücher).
+#
+# Felder: id, label (Anzeige), type (im Text), radio (Rufname im Funk, z. B. „Hornet ball“), era
+# (ww2 | cold-war | modern), sims, nation, service, seats, role, radios (nur Anzeige), group, note.
+# Die Reihenfolge innerhalb einer Epoche ist die Reihenfolge im Profil.
+
+# ------------------------------------------------------------------ Moderne
+- id: f16
+  label: F-16C Viper
+  type: F-16C
+  radio: Viper
+  era: modern
+  sims: [dcs, bms]
+  nation: us
+  service: usaf
+  seats: 1
+  role: multirole
+  radios: [AN/ARC-164 (UHF), AN/ARC-222 (VHF)]
+- id: fa18
+  label: F/A-18C Hornet
+  type: F/A-18C
+  radio: Hornet
+  era: modern
+  sims: [dcs, bms]
+  nation: us
+  service: usn
+  seats: 1
+  role: multirole
+  radios: [2× AN/ARC-210 (VHF/UHF)]
+- id: a10
+  label: A-10C Warthog
+  type: A-10C
+  radio: Hog
+  era: modern
+  sims: [dcs, bms]
+  nation: us
+  service: usaf
+  seats: 1
+  role: attack
+  radios: [AN/ARC-164 (UHF), AN/ARC-186 (VHF-AM und VHF-FM), "A-10C II: AN/ARC-210"]
+- id: f15e
+  label: F-15E Strike Eagle
+  type: F-15E
+  radio: Strike Eagle
+  era: modern
+  sims: [dcs, bms]
+  nation: us
+  service: usaf
+  seats: 2
+  role: multirole
+  note: In DCS derzeit nicht kaufbar (Razbam), in BMS fliegbar.
+- id: ah64
+  label: AH-64D Apache
+  type: AH-64D
+  radio: Apache
+  era: modern
+  sims: [dcs]
+  nation: us
+  service: usa
+  seats: 2
+  role: helicopter
+  radios: [ARC-186 (VHF), ARC-164 (UHF), 2× ARC-201D (FM), ARC-220 (KW)]
+- id: ka50
+  label: Ka-50 Black Shark
+  type: Ka-50
+  radio: Hokum
+  era: modern
+  sims: [dcs]
+  nation: ru
+  service: other
+  seats: 1
+  role: helicopter
+  radios: [R-800L1 (VHF/UHF), R-828 (FM)]
+- id: modern-other
+  label: Andere moderne Muster
+  type: anderes modernes Muster
+  era: modern
+  sims: [dcs, bms]
+  service: other
+  seats: 1
+  role: multirole
+  group: true
+  note: z. B. JF-17, CH-47F, C-130J (DCS) oder Mirage 2000, Tornado, Harrier (BMS)
+
+# ------------------------------------------------------------------ Kalter Krieg (inkl. Korea)
+- id: f86
+  label: F-86 Sabre
+  type: F-86F
+  radio: Sabre
+  era: cold-war
+  sims: [dcs, il2]
+  nation: us
+  service: usaf
+  seats: 1
+  role: fighter
+  radios: ["AN/ARC-27 (UHF, 18 Presets)"]
+  note: "DCS F-86F; IL-2 Korea F-86A-5 (Vorbild F-86A: noch VHF, AN/ARC-3 mit 8 Kanälen ⚠)"
+- id: mig15
+  label: MiG-15bis
+  type: MiG-15bis
+  radio: Fagot
+  era: cold-war
+  sims: [dcs, il2]
+  nation: su
+  service: other
+  seats: 1
+  role: fighter
+  radios: ["RSI-6 (KW, Wellenzahl)"]
+- id: f4
+  label: F-4E Phantom II
+  type: F-4E
+  radio: Phantom
+  era: cold-war
+  sims: [dcs, bms]
+  nation: us
+  service: usaf
+  seats: 2
+  role: multirole
+  radios: ["UHF (18 Presets, 20 AUX-Kanäle nur Empfang)"]
+- id: f5
+  label: F-5E Tiger II
+  type: F-5E
+  radio: Tiger
+  era: cold-war
+  sims: [dcs]
+  nation: us
+  service: usaf
+  seats: 1
+  role: fighter
+  radios: [AN/ARC-164 (UHF)]
+- id: mig21
+  label: MiG-21bis
+  type: MiG-21bis
+  radio: Fishbed
+  era: cold-war
+  sims: [dcs]
+  nation: su
+  service: other
+  seats: 1
+  role: fighter
+- id: ajs37
+  label: AJS-37 Viggen
+  type: AJS-37
+  radio: Viggen
+  era: cold-war
+  sims: [dcs]
+  nation: se
+  service: other
+  seats: 1
+  role: attack
+  radios: ["FR22 (VHF/UHF, Platznummer und Buchstabe)", "FR24 (VHF, Notfunk)"]
+- id: mirage-f1
+  label: Mirage F1
+  type: Mirage F1
+  radio: Mirage
+  era: cold-war
+  sims: [dcs]
+  nation: fr
+  service: other
+  seats: 1
+  role: fighter
+  radios: [TRAP 136 (VHF/UHF), TRAP 137B (UHF)]
+- id: uh1
+  label: UH-1H Huey
+  type: UH-1H
+  radio: Huey
+  era: cold-war
+  sims: [dcs]
+  nation: us
+  service: usa
+  seats: 2
+  role: helicopter
+  radios: [AN/ARC-51BX (UHF), AN/ARC-134 (VHF), AN/ARC-131 (FM)]
+- id: f14
+  label: F-14 Tomcat
+  type: F-14B
+  radio: Tomcat
+  era: cold-war
+  sims: [dcs]
+  nation: us
+  service: usn
+  seats: 2
+  role: fighter
+  radios: [AN/ARC-159 (UHF), AN/ARC-182 (VHF/UHF)]
+- id: f15c
+  label: F-15C Eagle
+  type: F-15C
+  radio: Eagle
+  era: cold-war
+  sims: [dcs, bms]
+  nation: us
+  service: usaf
+  seats: 1
+  role: fighter
+  radios: ["DCS: ARC-164 (UHF) und ARC-186 (VHF)", "BMS: zwei UHF-Geräte"]
+- id: mig29
+  label: MiG-29 Fulcrum
+  type: MiG-29A
+  radio: Fulcrum
+  era: cold-war
+  sims: [dcs, bms]
+  nation: su
+  service: other
+  seats: 1
+  role: fighter
+  radios: [R-862 (VHF/UHF)]
+- id: su27
+  label: Su-27/Su-33 Flanker
+  type: Su-27
+  radio: Flanker
+  era: cold-war
+  sims: [dcs]
+  nation: su
+  service: other
+  seats: 1
+  role: fighter
+  radios: [R-800 (VHF/UHF), R-864 (KW)]
+- id: su25
+  label: Su-25 Frogfoot
+  type: Su-25
+  radio: Frogfoot
+  era: cold-war
+  sims: [dcs]
+  nation: su
+  service: other
+  seats: 1
+  role: attack
+  radios: [R-862 (VHF/UHF), R-828 (FM)]
+- id: mi8
+  label: Mi-8MTV2 Hip
+  type: Mi-8MTV2
+  radio: Hip
+  era: cold-war
+  sims: [dcs]
+  nation: su
+  service: other
+  seats: 3
+  role: helicopter
+  radios: [R-863 (VHF/UHF), YaDRO-1A (KW), R-828 (FM)]
+- id: cw-other
+  label: Andere Muster des Kalten Kriegs
+  type: anderes Muster des Kalten Kriegs
+  era: cold-war
+  sims: [dcs, il2, bms]
+  service: other
+  seats: 1
+  role: fighter
+  group: true
+  note: z. B. L-39, C-101, Mi-24P, Gazelle, A-4E-Mod (DCS) oder F-80, F-84, Yak-9P, La-11, Il-10 (IL-2 Korea)
+
+# ------------------------------------------------------------------ 2. Weltkrieg
+- id: p51
+  label: P-51D Mustang
+  type: P-51D
+  radio: Mustang
+  era: ww2
+  sims: [dcs, il2]
+  nation: us
+  service: usaaf
+  seats: 1
+  role: fighter
+  radios: ["SCR-522A (VHF, Kanäle A–D)"]
+  note: In IL-2 Korea als F-51D
+- id: p47
+  label: P-47D Thunderbolt
+  type: P-47D
+  radio: Thunderbolt
+  era: ww2
+  sims: [dcs, il2]
+  nation: us
+  service: usaaf
+  seats: 1
+  role: fighter
+  radios: ["SCR-522A (VHF, Kanäle A–D)"]
+- id: spitfire
+  label: Spitfire Mk IX
+  type: Spitfire Mk IX
+  radio: Spitfire
+  era: ww2
+  sims: [dcs, il2]
+  nation: gb
+  service: other
+  seats: 1
+  role: fighter
+  radios: ["VHF, Kanäle A–D (TR.1143)"]
+  note: "⚠ Das DCS-Handbuch nennt das Gerät TR 1196A – im Original war das ein Kurzwellengerät; der VHF-Satz der Spitfire IX war das TR.1143 bzw. SCR-522."
+- id: bf109
+  label: Bf 109
+  type: Bf 109
+  radio: Messerschmitt
+  era: ww2
+  sims: [dcs, il2]
+  nation: de
+  service: other
+  seats: 1
+  role: fighter
+  radios: ["FuG 16ZY (VHF, vier Stellungen)"]
+- id: fw190
+  label: Fw 190
+  type: Fw 190
+  radio: Focke-Wulf
+  era: ww2
+  sims: [dcs, il2]
+  nation: de
+  service: other
+  seats: 1
+  role: fighter
+  radios: ["FuG 16ZY (VHF, vier Stellungen)"]
+- id: mosquito
+  label: Mosquito FB VI
+  type: Mosquito FB VI
+  radio: Mosquito
+  era: ww2
+  sims: [dcs, il2]
+  nation: gb
+  service: other
+  seats: 2
+  role: multirole
+  radios: [Kanäle A–D, Bordsprechanlage]
+- id: ww2-other
+  label: Andere Muster des 2. Weltkriegs
+  type: anderes Muster des 2. Weltkriegs
+  era: ww2
+  sims: [dcs, il2]
+  service: other
+  seats: 1
+  role: fighter
+  group: true
+  note: z. B. Yak, La, Il-2, Bf 110, Ju 88, He 111, Typhoon (IL-2) oder F4U, I-16, La-7 (DCS)

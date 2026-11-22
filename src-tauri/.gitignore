@@ -1,0 +1,5 @@
+# Rust-Build und von Tauri erzeugte Schemas
+/target/
+/gen/schemas
+# Spracherkennung fürs Paket (scripts/stage-asr.ts)
+/asr-bundle/

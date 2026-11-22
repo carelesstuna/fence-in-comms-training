@@ -1,0 +1,338 @@
+# Prüfungsfragen für Modul 2 (Funkgeräte & Comm Plan) – Pool der Modulprüfung (S-15).
+# Jede Frage trägt `exam: true`, steht in keiner Lektion und keiner Einstufung. Die Lektion ergibt sich aus der ID
+# (m2-l3-x-… gehört zu m2-l3). Weitere Prüfungsfragen stehen als `exam: true` in m2.yaml:
+#   L1: m2-l1-match-brevity, m2-l1-a10-fm, m2-l1-anatomy-foxmike
+#   L2: m2-l2-why-presets, m2-l2-commcard-button, m2-l2-anatomy-net
+#   L3: m2-l3-monitor, m2-l3-anatomy-guard, m2-l3-mayday-pan
+#   L4: m2-l4-what-you-hear, m2-l4-match-discipline
+#   L5: m2-l5-horizon
+#   L6: m2-l6-match-sources, m2-l6-preselect, m2-l6-wrong-freq
+#   L7: m2-l7-diagram-purpose, m2-l7-match-parts, m2-l7-msa, m2-l7-conflict
+#   L8: m2-l8-match-questions, m2-l8-north, m2-l8-dcs-atc-line (DCS), m2-l8-dcs-match-fields (DCS)
+#   L9: m2-l9-match-sources, m2-l9-mission-wins
+# Getippte Funksprüche (type: call) – die Prüfung soll auch produzieren lassen: m2-l1-x-call-fm-readback,
+# m2-l2-x-call-push, m2-l3-x-call-guard-reply, m2-l4-x-call-repeat, m2-l6-x-call-handoff.
+
+# ------------------------------------------------------------ Lektion 1: Funkgeräte im Cockpit
+- id: m2-l1-x-call-fm-readback
+  type: call
+  exam: true
+  call: m2-handoff-fm
+  prompt: >-
+    Der AWACS schickt dich zum JTAC {jtac} und nennt Gerät und Frequenz. Lies beides zurück.
+  hint: Gerät – Frequenz – Rufzeichen
+  explain: >-
+    „fox mike {fm|spoken}, {callsign|spoken}“: Gerät, Frequenz, Rufzeichen. Das Gerät gehört dazu, denn auf der
+    falschen Modulation findest du den JTAC nie – „uniform“ wäre UHF, „victor“ VHF-AM.
+
+- id: m2-l1-x-facts
+  type: choice
+  exam: true
+  prompt: Welche Aussagen zu Funkgeräten und Bändern stimmen? (Alles Zutreffende)
+  options:
+    - UHF ist das militärische Hauptband.
+    - Mit „victor“ ist das VHF-AM-Gerät gemeint.
+    - Auf welchem Gerät dein Flight liegt, legt der Comm Plan im Briefing fest.
+    - Der eigene Flight liegt in jedem Flugzeug auf VHF-FM.
+    - Ein AM-Funkgerät empfängt auch FM-Sendungen, wenn nur die Frequenz stimmt.
+  answer: [0, 1, 2]
+  explain: >-
+    UHF ist das Band der militärischen Stellen, „victor“ steht für das VHF-AM-Gerät. Für den eigenen Flight gibt es
+    keine feste Regel (in der F-16 läuft er meist über VHF, laut DCS-Handbuch der A-10C über UHF), deshalb zählt der
+    Comm Plan. FM nutzen Bodentruppen und JTAC, und ein Empfänger versteht nur die Modulation, auf die er eingestellt
+    ist: Frequenz und Modulation müssen beide stimmen.
+
+# ------------------------------------------------------------ Lektion 2: Kanäle, Comm Card, push
+- id: m2-l2-x-freq-by-net
+  type: input
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+    awacs: { pool: callsigns.awacs }
+    tanker: { pool: callsigns.tanker }
+    cp: { commplan: true, airfield: airfield }
+  prompt: |
+    Dein Funkgerät hat die Presets nicht geladen, du stellst Frequenzen von Hand ein. Deine Comm Card:
+
+    | Kanal | Netz | Frequenz |
+    |---|---|---|
+    | {cp.ground.channel} | {airfield.name} Ground | {cp.ground.freq} |
+    | {cp.tower.channel} | {airfield.name} Tower | {cp.tower.freq} |
+    | {cp.departure.channel} | Departure | {cp.departure.freq} |
+    | {cp.strike.channel} | Strike ({awacs}) | {cp.strike.freq} |
+    | {cp.tanker.channel} | Tanker ({tanker}) | {cp.tanker.freq} |
+
+    Der Lead sagt: „{flightName}, push Tanker.“ Welche Frequenz tippst du ein?
+  accept:
+    - "{cp.tanker.freq}"
+    - "{cp.tanker.freq|spoken}"
+  placeholder: Frequenz in MHz
+  explain: >-
+    „Tanker“ ist ein Netzname aus dem Comm Plan. Die Comm Card übersetzt ihn in Kanal und Frequenz: Tanker liegt auf
+    Kanal {cp.tanker.channel}, Frequenz {cp.tanker.freq}. Mit geladenen Presets hättest du nur den Kanal gewählt.
+
+- id: m2-l2-x-call-push
+  type: call
+  exam: true
+  call: m2-push-button
+  transmission: 0
+  prompt: Du bist Lead von {flightName}. Schick deinen Flight auf Kanal **{ch}**.
+  hint: Adressat – Brevity – Kanal
+  explain: >-
+    „{flightName}, push button {ch|spoken}“ – statt „button“ geht auch „channel“. Eine Antwort brauchst du nicht: Der
+    Check kommt erst auf dem neuen Kanal.
+
+- id: m2-l2-x-build-push-net
+  type: build
+  exam: true
+  call: m2-push-named
+  transmission: 0
+  prompt: Du bist Lead von {flightName} und schickst den Flight auf das Netz **{net}**. Setze den Funkspruch zusammen.
+  distractors: [switch, over]
+  explain: >-
+    Flight-Name, „push“, Netzname – mehr braucht es nicht. Welcher Kanal dahintersteckt, steht auf der Comm Card, und
+    wer mithört, erfährt die Frequenz nicht.
+
+# ------------------------------------------------------------ Lektion 3: Guard
+- id: m2-l3-x-guard-input
+  type: form
+  exam: true
+  prompt: >-
+    Du brauchst die internationale Notfrequenz. Auf welcher Frequenz liegt Guard auf deinem UHF-Gerät (uniform), und
+    auf welcher auf deinem VHF-Gerät (victor)?
+  fields:
+    - { label: Guard auf UHF (MHz), accept: ["243.0", "two four three point zero"], placeholder: MHz }
+    - { label: Guard auf VHF (MHz), accept: ["121.5", "one two one point five"], placeholder: MHz }
+  explain: >-
+    Guard ist weltweit gleich: 243.0 MHz im UHF-Band (militärisch) und 121.5 MHz im VHF-Band (zivil). 243.0 ist genau
+    das Doppelte von 121.5, das hilft beim Merken.
+
+- id: m2-l3-x-call-guard-reply
+  type: call
+  exam: true
+  call: m2-guard-contact
+  transmission: 1
+  prompt: >-
+    {airfield.name} Approach hat dich auf Guard gerufen und dir eine Frequenz genannt. Du hast umgeschaltet. Was funkst
+    du jetzt?
+  hint: Adressat – Rufzeichen – (Frequenz)
+  explain: >-
+    Du meldest dich auf der genannten Frequenz bei Approach, nicht auf Guard: „{airfield.name} Approach,
+    {callsign|spoken}, on {app|spoken}“. Die Frequenz am Ende ist üblich, aber kein Muss. Guard bleibt frei für Notrufe.
+
+- id: m2-l3-x-mayday-order
+  type: sequence
+  exam: true
+  prompt: Du setzt einen Notruf ab. Bring die Teile in die Reihenfolge nach ICAO.
+  items:
+    - "mayday, mayday, mayday"
+    - "Wer du bist (dein Rufzeichen)"
+    - "Was los ist (zum Beispiel Triebwerksausfall)"
+    - "Was du vorhast"
+    - "Wo du bist (Position und Höhe)"
+  explain: >-
+    Erst der Notruf selbst, dreimal. Danach wer du bist, was los ist, was du vorhast und wo du bist. Bleibt Zeit, steht
+    die gerufene Stelle noch vor dem Rufzeichen.
+
+# ------------------------------------------------------------ Lektion 4: Funkdisziplin
+- id: m2-l4-x-before-talk
+  type: sequence
+  exam: true
+  prompt: Auf einer vollen Frequenz willst du etwas melden. In welcher Reihenfolge gehst du vor?
+  items:
+    - Hineinhören, ob die Frequenz frei ist
+    - Überlegen, was du sagen willst
+    - Sprechtaste drücken
+    - Eine halbe Sekunde warten
+    - Sprechen
+  explain: >-
+    Hören, denken, drücken, kurz warten, sprechen. Wer sofort losredet, blockiert die Frequenz mit seinem „äh“ oder
+    verliert die erste Silbe, und die ist oft genau der Adressat.
+
+- id: m2-l4-x-call-repeat
+  type: call
+  exam: true
+  call: m2-blocked
+  transmission: 2
+  prompt: >-
+    Du hast {airfield.name} Tower gerufen: „{req}“. Gleichzeitig hat ein anderer Pilot gesendet. Der Tower meldet
+    „blocked, say again“ und ruft niemanden auf. Du hast kurz hineingehört, die Frequenz ist frei. Was funkst du?
+  hint: Adressat – Rufzeichen – Anliegen
+  explain: >-
+    Den ganzen Funkspruch noch einmal, vollständig und unverändert: „{airfield.name} Tower, {callsign|spoken}, {req}“.
+    Kein „sorry“, kein „as I was saying“ – das verlängert nur die Belegung der Frequenz.
+
+- id: m2-l4-x-blocked-other
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+    oth: { pool: callsigns.fighter, distinctFrom: [flightName] }
+    othNum: { int: [1, 8] }
+  prompt: >-
+    Du und ein anderer Pilot habt gleichzeitig {airfield.name} Tower gerufen. Der Tower antwortet: „blocked.
+    {oth} {othNum|spoken}, say again.“ Du bist {callsign}. Was tust du?
+  options:
+    - "Schweigen: Nur {oth} {othNum} wiederholt. Danach rufst du selbst – kurz hineinhören, dann vollständig."
+    - Sofort deinen Funkspruch wiederholen, bevor {oth} {othNum} wieder dazwischenfunkt.
+    - Beide wiederholen nach einer kurzen Pause, der Tower sortiert das dann aus.
+    - "Kurz „{callsign|spoken}, standing by“ melden, damit der Tower weiß, dass du auch noch wartest."
+  answer: 0
+  explain: >-
+    „blocked“ heißt: Keiner kam durch. Ruft der Lotse gezielt einen auf, wiederholt nur der. Du wartest, bis das
+    Gespräch fertig ist, hörst kurz hinein und rufst dann vollständig. Ruft er niemanden auf, hört jeder kurz hinein und
+    wiederholt dann seinen Funkspruch.
+
+# ------------------------------------------------------------ Lektion 5: SRS in der Praxis
+- id: m2-l5-x-listen-send
+  type: choice
+  exam: true
+  layer: community
+  prompt: >-
+    Du hast zwei Funkgeräte: Auf Gerät 1 liegt der Tower, auf Gerät 2 dein Flight. Zum Senden ist Gerät 1 gewählt. Dein
+    Wingman ruft dich auf Gerät 2, du hörst ihn und antwortest sofort mit der Sprechtaste. Wer hört dich?
+  options:
+    - Nur der Tower – gehört wird auf allen Geräten, gesendet wird nur auf dem gewählten.
+    - Dein Wingman – beim Drücken stellt sich das Sendegerät auf das Gerät ein, auf dem er dich gerufen hat.
+    - Beide – jede Sprechtaste sendet auf allen eingeschalteten Geräten gleichzeitig.
+    - Niemand – die Sprechtaste geht erst, wenn du das Sendegerät bestätigt hast.
+  answer: 0
+  explain: >-
+    Hören geht auf allen Geräten gleichzeitig, senden nur auf dem gewählten. Im Cockpit wählst du mit dem Funkschalter am
+    Gashebel, in SRS mit den Gerätetasten. Das ist die häufigste Panne: den Flight auf Gerät 2 hören und beim Tower
+    antworten.
+
+- id: m2-l5-x-match-intercom
+  type: match
+  exam: true
+  layer: sim
+  prompt: Das Intercom-Bedienteil von F-14 und F-4E hat drei Stellungen. Ordne sie zu.
+  pairs:
+    - [HOT MIC, "Das Intercom läuft ohne Taste, alles wird gehört."]
+    - [COLD MIC, "Das Intercom geht nur mit gedrückter Taste."]
+    - [RADIO OVERRIDE, "Das Intercom hat Vorrang vor dem Funk."]
+  explain: >-
+    Hot Mic: Das Mikrofon ist immer offen. Cold Mic: Du sprichst nur mit Taste. Radio Override: Das Intercom geht dem
+    Funk vor. Die Checklisten stellen die F-14 auf Cold Mic und die F-4E auf Hot Mic.
+
+- id: m2-l5-x-bms-wingman
+  type: choice
+  exam: true
+  sims: [bms]
+  layer: sim
+  prompt: >-
+    In Falcon BMS willst du prüfen, ob dich deine KI-Wingmen hören und ob dein VHF auf der Frequenz deines Flights
+    steht. Was tust du?
+  options:
+    - Du fragst etwas, das sie beantworten, etwa nach dem Treibstoff. Bleibt die Antwort aus, ist dein VHF vermutlich falsch eingestellt.
+    - Du machst einen Radio Check und wartest auf „five by five“.
+    - Du rufst sie auf Guard, dort hören die KI-Wingmen immer mit.
+    - Du tust nichts, die KI-Wingmen folgen jedem Frequenzwechsel von dir, auch auf VHF.
+  answer: 0
+  explain: >-
+    Radio Checks sind in BMS mit den KI-Wingmen nicht möglich. Auf VHF bleiben sie immer auf ihrer Flight-Frequenz
+    (Preset 15–19), deinen UHF-Wechseln (ATC, Tactical, Tanker) folgen sie dagegen. Ob du auf ihrer VHF bist, prüfst du
+    am einfachsten mit einer Frage nach dem Treibstoff.
+
+# ------------------------------------------------------------ Lektion 6: Welche Frequenz wann?
+- id: m2-l6-x-handoff-order
+  type: sequence
+  exam: true
+  prompt: Ein Lotse gibt dich an die nächste Stelle ab. Bring die vier Schritte der Übergabe in die richtige Reihenfolge.
+  items:
+    - Der Lotse nennt Stelle und Frequenz
+    - Du liest zurück
+    - Du schaltest um, am schnellsten über den Kanal der Comm Card
+    - Du meldest dich auf der neuen Frequenz
+  explain: >-
+    Zurücklesen, umschalten, melden. Das Zurücklesen kommt vor dem Umschalten, damit der Lotse einen Versprecher noch
+    korrigieren kann.
+
+- id: m2-l6-x-call-handoff
+  type: call
+  exam: true
+  call: m2-handoff-lookup
+  transmission: 1
+  prompt: >-
+    Kurz nach dem Start gibt dich {airfield.name} Tower an Departure ab und nennt die Frequenz. Lies zurück, bevor du
+    umschaltest.
+  hint: (Stelle) – Frequenz – Rufzeichen
+  explain: >-
+    „departure {cp.departure.freq|spoken}, {callsign|spoken}“ – die Frequenz allein genügt auch. Erst nach dem
+    Zurücklesen schaltest du um, am schnellsten über den Kanal auf der Comm Card.
+
+# ------------------------------------------------------------ Lektion 7: Platz- und Anflugkarten lesen
+- id: m2-l7-x-tap-ground
+  type: chart-tap
+  exam: true
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+    apd: { chart: airport, airfield: af, commplan: cp }
+  chart: apd
+  prompt: >-
+    Du stehst auf dem Vorfeld von **{af.name}** und willst anlassen und zur Bahn rollen. Tippe auf der Platzkarte auf
+    die Frequenz der Stelle, die dir die Rollfreigabe gibt.
+  target: ground
+  explain: >-
+    Am Boden spricht Ground (GND CON): Anlassen und Rollen. Der Tower übernimmt erst am Rollhalt für die Startfreigabe.
+    Der Funkblock steht oben auf der Platzkarte.
+
+# ------------------------------------------------------------ Lektion 8: Die Karte in deiner Sim
+- id: m2-l8-x-ruler-west
+  type: choice
+  exam: true
+  vars:
+    tru: { number: bearing }
+    mag: { derive: offset, from: tru, add: 8 }
+    magE: { derive: offset, from: tru, add: -8 }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Dein Lineal auf der Planungskarte misst rechtweisend (du hast es an einer Bahn geprüft). Vom Bullseye zu einem
+    Kontakt zeigt es **{tru}°** und **{rng} NM**. Die Missweisung im Gebiet beträgt laut Platzkarte **8° West**.
+    Bullseye-Calls sind magnetisch. Was sagst du im Funk?
+  options:
+    - "„bullseye {mag}/{rng}“"
+    - "„bullseye {tru}/{rng}“"
+    - "„bullseye {magE}/{rng}“"
+    - "„bullseye {rng}/{mag}“"
+  answer: 0
+  explain: >-
+    Bei westlicher Missweisung ist der magnetische Wert größer: {tru}° plus 8° ergibt {mag}° („east is least, west is
+    best“). Den Linealwert unverändert zu nehmen, wäre 8° daneben. Peilung zuerst, dann Entfernung.
+
+# ------------------------------------------------------------ Lektion 9: Platzinfos und Verfahren in deiner Sim
+- id: m2-l9-x-three-sources
+  type: choice
+  exam: true
+  vars:
+    a: { number: uhf }
+    b: { number: uhf, distinctFrom: [a] }
+    c: { number: uhf, distinctFrom: [a, b] }
+  prompt: >-
+    Für denselben Platz nennen dir drei Quellen drei verschiedene Tower-Frequenzen: das Missionsbriefing **{a}**, die
+    Standarddaten der Sim (zum Beispiel F10-Flugplatzfenster oder BMS-Platzkarte) **{b}** und die echte Karte **{c}**.
+    Du hast noch keinen Lotsen gehört. Welche stellst du ein?
+  options:
+    - "{a} – Missionsunterlagen gelten vor den Daten der Sim und der echten Welt."
+    - "{b} – die Sim kennt ihre eigenen Lotsen am besten."
+    - "{c} – die echte Karte ist offiziell und deshalb maßgeblich."
+    - Alle drei nacheinander durchprobieren, bis jemand antwortet.
+  answer: 0
+  explain: >-
+    Missionsunterlagen vor Sim-Daten vor echter Welt. Briefing und Comm Card sind für genau diesen Flug gemacht, und
+    Missionsbauer ändern Frequenzen. Sagt dir später ein Lotse etwas anderes, schlägt das alles Gedruckte.
+
+- id: m2-l9-x-bms-dest
+  type: input
+  exam: true
+  sims: [bms]
+  layer: sim
+  prompt: >-
+    In Falcon BMS ist dein Zielplatz ein anderer Platz als dein Startplatz. Auf welchem UHF-Preset liegt der Tower des
+    Zielplatzes?
+  accept: ["8", "channel 8", "button 8", "preset 8"]
+  placeholder: Nummer eintippen …
+  explain: >-
+    Der Comm Plan ist fest: UHF 7 Approach, 8 Tower und 9 Ground am Zielplatz (am Startplatz 2 Ground, 3 Tower, 4
+    Departure). Ist der Zielplatz derselbe wie der Startplatz, bleiben die Presets des Startplatzes gültig.

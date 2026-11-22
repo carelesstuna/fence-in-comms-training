@@ -1,0 +1,18 @@
+id: andersen
+name: Andersen
+map: marianas
+icao: PGUA
+elevationFt: 590
+runways: ["06L/24R", "06R/24L"]
+atc: { uhf: 250.1, vhf: 126.2, hf: 3.85, vhfLow: 38.6 }
+tacan: 54X
+ils: "ILS 06R: 110.10 (IUAM)"
+verified: dcs-data
+notes:
+  - Bomber-Stützpunkt auf Guam, Klippen an beiden Pistenenden.
+  - Ziviler Verkehr von Guam International in der Nähe.
+  - TACAN Kanal 54 (UAM) laut DCS-Funkfeuerdaten (Mods/terrains/MarianaIslands/Beacons.lua); den Modus nennen die Daten nicht.
+  - "Vier ILS laut Beacons.lua, Bahnen aus Lage und Richtung der Localizer berechnet: 06L 109.30 (IAND), 06R 110.10 (IUAM), 24L 110.15 (IPMY), 24R 109.35 (IYIG)."
+  - Laut Community funktioniert der Gleitpfad von 06L in DCS nicht richtig – im Spiel prüfen.
+  - "⚠ Platzhöhe geschätzt: Die Bahnen steigen nach Nordosten an, die Sender liegen zwischen 530 und 591 ft. DCS liefert keine Platzkarte mit – im F10-Fenster (ELEVATION) prüfen."
+  - "HF und tiefes VHF (Flugplatzfenster der F10-Karte) laut DCS-Funkdaten (radio.lua der Karte)."

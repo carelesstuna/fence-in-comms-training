@@ -1,0 +1,271 @@
+# Prüfungsfragen für Modul 3 (Am Boden & Bodencrew) – Pool der Modulprüfung (S-15).
+# Jede Frage trägt `exam: true`, steht in keiner Lektion und keiner Einstufung. Die Lektion ergibt sich aus der ID
+# (m3-l4-x-… gehört zu m3-l4). Weitere Prüfungsfragen stehen als `exam: true` in m3.yaml und m3-ohne-atc.yaml:
+#   L1: m3-l1-atis-runway, m3-l1-why-letter, m3-l1-anatomy-instruction
+#   L2: m3-l2-channel, m3-l2-anatomy-clear, m3-l2-after-disconnect
+#   L3: m3-l3-clearance-items, m3-l3-progressive, m3-l3-anatomy-turn, m3-l3-hold-vs-short
+#   L4: m3-l4-hands, m3-l4-order
+#   L5: m3-l5-interval, m3-l5-ack-clearance
+#   L6: m3-l6-flight-level, m3-l6-formation-squawk
+#   L7: m3-l7-please-advise, m3-l7-order
+# Funkspruch produzieren (U2-01, getippt oder gebaut): m3-l1-x-build-initial, m3-l3-x-giving-way,
+# m3-l3-x-clearance-readback, m3-l5-x-lineup-readback, m3-l5-x-takeoff-readback, m3-l6-x-fl-readback.
+
+# ------------------------------------------------------------ Lektion 1: ATIS
+- id: m3-l1-x-attention-all
+  type: choice
+  exam: true
+  vars:
+    atisOld: { letter: true }
+    atisNew: { letter: true, distinctFrom: [atisOld] }
+  prompt: >-
+    Du hast die ATIS gehört und „information {atisOld}“ aufgeschrieben. Jetzt hörst du auf der Frequenz des Towers:
+    „attention all aircraft, information {atisNew} current.“ Was heißt das für dich?
+  options:
+    - Es gibt eine neue Ausgabe. Du übernimmst die neuen Werte, vor allem den Luftdruck.
+    - Nichts – deine Ausgabe {atisOld} gilt weiter, bis du den Platz verlässt.
+    - Nichts, solange du am Boden stehst – die neue Ausgabe gilt erst für Piloten in der Luft.
+    - Du vergleichst die Buchstaben im Alphabet. Nur wenn {atisNew} hinter {atisOld} steht, ist deine Ausgabe veraltet.
+  answer: 0
+  explain: >-
+    „information {atisNew} current“ heißt: Aktuell ist jetzt Ausgabe {atisNew}, deine Ausgabe {atisOld} ist veraltet. Du
+    übernimmst die neuen Werte, besonders Bahn und Luftdruck. Wo der Buchstabe im Alphabet steht, spielt keine Rolle: Nach
+    Zulu kommt wieder Alfa, verglichen wird nur auf gleich oder ungleich.
+
+- id: m3-l1-x-build-initial
+  type: build
+  exam: true
+  call: m3-atis
+  transmission: 1
+  prompt: Du hast die ATIS gehört. Ruf Ground und bitte ums Anlassen.
+  distractors: ["{airfield.name} Tower", request takeoff, "information {atis} received"]
+  explain: >-
+    Adressat Ground, dein Rufzeichen, der ATIS-Buchstabe und die Anfrage. Das Anlassen gehört zu Ground, nicht zum
+    Tower – und vom Start bist du noch weit entfernt.
+
+- id: m3-l1-x-altimeter-say
+  type: generated
+  exam: true
+  generator: number-to-spoken
+  params: { kind: altimeter }
+
+# ------------------------------------------------------------ Lektion 2: Crew Chief
+- id: m3-l2-x-pre-start
+  type: choice
+  exam: true
+  layer: community
+  prompt: >-
+    Bevor der Crew Chief dir das Anlassen freigibt, meldet er, dass einiges in Ordnung ist. Was davon? (Alles Zutreffende)
+  options:
+    - Vor dem Einlauf und hinter der Düse ist niemand.
+    - Eine Brandwache steht mit dem Feuerlöscher bereit.
+    - Die Bremsklötze liegen.
+    - Ground hat die Rollfreigabe erteilt.
+    - Die Waffen sind scharf gemacht.
+  answer: [0, 1, 2]
+  explain: >-
+    Bereich frei, Brandwache, Bremsklötze – danach folgt „clear to start“. Die Rollfreigabe gibt Ground erst viel später, und
+    die Waffen werden erst am Bahnende scharf gemacht.
+
+- id: m3-l2-x-rollout
+  type: choice
+  exam: true
+  layer: community
+  vars:
+    af: { pool: airfields }
+  prompt: >-
+    Du stehst in {af.name}. Alle Checks sind durch, die Bremsklötze sind weg, das Intercom-Kabel ist ab, und der Crew Chief
+    winkt dich aus der Parkposition. Reicht das zum Losrollen?
+  options:
+    - "Nein – es fehlt die Rollfreigabe von Ground. Das Zeichen heißt nur: Der Weg ist frei."
+    - Ja – der Crew Chief ist für alles am Boden zuständig, auch für die Rollfreigabe.
+    - Nein – du brauchst noch die Startfreigabe vom Tower.
+    - Ja – nach dem Abziehen des Kabels ist das Flugzeug ausdrücklich zum Rollen freigegeben.
+  answer: 0
+  explain: >-
+    Die Rollfreigabe gibt Ground, nicht der Crew Chief. Sein Zeichen sagt nur, dass der Weg aus der Parkposition frei ist.
+    Beides brauchst du. Die Startfreigabe kommt erst viel später vom Tower.
+
+# ------------------------------------------------------------ Lektion 3: Ground
+- id: m3-l3-x-giving-way
+  type: call
+  exam: true
+  call: m3-give-way
+  transmission: 1
+  prompt: >-
+    Du rollst über den Platz. Ground weist dich an, an einer Kreuzung einem anderen Flugzeug Vorfahrt zu lassen. Lies die
+    Anweisung zurück.
+  explain: >-
+    Zurücklesen statt „roger“: in der „-ing“-Form („giving way to the …“) mit dem Flugzeugtyp, am Ende dein Rufzeichen. So
+    weiß Ground, dass du das richtige Flugzeug gefunden hast und schon tust, was verlangt war.
+
+- id: m3-l3-x-clearance-readback
+  type: build
+  exam: true
+  call: m3-ifr-clearance
+  transmission: 2
+  prompt: Clearance hat dir die IFR-Freigabe gegeben. Lies sie vollständig zurück.
+  distractors: [readback correct, "hold short of runway {airfield.runway|spoken}", roger]
+  explain: >-
+    Ziel, Route, Höhe, Abflugfrequenz und Squawk in der Reihenfolge der Freigabe, dein Rufzeichen am Ende. Ein „roger“
+    reicht bei einer Streckenfreigabe nie, und „readback correct“ sagt der Lotse, nicht du.
+
+# ------------------------------------------------------------ Lektion 4: EOR
+- id: m3-l4-x-after-landing
+  type: choice
+  exam: true
+  vars:
+    af: { pool: airfields }
+  prompt: >-
+    Du bist mit scharfen Waffen an Bord in {af.name} gelandet und rollst zum Bahnende zurück. Was passiert dort, und was
+    gilt für deine Hände?
+  options:
+    - Die Crew entwaffnet das Flugzeug (De-Arm). Solange sie arbeitet, hältst du die Hände sichtbar.
+    - Du entwaffnest das Flugzeug selbst und hältst die Hände frei, die Crew prüft nur Fahrwerk und Reifen.
+    - Nichts – entwaffnet wird erst nach dem Abstellen, die Hände darfst du bis dahin frei bewegen.
+    - Du meldest dem Tower „arming complete“ und rollst gleich zur Parkposition weiter.
+  answer: 0
+  explain: >-
+    Nach der Landung läuft es am Bahnende umgekehrt: De-Arm statt Arming, mit denselben Regeln für die Hände (AFMAN
+    11-2F-16 V3, Abs. 3.4; Korea-BEM). Einen festen Funkspruch dafür gibt es nicht.
+
+- id: m3-l4-x-eor-comm
+  type: choice
+  exam: true
+  vars:
+    af: { pool: airfields }
+  prompt: >-
+    Du stehst als F-16-Pilot am Bahnende von {af.name}, und die EOR-Crew kommt ans Flugzeug. Wie verständigt ihr euch
+    normalerweise?
+  options:
+    - Über das Intercom, wie beim Anlassen.
+    - Über die Ground-Frequenz, damit Ground mithört.
+    - Über die Tower-Frequenz, weil der Tower die Bahn besitzt.
+    - Mit einer festen Funkformel, etwa „arming complete“.
+  answer: 0
+  explain: >-
+    Pilot und Bodencrew sprechen normalerweise per Intercom, auch bei den EOR-Checks (AFMAN 11-2F-16 V3, Abs. 3.2). Fällt es
+    aus, bleiben Sichtzeichen. Einen Funkspruch für den Halt am Bahnende gibt es in den Vorschriften nicht.
+
+# ------------------------------------------------------------ Lektion 5: Tower
+- id: m3-l5-x-ready-why
+  type: choice
+  exam: true
+  vars:
+    af: { pool: airfields }
+  prompt: >-
+    Du stehst am Rollhalt von {af.name} und meldest dich beim Tower. Warum sagst du „ready for departure“ und nicht „ready
+    for takeoff“?
+  options:
+    - Das Wort „takeoff“ gehört nur in die Startfreigabe, damit nichts verwechselt wird.
+    - Weil „departure“ die Reservierung der Bahn schon einschließt.
+    - Bei „ready for takeoff“ müsste der Tower sofort die Startfreigabe geben.
+    - Es gibt keinen Unterschied, beides ist üblich und gleich gut.
+  answer: 0
+  explain: >-
+    Seit Teneriffa 1977 bleibt das Wort „takeoff“ der Startfreigabe vorbehalten („cleared for takeoff“). Bei der Meldung am
+    Rollhalt sagst du deshalb „ready for departure“.
+
+- id: m3-l5-x-lineup-readback
+  type: call
+  exam: true
+  call: m3-ready-departure
+  transmission: 2
+  prompt: >-
+    Du hast dich am Rollhalt beim Tower abflugbereit gemeldet. Jetzt antwortet er dir. Lies die Antwort zurück.
+  explain: >-
+    Bahn und Anweisung wörtlich, dann dein Rufzeichen. „line up and wait“ ist keine Startfreigabe, zurücklesen musst du es
+    trotzdem: Wer auf eine Bahn rollt, liest die Bahn immer mit.
+
+- id: m3-l5-x-takeoff-readback
+  type: call
+  exam: true
+  call: m3-takeoff-clearance
+  transmission: 1
+  prompt: Du stehst ausgerichtet auf der Bahn, der Tower gibt dir die Startfreigabe. Lies sie zurück.
+  hint: Runway – Freigabe – Rufzeichen
+  explain: Bahn und „cleared for takeoff“, dann dein Rufzeichen. Den Wind musst du nicht zurücklesen.
+
+# ------------------------------------------------------------ Lektion 6: Departure
+- id: m3-l6-x-checkin-cloze
+  type: cloze
+  exam: true
+  call: m3-departure-checkin
+  transmission: 0
+  blanks: [2, 3]
+  prompt: >-
+    Du steigst nach dem Start durch **{altA}.000 ft** und bist auf **{altB}.000 ft** freigegeben. Ergänze deinen Erstanruf
+    bei Departure.
+  explain: >-
+    „leaving“ nennt die Höhe, die du gerade verlässt, „climbing to“ die, auf die du steigst. So prüft der Lotse, ob sein Radar
+    deine Höhe richtig anzeigt. In Europa hörst du „passing“ statt „leaving“.
+
+- id: m3-l6-x-fl-readback
+  type: call
+  exam: true
+  call: m3-departure-checkin
+  transmission: 2
+  prompt: Departure hat dich auf dem Radar und gibt dir eine neue Höhe. Lies sie zurück.
+  hint: Anweisung mit Flight Level – Rufzeichen
+  explain: Die Höhe wörtlich, Rufzeichen am Ende. „FL{fl}0“ oder „flight level {fl|spoken} zero“ – beides geht.
+
+- id: m3-l6-x-squawk-standby
+  type: choice
+  exam: true
+  prompt: >-
+    Departure sagt: „{callsign|spoken}, squawk standby.“ Was tust du?
+  options:
+    - Den Transponder auf STBY stellen. Er bleibt an, antwortet dem Radar aber nicht.
+    - Warten. „standby“ heißt, dass Departure sich gleich noch einmal meldet.
+    - Den Transponder auf 7600 stellen, den Code für Funkausfall.
+    - Die Ident-Taste drücken, damit dein Punkt auf dem Schirm aufleuchtet.
+  answer: 0
+  explain: >-
+    Am Transponder heißt „standby“: Das Gerät schweigt. Das Standardwort „standby“ („Warte, ich melde mich“) ist etwas ganz
+    anderes. In einer Standard-Formation squawkt nur der Lead, alle anderen stehen auf standby. 7600 heißt Funkausfall, und die
+    Ident-Taste drückst du nur auf Anweisung („squawk ident“).
+
+- id: m3-l6-x-transition-us
+  type: choice
+  exam: true
+  prompt: >-
+    Du fliegst in den USA und steigst nach dem Start. Ab welcher Höhe über dem Meer stellst du den Standard-Luftdruck (29.92
+    inHg) ein und sprichst Flight Levels?
+  options:
+    - 18.000 ft
+    - 10.000 ft
+    - 25.000 ft
+    - 5.000 ft
+  answer: 0
+  explain: >-
+    In den USA liegt die Übergangshöhe einheitlich bei 18.000 ft (14 CFR 91.121). Darunter stellst du den Luftdruck vom Platz
+    ein (Altimeter aus der ATIS) und sprichst Höhen in Fuß. In Europa ist die Übergangshöhe von Platz zu Platz verschieden.
+
+# ------------------------------------------------------------ Lektion 7: Ohne Tower
+- id: m3-l7-x-parts
+  type: match
+  exam: true
+  layer: community
+  prompt: Eine Selbstansage ohne Tower hat vier Teile. Wozu dient welcher Teil?
+  pairs:
+    - [Platzname und „Traffic“ am Anfang, "Adressat sind alle, die auf der Frequenz zuhören"]
+    - [Rufzeichen, Damit dich die anderen später wiedererkennen]
+    - [Position und Absicht, "Was du tust oder vorhast, etwa „taxiing to runway …“"]
+    - [Platzname am Ende, "Wer den Anfang verpasst hat, hört, welcher Platz gemeint ist"]
+  explain: >-
+    So beschreibt das FAA AIM (4-1-9) die Selbstansage: Platzname und „Traffic“, Rufzeichen, Position und Absicht, Platzname
+    noch einmal am Ende. Niemand antwortet, es ist eine Information und keine Frage.
+
+- id: m3-l7-x-cloze-taxi
+  type: cloze
+  exam: true
+  layer: community
+  call: m3-traffic-taxi
+  transmission: 0
+  blanks: [0, 3]
+  prompt: >-
+    Heute ist kein Tower besetzt, alle sprechen auf der Platzfrequenz von **{af.name}**. Du rollst zur Bahn
+    **{wx.runway|spoken}** und sagst dich an. Ergänze die Lücken.
+  explain: >-
+    Adressat ist „Traffic“, nicht „Tower“: Du sprichst zu allen, die zuhören. Und du bittest um nichts. Statt „request taxi“
+    sagst du „taxiing“, nachdem du geschaut und gehört hast, dass nichts im Weg ist.

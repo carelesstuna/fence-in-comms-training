@@ -1,0 +1,460 @@
+# Spur C – Mud Moving / CAS (JTAC mit A-10). Rollen wie in content/README.md.
+# Konzept: docs/content-plan/spur-c-cas-jtac.md. Quellen: Recherche (docs/research/01-funkverfahren.md, Abschnitt 8,
+# nach Sekundärquellen zur JP 3-09.3 – das Original war nicht lesbar), DCS-Handbücher (A-10C S. 784–788, P-51D S. 174,
+# F-5E), DCS JFO/JTAC Pilot Guide (JTG, Community), BMS-CAS-Kneeboard-Blätter, Hoggit-Wiki JTAC.
+# Alle Werte des 9-Line kommen aus einem gewürfelten Einsatzraum ({ casArea: true }), damit sie zueinander passen.
+
+# ------------------------------------------------------------------ Lektion 1: Check-in
+- id: track-c-checkin
+  title: Check-in beim JTAC
+  context: >-
+    Der AWACS hat dich auf das FM-Netz des JTAC geschickt. Jetzt meldest du dich mit allem, was er für seine Planung
+    braucht: wer du bist, wo, womit und wie lange.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+    ord:
+      oneOf:
+        - { text: "4 GBU-12, 2 Maverick, 30 mm", spoken: "four GBU-12, two Maverick, thirty millimeter" }
+        - { text: "2 GBU-38, 2 GBU-12, rockets, 30 mm", spoken: "two GBU-38, two GBU-12, rockets, thirty millimeter" }
+        - { text: "4 Mk-82, 2 Maverick, 30 mm", spoken: "four Mk-82, two Maverick, thirty millimeter" }
+    playtime: { number: playtime, range: [30, 120], step: 10 }
+    own: { number: lasercode }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - text: "{jtac}"
+          role: addressee
+          critical: true
+          note: >-
+            Der JTAC zuerst – meist auf FM. Welches Gerät und welche Frequenz gelten, sagen Comm Plan und Übergabe; in BMS
+            liegt der JTAC auf UHF-Preset 6. Auf dem falschen Gerät hört er dich nicht (Modul 2).
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Dein Rufzeichen bzw. deine Missionsnummer.
+        - text: "{flightSize|spoken} A-10C"
+          role: info
+          alt: ["{flightSize} A-10C", "{flightSize} A-10"]
+          note: Anzahl und Typ. Daran sieht der JTAC, welche Waffen und Sensoren er erwarten kann.
+        - text: "IP {cas.ip}"
+          role: position
+          note: >-
+            Wo du bist – meist ein IP oder eine Halteposition. Position und Höhe, dann Bewaffnung, dann Playtime: Diese
+            Reihenfolge nennen DCS-Handbücher, der JTAC-Leitfaden der Community und die BMS-Blätter übereinstimmend.
+        - text: "angels {cas.hold|spoken}"
+          role: value
+          note: Deine Höhe in Tausend Fuß. Wichtig für die Staffelung über dem Ziel.
+        - text: "{ord|spoken}"
+          role: info
+          alt: ["{ord}"]
+          note: >-
+            Bewaffnung für den ganzen Flight. Die BMS-Blätter zählen dazu auch Zünderstellung und Laser-Codes der
+            Waffen.
+        - text: "playtime {playtime|spoken}"
+          role: value
+          alt: ["playtime {playtime}"]
+          note: Wie lange du bleiben kannst, bis du nach Hause musst – Stunden plus Minuten.
+        - text: "targeting pod, laser code {own|spoken}"
+          role: info
+          optional: true
+          alt: ["targeting pod, laser code {own}", "pod, laser {own}"]
+          note: >-
+            Fähigkeiten: Zielbehälter und dein eigener Laser-Code. Die BMS-Blätter nennen weitere freiwillige Angaben
+            (Karte, FLIR, Datenlink).
+        - text: abort code in the clear
+          role: info
+          note: >-
+            Der Abbruchcode (siehe Glossar). Auf verschlüsselten Funkgeräten entfällt er – „in the clear“ sagt, dass du
+            unverschlüsselt sendest und ihn deshalb nicht nennst (laut den Quellen).
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{jtac}", role: callsign }
+        - text: copy all
+          role: proword
+          note: Check-in vollständig angekommen (Wortlaut aus der Praxis ⚠).
+        - text: ready to copy situation update?
+          role: request
+          note: Jetzt kommt die Lage. Wortlaut ⚠ – die Quellen nennen nur, dass ein Situation Update folgt.
+
+- id: track-c-sitrep
+  title: Situation Update
+  context: >-
+    Nach dem Check-in schildert der JTAC die Lage. Die Bedrohung kommt zuerst, weil sie Höhe und Anflug bestimmt.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{jtac}", role: callsign }
+        - text: "threat {cas.threat}, {cas.threat.dist|spoken} kilometers {cas.threat.dir} of the target area"
+          role: info
+          note: >-
+            Bedrohung zuerst. Das BMS-Blatt für die Lagemeldung hat sieben Punkte in fester Folge: Bedrohung,
+            Feindlage, eigene Kräfte, Artillerie, Freigabe, Gefahren, Bemerkungen. Der Wortlaut hier ist ein Beispiel.
+        - text: "targets {cas.target}"
+          role: info
+          note: Was bekämpft werden soll – noch ohne Koordinate.
+        - text: "friendlies {cas.friend.dir} {cas.friend.dist|spoken} meters"
+          role: position
+          note: Wo die eigenen Leute stehen, vom Zielgebiet aus.
+        - text: no artillery
+          role: info
+          note: Ob eigene Artillerie schießt – sonst müsste der Luftraum getrennt werden.
+        - text: "remain at or above angels {cas.minAlt|spoken}"
+          role: instruction
+          note: >-
+            Restriktion aus der Bedrohung. Als Faustregel nennt das Hoggit-Wiki etwa 12.000 ft über MANPADS und 7.000 ft
+            über Flak (⚠ Community).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Verstanden. Im laufenden Gespräch reicht das Rufzeichen.
+
+- id: track-c-gameplan
+  title: Game Plan und „ready to copy“
+  context: >-
+    Bevor der 9-Line kommt, sagt der JTAC, wie er den Angriff führen will. Dann holst du dein Kneeboard heraus.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{jtac}", role: callsign }
+        - text: "type {cas.ctrl|spoken} in effect"
+          role: info
+          note: >-
+            Die Control Type: wie eng der JTAC jeden Angriff kontrolliert (Lektion 6). „Type 2 in effect, advise when
+            ready for 9-line“ steht so in den DCS-Handbüchern.
+        - text: "{cas.attack}"
+          role: info
+          when: cas.bomb
+          note: >-
+            BOT (bomb on target): Du bestätigst das Zielobjekt selbst. BOC (bomb on coordinate): Die Waffe fällt auf die
+            Koordinate, z. B. gegen Infanterie. Das entscheidet der JTAC.
+        - text: "{cas.weapon.effect}"
+          role: request
+          note: Welche Waffe und wie viele pro Anflug (laut BMS-Blatt für den Game Plan).
+        - text: advise when ready for nine-line
+          role: request
+          note: Kneeboard raus – gleich kommen die neun Zeilen am Stück.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: ready to copy
+          role: request
+          critical: true
+          note: Bereit zum Mitschreiben. In DCS ist das ein Menüpunkt („Ready to copy“).
+
+- id: track-c-keyhole
+  title: Halten im Keyhole
+  context: >-
+    Bis du dran bist, schickt dich der JTAC auf eine Halteposition. Auf Servern mit menschlichen JTACs ist dafür das
+    Keyhole üblich.
+  freq: VHF-FM (fox mike)
+  layer: community
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{jtac}", role: callsign }
+        - text: "hold {cas.keyhole|spoken}"
+          role: instruction
+          note: >-
+            Keyhole: Echo ist die Zielmitte, Alfa liegt nördlich, Bravo östlich, Charlie südlich, Delta westlich. Die Zahl
+            ist der Abstand in NM – „{cas.keyhole}“.
+        - text: "angels {cas.hold|spoken}"
+          role: value
+          note: Deine Höhe im Stack. Mehrere Flugzeuge halten übereinander.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "holding {cas.keyhole|spoken}"
+          role: position
+          critical: true
+          alt: ["holding {cas.keyhole}"]
+          note: Zurücklesen, wo du hältst …
+        - text: "angels {cas.hold|spoken}"
+          role: value
+          critical: true
+          alt: ["angels {cas.hold}"]
+          note: … und in welcher Höhe.
+
+# ------------------------------------------------------------------ Lektion 2: der 9-Line
+- id: track-c-nineline
+  title: Der 9-Line
+  context: >-
+    Der JTAC gibt dir das Briefing für den Angriff, Zeile für Zeile. Die Zeilennummern spricht er hier nicht mit – ob
+    sie gesprochen werden, ist in den Quellen offen ⚠. Drei Zeilen pro Übertragung, dann die Remarks.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, dangerClose: any }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{jtac}", role: callsign }
+        - text: "IP {cas.ip}"
+          role: position
+          note: "**Line 1 – IP:** der Punkt, an dem dein Anflug beginnt."
+        - text: "{cas.hdg|spoken} offset {cas.offset}"
+          role: value
+          note: >-
+            **Line 2 – Heading und Offset:** Kurs vom IP zum Ziel (missweisend) und die Seite, zu der du den Anflug versetzt
+            – weg von den eigenen Leuten.
+        - text: "{cas.dist|spoken}"
+          role: value
+          note: >-
+            **Line 3 – Distance:** vom IP zum Ziel in NM. Von einer Battle Position (Hubschrauber) käme sie in Metern.
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - text: "{cas.elev|spoken} feet"
+          role: value
+          note: >-
+            **Line 4 – Target Elevation:** Höhe des Ziels in Fuß über Meer. Sie geht direkt in die Waffe – deshalb
+            liest du sie zurück.
+        - text: "{cas.target}"
+          role: info
+          note: "**Line 5 – Target Description:** was es ist und wie viele."
+        - text: "{cas.grid|spoken}"
+          role: position
+          note: >-
+            **Line 6 – Target Location:** die Koordinate (MGRS), zwei Buchstaben und acht Ziffern. Zweite Pflicht im
+            Readback.
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - text: "{cas.mark|spoken}"
+          role: info
+          note: >-
+            **Line 7 – Mark:** wie das Ziel markiert wird – Laser mit Code, Willie Pete (weißer Phosphor), sparkle
+            (IR-Pointer bei Nacht) oder none.
+        - text: "{cas.friend|spoken}"
+          role: position
+          note: >-
+            **Line 8 – Friendlies:** Richtung und Abstand in Metern vom Ziel zu den eigenen Leuten. „South“ heißt: Sie
+            stehen südlich des Ziels.
+        - text: "egress {cas.egress}"
+          role: instruction
+          note: "**Line 9 – Egress:** wohin du nach dem Angriff abfliegst. Bedrohungen gehören in die Remarks."
+        - text: advise when ready for remarks
+          role: request
+          note: Jetzt kommen die Remarks (so in den DCS-Handbüchern).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign }
+        - text: ready to copy remarks
+          role: request
+          note: Bereit für die Remarks (Wortlaut aus dem DCS-Handbuch der F-5E).
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          note: >-
+            Restriktion: Nur aus diesem Kurssektor darfst du angreifen, im Uhrzeigersinn von – bis. Sie läuft quer zur
+            Linie zu den Freunden. Wird zurückgelesen.
+        - text: "laser-target line {cas.ltl|spoken}"
+          role: value
+          when: cas.laser
+          note: Kurs vom Laser des JTAC zum Ziel. Kommt nur, wenn mit Laser markiert wird.
+        - text: "threat {cas.threat} {cas.threat.dir} {cas.threat.dist|spoken} kilometers"
+          role: info
+          note: Die Bedrohung noch einmal mit Lage.
+        - text: "time on target {cas.tot|spoken}"
+          role: instruction
+          note: Wann die Waffe einschlagen soll (oder „push when ready“).
+        - text: danger close
+          role: info
+          when: cas.dc
+          note: >-
+            Die eigenen Leute sind näher am Ziel, als für diese Waffe als sicher gilt (Lektion 3). Gehört zu den
+            Restriktionen und wird zurückgelesen.
+
+# ------------------------------------------------------------------ Lektion 3: Readback
+- id: track-c-readback
+  title: Readback nach dem 9-Line
+  context: >-
+    Nach den Remarks liest du genau das zurück, was Pflicht ist: Line 4, Line 6 und jede Restriktion. So steht der Ablauf
+    in den DCS-Handbüchern (ein Readback nach den Remarks). Der JTAC-Leitfaden der Community kennt eine zweite Folge:
+    erst Line 4 und 6, nach den Remarks noch einmal die Restriktionen.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, dangerClose: any }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - text: "{jtac}"
+          role: addressee
+          optional: true
+          note: Im laufenden Gespräch darf der Adressat fehlen.
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+        - text: "{cas.elev|spoken} feet"
+          role: value
+          critical: true
+          alt: ["{cas.elev}", "{cas.elev} feet", "{cas.elev} ft", "elevation {cas.elev}"]
+          note: Line 4. Ein Zahlendreher hier, und die Waffe rechnet mit der falschen Zielhöhe.
+        - text: "{cas.grid|spoken}"
+          role: position
+          critical: true
+          alt: ["{cas.grid}", "grid {cas.grid}"]
+          note: Line 6. Die Koordinate, auf die alles zielt.
+        - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          critical: true
+          alt:
+            - "final attack heading {cas.fah.from} to {cas.fah.to}"
+            - "final attack heading {cas.fah.from}, {cas.fah.to}"
+            - "FAH {cas.fah.from} to {cas.fah.to}"
+            - "FAH {cas.fah.from}, {cas.fah.to}"
+            - "attack heading {cas.fah.from} to {cas.fah.to}"
+          note: Jede Restriktion aus den Remarks, wortgleich.
+        - text: danger close
+          role: info
+          critical: true
+          when: cas.dc
+          note: Danger Close ist eine Restriktion – sie wird mit zurückgelesen.
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: readback correct
+          role: proword
+          note: >-
+            Erst danach geht es weiter („readback correct“ steht in den DCS-Handbüchern). Im JTAC-Leitfaden folgt: „say
+            when ready for talk-on“.
+
+- id: track-c-readback-correction
+  title: Korrektur im Readback
+  context: Im Readback steckt ein Zahlendreher in Line 6. Der JTAC korrigiert, du liest richtig neu.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign }
+        - { text: "{cas.elev|spoken} feet", role: value }
+        - text: "{cas.gridWrong|spoken}"
+          role: position
+          note: Hier steckt der Fehler – eine Ziffer ist vertauscht oder daneben.
+        - { text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}", role: instruction }
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: correction
+          role: proword
+          note: >-
+            „Correction“ und gleich der richtige Wert (DCS JTAC-Leitfaden, DCS-Handbuch). „Negative“ wäre denkbar, steht
+            aber in keiner Quelle als Wortlaut.
+        - { text: "{cas.grid|spoken}", role: position }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "{cas.grid|spoken}"
+          role: position
+          critical: true
+          alt: ["{cas.grid}", "grid {cas.grid}"]
+          note: Noch einmal – jetzt richtig. Nur der korrigierte Wert.
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: readback correct, role: proword }
+
+- id: track-c-danger-close
+  title: Danger Close im Readback
+  context: >-
+    Die eigenen Leute stehen nah am Ziel. Der JTAC sagt es in den Remarks, und du liest es mit zurück.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, dangerClose: yes }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}", role: instruction }
+        - text: danger close
+          role: info
+          note: Freunde näher, als für die Waffe als sicher gilt – hier {cas.friend.dist} m.
+        - text: "ground commander's initials {cas.initials|spoken}"
+          role: info
+          note: >-
+            Der Bodenkommandeur übernimmt das Risiko und nennt dazu seine Initialen (⚠ nicht an der JP 3-09.3 geprüft).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: "{cas.elev|spoken} feet", role: value, critical: true, alt: ["{cas.elev}", "{cas.elev} feet", "elevation {cas.elev}"] }
+        - { text: "{cas.grid|spoken}", role: position, critical: true, alt: ["{cas.grid}", "grid {cas.grid}"] }
+        - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          critical: true
+          alt: ["final attack heading {cas.fah.from} to {cas.fah.to}", "final attack heading {cas.fah.from}, {cas.fah.to}", "FAH {cas.fah.from}, {cas.fah.to}"]
+        - text: danger close
+          role: info
+          critical: true
+          note: Wird mitgelesen – es ist eine Restriktion.
+        - text: "{cas.initials|spoken}"
+          role: info
+          alt: ["{cas.initials}", "initials {cas.initials|spoken}"]
+          note: Auch die Initialen (⚠).

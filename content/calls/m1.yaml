@@ -1,0 +1,561 @@
+# Annotierte Funksprüche für Modul 1 (Grundausbildung).
+# Platzhalter: {callsign} = eingebaut, {airfield.name} usw. = über "vars" gewürfelt.
+# "|spoken" liefert die gesprochene Form (Zahlen als Wörter).
+
+- id: m1-radio-check
+  title: Radio Check beim Tower
+  context: Du sitzt startbereit im Cockpit und willst prüfen, ob dein Funkgerät richtig sendet und empfängt.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Tower"
+          role: addressee
+          note: Zuerst nennst du die Station, die du erreichen willst – hier den Tower, der die Bahn und den Luftraum direkt um den Platz kontrolliert. Alle auf der Frequenz hören mit, so weiß jeder sofort, wer gemeint ist.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dann sagst du, wer du bist. Ohne Rufzeichen weiß der Tower nicht, wem er antworten soll.
+        - text: radio check
+          role: request
+          note: Dein Anliegen – kurz und mit festen Worten.
+        - text: "{airfield.twr|spoken}"
+          role: value
+          optional: true
+          note: Die Frequenz ist optional, hilft aber, wenn mehrere Funkgeräte laufen. Zahlen werden Ziffer für Ziffer gesprochen.
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: In der Antwort ist DEIN Rufzeichen der Adressat – der Tower ruft jetzt dich.
+        - text: "{airfield.name} Tower"
+          role: callsign
+          note: Danach nennt sich der Tower selbst. Nach dem Erstkontakt lassen Lotsen das oft weg.
+        - text: loud and clear
+          role: info
+          note: >-
+            Die Lesbarkeit, militärisch üblich (ACP 125). Nach ICAO hieße es „read you five“, als Slang hörst du
+            „five by five“. Mehr in Modul 1, Lektion 7.
+
+- id: m1-startup-request
+  title: Anlassfreigabe bei Ground
+  context: Du stehst kalt auf dem Vorfeld, hast die ATIS gehört und willst die Triebwerke anlassen.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Ground"
+          role: addressee
+          note: Für alles am Boden vor dem Rollhalt (der Markierung vor der Bahn, an der du ohne Freigabe anhältst) ist Ground zuständig.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: >-
+            Dein Rufzeichen: Name, Nummer deines Flights und deine Nummer im Flight (mehr dazu in
+            Modul 1, Lektion 4). Die Zahlen sprichst du Ziffer für Ziffer.
+        - text: "information {atis}"
+          role: info
+          alt: ["with {atis}"]
+          free: true
+          note: >-
+            Zeigt, dass du die aktuelle ATIS (Wetter, Piste, Luftdruck) gehört hast. Ground muss sie dir
+            dann nicht vorlesen. Üblich ist auch „with {atis}“. Das Handbuch Doc 9432 der ICAO (internationale Zivilluftfahrt-Organisation) setzt die ATIS-Kennung
+            ans Ende („request startup, information {atis}“). Beide Reihenfolgen sind richtig.
+        - text: request startup
+          role: request
+          alt: ["request start up"]
+          note: Dein Anliegen. Die Anlassfreigabe erlaubt noch kein Rollen!
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Ground ruft dich.
+        - text: startup approved
+          role: instruction
+          note: Die Freigabe. Ein kurzes „{callsign|spoken}“ oder „roger, {callsign|spoken}“ als Bestätigung genügt.
+
+# ------------------------------------------------------------ Lektion 2: Buchstabieralphabet
+- id: m1-taxi-request
+  title: Rollfreigabe mit Rollwegen
+  context: >-
+    Du hast angelassen und willst mit deinem Flight zur Startbahn rollen. Buchstaben tauchen hier
+    gleich zweimal auf: in der ATIS-Kennung und in den Namen der Rollwege.
+  freq: "{airfield.gnd} {airfield.gnd.band}"
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+    twA: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel, Juliett, Kilo] }
+    twB: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel, Juliett, Kilo], distinctFrom: [twA] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Ground"
+          role: addressee
+          note: Rollen gehört zu Ground – alles am Boden bis kurz vor die Startbahn.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Als Lead sprichst du für den ganzen Flight – mit deinem eigenen Rufzeichen.
+        - text: flight of two
+          role: info
+          note: >-
+            „Wir sind zwei Flugzeuge.“ Der Lead (Nummer 1) spricht für beide, sein Wingman (Nummer 2)
+            hört mit und schweigt. Mehr dazu in Modul 1, Lektion 4.
+        - text: "information {atis}"
+          role: info
+          alt: ["with {atis}"]
+          free: true
+          note: >-
+            Die ATIS-Kennung ist ein Buchstabe im Alphabet. Jede neue ATIS-Ausgabe bekommt den nächsten
+            Buchstaben – so weiß Ground, ob du das aktuelle Wetter kennst. Üblich ist auch „with {atis}“.
+        - text: request taxi
+          role: request
+          note: Dein Anliegen. Kommt zum Schluss, nachdem klar ist, wer mit wem spricht.
+    - speaker: "{airfield.name} Ground"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Ground ruft jetzt dich – und meint damit deinen ganzen Flight.
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+          note: Die Startbahn. Runway-Nummern sind die Richtung der Bahn in Zehnergrad, Ziffer für Ziffer gesprochen.
+        - text: "taxi via {twA}, {twB}"
+          role: instruction
+          more:
+            label: Das NATO-Alphabet
+            to: /wissen/nato-alphabet
+          note: >-
+            Rollwege heißen nach Buchstaben – und werden im Alphabet gesprochen. Die Reihenfolge ist
+            der Weg: erst {twA}, dann {twB}. Das ist die US-Form; nach ICAO hörst du „taxi to holding
+            point runway … via …“.
+        - text: "hold short of runway {airfield.runway|spoken}"
+          role: instruction
+          alt: ["hold short runway {airfield.runway|spoken}"]
+          note: Vor der Startbahn anhalten und warten. Diese Anweisung musst du immer zurücklesen.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "runway {airfield.runway|spoken}"
+          role: value
+          note: Die Runway zuerst – sie ist der wichtigste Teil der Freigabe.
+        - text: "via {twA}, {twB}"
+          role: instruction
+          alt: ["taxi via {twA}, {twB}"]
+          note: Der Rollweg, genau in der Reihenfolge, die Ground genannt hat.
+        - text: "hold short of runway {airfield.runway|spoken}"
+          role: instruction
+          alt: ["hold short runway {airfield.runway|spoken}"]
+          note: >-
+            „Hold short“ wird immer wörtlich zurückgelesen. Daran erkennt Ground, dass du nicht auf die Bahn
+            rollst. Das „of“ darfst du weglassen: Entscheidend sind „hold short“ und die Bahn.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Beim Zurücklesen steht dein Rufzeichen am Ende.
+
+# ------------------------------------------------------------ Lektion 3: Zahlen im Funk
+- id: m1-approach-numbers
+  title: Zahlen vom Approach-Lotsen
+  context: >-
+    Du kommst zurück zum Platz. Der Approach-Lotse gibt dir Luftdruck, Kurs und Höhe – drei
+    Zahlen in einem Atemzug, die du alle zurücklesen musst. {airfield.name} liegt auf der Karte {airfield.map}; der
+    Lotse spricht die {airfield.phraseology.here}.
+  freq: "{airfield.app} {airfield.app.band}"
+  vars:
+    airfield: { pool: airfields }
+    # Luftdruck in der Form des Platzes: „altimeter“ in inHg (FAA) oder „QNH“ in hPa (ICAO)
+    altim: { number: pressure, airfield: airfield }
+    hdg: { number: heading }
+    # Vektorhöhe mindestens 2.000 ft über dem Platz (Creech liegt auf 3.126 ft)
+    alt: { number: altitude, range: [3000, 9000], step: 1000, above: { airfield: airfield, add: 2000 } }
+  transmissions:
+    - speaker: "{airfield.name} Approach"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Lotse ruft dich.
+        - text: "{altim.word} {altim|spoken}"
+          role: value
+          note: >-
+            Der Luftdruck für deinen Höhenmesser, Ziffer für Ziffer: {altim} {altim.unit} wird zu „{altim|spoken}“.
+            In der US-Form (FAA) heißt er „altimeter“ in Zoll Quecksilbersäule (inHg), vier Ziffern ohne Punkt; nach
+            ICAO „QNH“ in Hektopascal (mehr in Modul 1, Lektion 3).
+        - text: "turn left heading {hdg|spoken}"
+          role: instruction
+          note: Kurse sind immer dreistellig und werden Ziffer für Ziffer gesprochen – auch mit führender Null.
+        - text: "{airfield.descend} {alt|spoken}"
+          role: instruction
+          note: >-
+            Höhen in ganzen Tausend Fuß – die Tausender als Ziffern, dann „thousand“. „Descend and
+            maintain“ ist die US-Formulierung (FAA), nach ICAO heißt es „descend to …“.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{altim.word} {altim|spoken}"
+          role: value
+          weak: ["{altim.other} {altim|spoken}"]
+          weakNote: "In der {airfield.phraseology.form} heißt der Luftdruck „{altim.word}“"
+          note: Der Höhenmesser-Wert gehört zu den Dingen, die du immer zurückliest.
+        - text: "left heading {hdg|spoken}"
+          role: instruction
+          alt: ["turn left heading {hdg|spoken}"]
+          note: Mit Richtung („left“) – so merkt der Lotse, wenn du falsch herum drehen würdest.
+        - text: "{airfield.descend} {alt|spoken}"
+          role: instruction
+          alt: ["{airfield.descend.ing} {alt|spoken}"]
+          weak: ["{airfield.descend.other} {alt|spoken}", "{airfield.descend.otherIng} {alt|spoken}"]
+          weakNote: "In der {airfield.phraseology.form} heißt es „{airfield.descend}“"
+          note: Die Höhe wird wörtlich zurückgelesen, in der Form des Lotsen.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dein Rufzeichen zum Schluss.
+
+- id: m1-frequency-change
+  title: Wechsel zu Departure
+  context: Kurz nach dem Start gibt dich der Tower an Departure (die Radar-Abflugkontrolle) ab.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+  transmissions:
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Tower ruft dich.
+        - text: contact departure
+          role: instruction
+          note: Wechsle zur nächsten Stelle und melde dich dort.
+        - text: "{airfield.dep|spoken}"
+          role: value
+          note: >-
+            Die Frequenz Ziffer für Ziffer. Den Punkt sprechen US-Militär und FAA als „point“, ICAO
+            als „decimal“ – beides ist richtig.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "departure {airfield.dep|spoken}"
+          role: value
+          note: Du liest Stelle und Frequenz zurück. Ein Zahlendreher fällt so sofort auf.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dein Rufzeichen zum Schluss – dann drehst du am Funkgerät.
+
+- id: m1-awacs-checkin-angels
+  title: Höhe im taktischen Format – angels
+  context: >-
+    Du meldest dich beim AWACS an, der fliegenden Radar-Leitstelle. Taktische Stellen sprechen Höhen
+    nicht in Fuß, sondern in „angels“: Tausend Fuß.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    ang: { number: angels }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{awacs}"
+          role: addressee
+          note: Das Rufzeichen des AWACS.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dein Rufzeichen.
+        - text: checking in
+          role: intent
+          alt: ["checking in as fragged", "as fragged"]
+          note: >-
+            „Ich melde mich an.“ Oft hörst du hier „checking in as fragged“: Du fliegst genau das, was im
+            Einsatzbefehl (Frag) steht, und der AWACS kennt deinen Auftrag schon. Mehr dazu in Modul 5.
+        - text: "angels {ang|spoken}"
+          role: value
+          more:
+            label: ATC oder AWACS – wer im Funk wofür zuständig ist
+            to: /wissen/atc-oder-awacs
+          note: >-
+            „angels {ang|spoken}“ heißt {ang}.000 Fuß. Nach „angels“ kommen nur noch die Tausender,
+            Ziffer für Ziffer.
+    - speaker: "{awacs}"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der AWACS ruft dich.
+        - text: "{awacs}"
+          role: callsign
+          note: Der AWACS nennt sich selbst.
+        - text: picture clean
+          role: brevity
+          note: Brevity-Code – „im Lagebild sind keine Kontakte“. Mehr dazu in Modul 5.
+
+- id: m1-ops-check
+  title: Ops Check – Treibstoff im Flight
+  # OPS CHECK ist kein Brevity-Wort der ATP 1-02.1, aber ein offizieller F-16-Verfahrensbegriff
+  # (AFMAN 11-2F-16 V3, Abs. 3.30.4). Einen Antwortwortlaut legt die Vorschrift nicht fest: community.
+  layer: community
+  context: >-
+    Der Lead fragt in regelmäßigen Abständen ab, ob im Flight alles in Ordnung ist. Jeder antwortet
+    mit seiner Nummer und dem Treibstoff in Tausend Pfund. Der Ops Check ist ein offizieller
+    Verfahrensbegriff der USAF-F-16; was genau geantwortet wird, regelt die Staffel bzw. das Briefing.
+  vars:
+    # Treibstoff aus dem Wert des Leads abgeleitet: im Flight liegen die Werte dicht beieinander, die Wingmen
+    # eher etwas darunter (E1-12). Große Unterschiede wären ein Befund – genau dafür gibt es den Ops Check.
+    fl: { number: fuel, range: [4.5, 8.5] }
+    d2: { number: fuel, range: [-1, -0.2] }
+    d3: { number: fuel, range: [-0.8, 0.2] }
+    d4: { number: fuel, range: [-1.2, -0.2] }
+    f2: { derive: sum, of: [fl, d2], kind: fuel }
+    f3: { derive: sum, of: [fl, d3], kind: fuel }
+    f4: { derive: sum, of: [fl, d4], kind: fuel }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: Nur der Flight-Name – gemeint sind alle Mitglieder deines Flights.
+        - text: ops check
+          role: request
+          note: >-
+            Bitte um Zustandsmeldung. Mindestens der Treibstoff, je nach Staffel auch Waffen- oder
+            Systemstatus. Bei der F-16 gehören laut Vorschrift auch Triebwerksanzeigen, Sauerstoff und
+            G-Anzug zur Prüfung (AFMAN 11-2F-16 V3, Abs. 3.30.4).
+    - speaker: "{wingman}"
+      segments:
+        - text: Two
+          role: callsign
+          note: Im eigenen Flight genügt die Positionsnummer.
+        - text: "{f2|spoken}"
+          role: value
+          note: Treibstoff in Tausend Pfund – „{f2|spoken}“ sind {f2} × 1.000 lbs.
+    - speaker: "{element}"
+      segments:
+        - { text: Three, role: callsign }
+        - { text: "{f3|spoken}", role: value }
+    - speaker: "{element2}"
+      segments:
+        - { text: Four, role: callsign }
+        - { text: "{f4|spoken}", role: value }
+
+# ------------------------------------------------------------ Lektion 4: Rufzeichen und Flights
+- id: m1-flight-check
+  title: Check-in im eigenen Flight
+  context: >-
+    Nach jedem Frequenzwechsel prüft der Lead, ob alle mitgekommen sind. Die Antworten sind die
+    kürzesten Funksprüche überhaupt.
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          note: >-
+            Der Flight-Name ohne Nummer. Sind mehrere Flights gleichen Namens auf der Frequenz, nimm
+            die Nummer dazu („{flight|spoken}“).
+        - text: check
+          role: request
+          note: „Meldet euch!“ – jeder bestätigt, dass er auf der Frequenz ist.
+    - speaker: "{wingman}"
+      segments:
+        - text: Two
+          role: callsign
+          note: >-
+            Nummer 2 ({wingman}) antwortet nur mit seiner Position. Das gilt, weil es die Antwort auf den
+            Ruf des Leads ist – eine selbst begonnene Meldung trägt das volle Rufzeichen (mehr in Modul 4).
+    - speaker: "{element}"
+      segments:
+        - text: Three
+          role: callsign
+          note: Der Element Lead ({element}).
+    - speaker: "{element2}"
+      segments:
+        - text: Four
+          role: callsign
+          note: Nummer 4 ({element2}). Die Reihenfolge 2-3-4 ist fest – keiner fällt dem anderen ins Wort.
+
+- id: m1-ball-call
+  title: Ball Call mit Side Number
+  context: >-
+    Im Endanflug auf den Träger meldest du dich nicht mit dem taktischen Rufzeichen, sondern mit der
+    Nummer an deinem Flugzeug: der Side Number (Modex).
+  vars:
+    modex: { number: modex }
+    fuel: { number: fuel, range: [3.5, 5.5] }
+  transmissions:
+    - speaker: "{modex}"
+      you: true
+      segments:
+        - text: "{modex|spoken}"
+          role: callsign
+          note: >-
+            Die Side Number – dreistellig, groß auf das Flugzeug gemalt. Der Landing Signal Officer
+            (LSO) sieht sie und weiß sofort, wer da anfliegt.
+        - text: Hornet
+          role: info
+          note: Der Flugzeugtyp. Zusammen mit dem Treibstoff zeigt er dem Deck, wie schwer das Flugzeug ist.
+        - text: ball
+          role: info
+          note: „Ich sehe die optische Landehilfe“ – den Lichtpunkt, der den Gleitpfad anzeigt.
+        - text: "{fuel|spoken}"
+          role: value
+          note: Treibstoff in Tausend Pfund.
+    - speaker: Paddles
+      segments:
+        - text: roger ball
+          role: proword
+          note: Der LSO („Paddles“) bestätigt („roger“ = empfangen, mehr in Modul 1, Lektion 6) und übernimmt die Führung im Endanflug. Mehr dazu in der später geplanten Spur B.
+
+# ------------------------------------------------------------ Lektion 5: Standardwörter
+- id: m1-report-wilco
+  title: „Report …“ – Antwort mit wilco
+  context: >-
+    Der Tower gibt dir keine Freigabe, sondern einen Auftrag für später: Melde dich, wenn du einen
+    bestimmten Punkt erreichst.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+    rep: { oneOf: [report initial, report five mile final, report base] }
+  transmissions:
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Tower ruft dich.
+        - text: "{rep}"
+          role: instruction
+          note: >-
+            Ein Auftrag, dich später zu melden. Hier gibt es keine Zahl zurückzulesen – du bestätigst
+            nur, dass du es tun wirst.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: wilco
+          role: proword
+          note: >-
+            „Will comply“ – ich habe verstanden UND ich mache es. Enthält roger schon, deshalb nie
+            „roger wilco“.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Dein Rufzeichen zum Schluss.
+
+- id: m1-say-again
+  title: Nicht verstanden – say again
+  context: Im entscheidenden Moment rauscht es. Die Frequenz ist untergegangen, und raten ist keine Option.
+  freq: "{airfield.twr} {airfield.twr.band}"
+  vars:
+    airfield: { pool: airfields }
+  transmissions:
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Der Tower ruft dich …
+        - text: contact departure
+          role: instruction
+          note: … und schickt dich zu Departure …
+        - text: "[Rauschen]"
+          role: value
+          note: … aber die Frequenz geht im Rauschen unter.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Tower"
+          role: addressee
+          note: Du rufst zurück.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer fragt nach.
+        - text: say again
+          role: proword
+          note: >-
+            „Bitte wiederholen.“ Niemals „repeat“ – das ist in der Feuerunterstützung das Kommando,
+            noch einmal zu schießen.
+        - text: frequency
+          role: request
+          note: Sag, WAS du nicht verstanden hast. Dann muss der Tower nur diesen Teil wiederholen.
+    - speaker: "{airfield.name} Tower"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+        - text: "contact departure {airfield.dep|spoken}"
+          role: instruction
+          note: Jetzt vollständig.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "departure {airfield.dep|spoken}"
+          role: value
+          note: Zurücklesen – jetzt erst recht.
+        - text: "{callsign|spoken}"
+          role: callsign
+
+- id: m1-correction
+  title: Versprochen – correction
+  context: Du meldest dem AWACS deine Höhe und merkst mitten im Satz, dass die Zahl falsch war.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    a1: { number: angels, range: [15, 30] }
+    a2: { number: angels, range: [15, 30], distinctFrom: [a1] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{awacs}"
+          role: addressee
+          note: Wen du rufst.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer du bist.
+        - text: "angels {a1|spoken}"
+          role: value
+          note: Die falsche Höhe ist schon draußen …
+        - text: correction
+          role: proword
+          note: >-
+            „Ich habe mich versprochen, richtig ist …“. Danach kommt sofort der korrekte Wert. Nicht
+            „sorry“, nicht „äh, nein“.
+        - text: "angels {a2|spoken}"
+          role: value
+          note: Der richtige Wert. Nur er gilt.
+
+# ------------------------------------------------------------ Lektion 6: Readback und Radio Check
+- id: m1-radio-check-readability
+  title: Radio Check mit Lesbarkeit
+  context: >-
+    Du prüfst auf einer neuen Frequenz, ob man dich versteht. Die Antwort ist eine Zahl auf der
+    Lesbarkeitsskala von 1 bis 5.
+  freq: "{airfield.app} {airfield.app.band}"
+  vars:
+    airfield: { pool: airfields }
+    read: { oneOf: [three, four, five] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} Approach"
+          role: addressee
+          note: Die Station, deren Frequenz du prüfen willst.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer prüft.
+        - text: radio check
+          role: request
+          note: „Wie hörst du mich?“
+        - text: "{airfield.app|spoken}"
+          role: value
+          optional: true
+          note: Die Frequenz ist optional – hilfreich, wenn du mehrere Funkgeräte hast.
+    - speaker: "{airfield.name} Approach"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Approach ruft dich.
+        - text: "{airfield.name} Approach"
+          role: callsign
+          note: Approach nennt sich selbst.
+        - text: "read you {read}"
+          role: info
+          note: >-
+            Die Lesbarkeit nach ICAO: 5 = einwandfrei, 4 = gut lesbar, 3 = nur mit Mühe, 2 = zeitweise,
+            1 = unlesbar. Bei 3 oder schlechter lohnt sich ein anderes Funkgerät oder eine andere
+            Frequenz.

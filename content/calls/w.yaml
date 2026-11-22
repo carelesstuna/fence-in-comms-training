@@ -1,0 +1,169 @@
+# Spur W – Warbirds & Kalter Krieg.
+# Brevity-Wörter laut ATP 1-02.1 (2020/21): VECTOR S. 68, ANGELS, BUSTER, SCRAMBLE S. 54, PANCAKE S. 46,
+# BOGEY DOPE, PIGEONS, BANDIT, TALLY. Die Gesprächsformen sind Beispiele (community).
+
+# ------------------------------------------------------------ Lektion 1: Funk im Warbird
+- id: w-mayday-warbird
+  title: Mayday im Warbird
+  # Ablauf laut DCS-Handbüchern P-51D (S. 147) und P-47D (S. 158): „Mayday“ dreimal, dann das Rufzeichen
+  # dreimal; wenn Zeit bleibt Position (und Uhrzeit), Kurs (und Fahrt), Höhe und Absicht. Erst auf der
+  # zugewiesenen Frequenz. Die Höhe als „angels“ ist Leitstellen-Sprache; „altitude … thousand“ gilt genauso.
+  layer: sim
+  context: >-
+    Dein Motor stirbt über dem Wasser. Bevor du aussteigst, rufst du auf der zugewiesenen Frequenz um
+    Hilfe – so, wie es die Handbücher von P-51D und P-47D beschreiben.
+  vars:
+    d: { oneOf: [{ text: "10", spoken: ten }, { text: "15", spoken: fifteen }, { text: "20", spoken: twenty }, { text: "30", spoken: thirty }] }
+    dir: { oneOf: [north, east, south, west] }
+    hdg: { number: heading }
+    ang: { number: angels, range: [3, 12] }
+    act: { oneOf: [bailing out, ditching] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: mayday, mayday, mayday
+          role: proword
+          critical: true
+          note: Dreimal – damit es auch durch Rauschen und andere Sender hindurch erkannt wird.
+        - text: "{callsign|spoken}, {callsign|spoken}, {callsign|spoken}"
+          role: callsign
+          critical: true
+          alt: ["{callsign|spoken}"]
+          note: Das Handbuch verlangt das Rufzeichen dreimal. Einmal geht auch, dreimal ist sicherer.
+        - text: "{d|spoken} miles {dir} of home plate"
+          role: position
+          note: Die geschätzte Position. Ohne sie sucht die Rettung das ganze Meer ab.
+        - text: "heading {hdg|spoken}"
+          role: value
+          note: Kurs – wohin du fliegst bzw. treibst.
+        - text: "angels {ang|spoken}"
+          role: value
+          alt: ["altitude {ang|spoken} thousand", "{ang|spoken} thousand"]
+          note: >-
+            Deine Höhe in tausend Fuß. Höhe bringt Reichweite – und die Peilstellen hören dich besser. Für die
+            Seenotrettung ist Klartext („altitude five thousand“) genauso gut.
+        - text: "{act}"
+          role: intent
+          critical: true
+          note: Die Absicht – aussteigen (bailing out) oder notwassern (ditching).
+
+# ------------------------------------------------------------ Lektion 2: IL-2 ohne Funkgerät
+- id: w-contact-report
+  title: Kontakt melden – Uhr, Entfernung, Höhe
+  # Die KI-Flügelmänner in IL-2 melden Kontakte als Rufzeichen + Uhrzeit-Position + Entfernung in km +
+  # Typ (Sprachbausteine im Spielordner data\Audio\radio). Uhr und high/low wie in Modul 4.
+  layer: community
+  context: >-
+    Du siehst gegnerische Jäger. Deine Rotte muss sofort wissen, wo – ohne Radar, ohne Datenlink,
+    nur mit den Augen.
+  vars:
+    clk: { oneOf: [left ten o'clock, left eleven o'clock, right one o'clock, right two o'clock, right three o'clock, left nine o'clock] }
+    km: { oneOf: [{ text: "2 kilometers", spoken: two kilometers }, { text: "3 kilometers", spoken: three kilometers }, { text: "5 kilometers", spoken: five kilometers }] }
+    hl: { oneOf: [high, low, level] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{flightName}"
+          role: addressee
+          alt: ["{flightName|spoken}"]
+          note: Wen du rufst – deinen eigenen Flight (Rotte oder Schwarm).
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Wer meldet. Ohne Rufzeichen weiß keiner, aus wessen Sicht „zwei Uhr“ gilt.
+        - text: bandits
+          role: brevity
+          critical: true
+          alt: [bandit]
+          note: Als feindlich erkannte Flugzeuge – im Warbird meist an Bauart und Kennzeichen.
+        - text: "{clk}"
+          role: position
+          critical: true
+          note: Die Uhr aus deiner Sicht – 12 Uhr ist deine Nase.
+        - text: "{km|spoken}"
+          role: position
+          optional: true
+          note: >-
+            IL-2 rechnet in Kilometern, so melden auch die KI-Flügelmänner – selbst die amerikanischen und britischen.
+            In DCS-Warbirds und im historischen RAF-/USAAF-Funk: Meilen oder gar keine Entfernung, nur Uhr und
+            high/low.
+        - text: "{hl}"
+          role: position
+          note: Über dir (high), unter dir (low) oder auf deiner Höhe (level).
+
+# ------------------------------------------------------------ Lektion 3: Leitstelle statt AWACS
+- id: w-gci-vector
+  title: Die Leitstelle führt dich heran
+  # VECTOR, ANGELS und BUSTER sind core (ATP 1-02.1). Die Reihenfolge im Spruch ist ein Beispiel.
+  layer: community
+  context: >-
+    Eine Leitstelle am Boden (GCI) hat eine Gruppe auf dem Radar und schickt dich hin. Sie nennt Kurs,
+    Höhe und Tempo. Du bestätigst nur mit deinem Rufzeichen.
+  vars:
+    gci: { pool: callsigns.gci }
+    pic: { geo: true, groups: 1, id: hostile }
+    ang: { number: angels, range: [15, 30] }
+  transmissions:
+    - speaker: "{gci}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Der Ruf gilt nur dir. }
+        - { text: "{gci}", role: callsign }
+        - text: "vector {pic.g1.cutoff|spoken}"
+          role: brevity
+          note: >-
+            VECTOR – dreh auf diesen Kurs: {pic.g1.cutoff}. Ein Abfangkurs: Die Leitstelle hält vor, wohin die
+            Gruppe fliegt, damit du sie triffst, statt hinterherzufliegen.
+        - text: "angels {ang|spoken}"
+          role: value
+          note: "ANGELS – Höhe der Eigenen in tausend Fuß: geh auf {ang}.000 ft."
+        - text: buster
+          role: brevity
+          note: BUSTER – volle Dauerleistung ohne Nachbrenner. Nachbrenner bzw. Höchstleistung (im Warbird die Notleistung) hieße GATE.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Nur das Rufzeichen. Du fliegst, was er sagt – zurücklesen musst du es nicht.
+
+- id: w-pancake
+  title: Pancake – zurück zum Platz
+  # PANCAKE (ATP 1-02.1 S. 46): landen bzw. um Landung bitten, ein Grund darf folgen. PIGEONS: Kurs und
+  # Entfernung zum Platz. Die Gesprächsform ist ein Beispiel.
+  layer: community
+  context: >-
+    Dein Treibstoff wird knapp. Du meldest der Leitstelle, dass du landen willst, und lässt dir den Weg
+    nach Hause geben.
+  vars:
+    gci: { pool: callsigns.gci }
+    pb: { number: bearing }
+    pr: { oneOf: [{ text: "25", spoken: twenty-five }, { text: "40", spoken: forty }, { text: "55", spoken: fifty-five }] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{gci}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: pancake fuel
+          role: brevity
+          critical: true
+          alt: [pancake]
+          note: PANCAKE – ich will landen. Der Grund (fuel, ammo) darf folgen.
+        - text: request pigeons
+          role: request
+          alt: [pigeons, say pigeons]
+          note: Bitte um Kurs und Entfernung zum Heimatplatz.
+    - speaker: "{gci}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{gci}", role: callsign }
+        - { text: pigeons home plate, role: brevity }
+        - { text: "{pb|spoken}", role: value, note: "Kurs zum Platz: {pb}." }
+        - { text: "{pr|spoken}", role: value, note: "Entfernung in Seemeilen: {pr}." }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }

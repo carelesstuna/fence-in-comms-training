@@ -1,0 +1,14 @@
+id: al-dhafra
+name: Al Dhafra
+map: persian-gulf
+icao: OMAM
+elevationFt: 52
+runways: ["13L/31R", "13R/31L"]
+atc: { vhf: 126.5 }
+tacan: 96X
+verified: dcs-data
+notes:
+  - Großer Koalitions-Stützpunkt mit rund 250 Abstellplätzen.
+  - VORTAC MA (VOR 114.90, TACAN Kanal 96) laut DCS-Funkfeuerdaten (Mods/terrains/PersianGulf/Beacons.lua); VOR 114.90 gehört nach der Standardpaarung zu Kanal 96X. Ein ILS führen die Daten für Al Dhafra nicht.
+  - Platzhöhe aus Beacons.lua (VORTAC auf 16 m = 52 ft). DCS liefert für den Persischen Golf keine Platzkarten mit.
+  - "Funk laut DCS-Funkdaten (Mods/terrains/PersianGulf/radio.lua, Eintrag OMAM) nur auf VHF 126.5 – kein UHF. Ältere Kartenstände (pydcs-Tabelle) nannten UHF 251.1; im F10-Fenster (Airdrome Data) gegenprüfen."

@@ -1,0 +1,24 @@
+# Karten/Theater (DCS-Karten und das BMS-Theater Korea). Flugplätze verweisen über "map" hierauf.
+# sims: In welcher Sim es die Karte gibt. Wer Sims im Profil hat, bekommt nur Plätze von Karten dieser Sims
+# (gibt es keinen passenden Platz, z. B. nur IL-2, alle – siehe preferBySim in src/core/random/vars.ts).
+# phraseology (Pflicht): Wie die Lotsen auf der Karte sprechen (E3-12). Würfel und Funksprüche folgen dem Platz, wenn
+# im Profil „Kartenabhängig“ eingestellt ist; Standard ist „Immer US-Form (FAA)“.
+#   faa  = US-Form: „altimeter two niner niner two“ (inHg), „descend and maintain …“, Sicht in Meilen.
+#          Nevada und Guam sind US-Gebiet; Korea nutzt inHg, und BMS spricht die US-Form.
+#   icao = ICAO-Form: „QNH one zero one three“ (hPa), „descend to …“, Sicht in Kilometern.
+#          Alle Karten ohne US-Flugsicherung, auch Afghanistan und Irak (ICAO-Staaten; an Plätzen mit
+#          US-Militärlotsen kann es anders klingen – dort gibt es noch keine Plätze im Pool).
+- { id: caucasus, name: Kaukasus, era: modern, sims: [dcs], phraseology: icao }
+- { id: nttr, name: Nevada (NTTR), era: modern, sims: [dcs], phraseology: faa }
+- { id: persian-gulf, name: Persischer Golf, era: modern, sims: [dcs], phraseology: icao }
+- { id: syria, name: Syrien, era: modern, sims: [dcs], phraseology: icao }
+- { id: marianas, name: Marianen, era: modern, sims: [dcs], phraseology: faa }
+- { id: sinai, name: Sinai, era: modern, sims: [dcs], phraseology: icao }
+- { id: kola, name: Kola, era: modern, sims: [dcs], phraseology: icao }
+- { id: afghanistan, name: Afghanistan, era: modern, sims: [dcs], phraseology: icao }
+- { id: iraq, name: Irak, era: modern, sims: [dcs], phraseology: icao }
+- { id: south-atlantic, name: Südatlantik, era: modern, sims: [dcs], phraseology: icao }
+- { id: germany-cw, name: Deutschland (Kalter Krieg), era: cold-war, sims: [dcs], phraseology: icao }
+- { id: normandy, name: Normandie, era: ww2, sims: [dcs], phraseology: icao }
+- { id: channel, name: Ärmelkanal, era: ww2, sims: [dcs], phraseology: icao }
+- { id: kto, name: Korea (KTO), era: modern, sims: [bms], phraseology: faa }

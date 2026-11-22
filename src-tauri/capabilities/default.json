@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Hauptfenster und per Link geöffnete Fenster (tab-1, tab-2 …): nur die Grundfunktionen von Tauri. Das Opener-Plugin ist eingebunden, aber hier nicht freigegeben: Externe Links öffnet allein der Handler für neue Fenster in lib.rs, nur http und https",
+  "windows": ["main", "tab-*"],
+  "permissions": ["core:default"]
+}

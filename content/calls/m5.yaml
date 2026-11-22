@@ -1,0 +1,776 @@
+# Annotierte Funksprüche für Modul 5 (AWACS-Grundlagen).
+# Grundlage: docs/content-plan/m5-awacs.md. Hauptquelle für Check-in, Rufzeichenregeln, Picture, Declare,
+# Threat und Faded ist ATP 3-52.4 „Air Control Communication“ (2. Sept. 2021, „ACC“, Seitenzahlen gedruckt);
+# Brevity-Wörter laut ATP 1-02.1 (2020/21 bzw. Umschreibung bei Wikipedia, Stand 25.04.2025). Der Wortlaut
+# ganzer Gespräche, der in ACC nicht als Beispiel steht (Sim-Kurzform, Pigeons, Anchor), ist Praxis und
+# deshalb `layer: community`.
+# Lagegeometrie: `{ geo: true }` – alle BRAA-, Bullseye- und Aspekt-Werte sind daraus berechnet. Der Generator
+# folgt ACC: Kontakthöhen als ganze Zahl („twenty-five thousand“), flank/beam/drag mit Haupt- oder
+# Nebenhimmelsrichtung, ab drei Gruppen „wide“/„deep“ in der Reihenfolge des Labels, und mit Label bekommen nur
+# die Gruppen am vorderen Rand einen Bullseye (`{pic.gN.call}`). `labelled: false` = Core Information.
+# Track im Picture mit Label (ACC IV-6.b, IV-13.d): alle hot → kein Track; gemeinsame Richtung → einmal hinter dem
+# Label (`{pic.head}`); verschiedene Richtungen → je Gruppe. `{pic.threat}` ist eine neue Gruppe aus derselben
+# eigenen Position innerhalb der Threat-Reichweite (20–35 NM, hot oder flank).
+
+# ------------------------------------------------------------ Lektion 1: Anmelden beim AWACS
+- id: m5-awacs-checkin-fragged
+  title: Check-in „as fragged“
+  # Ablauf und Wortlaut laut ACC (2021), S. 8, Beispiel „Check In AS FRAGGED“.
+  layer: core
+  context: >-
+    Dein Flight fliegt genau so, wie es im Einsatzbefehl steht. Dann genügt die Kurzform: Missionsnummer,
+    „as fragged“ und die Bitte um einen Alpha Check vom Bullseye. Das Muster steht in der ATP 3-52.4.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    mn: { int: [1000, 9999] }
+    pic: { geo: true, groups: 1 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true, note: Wen du rufst – das Rufzeichen des AWACS aus dem Briefing. }
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Du sprichst als Lead für den ganzen Flight.
+        - text: "mission number {mn|spoken}"
+          role: info
+          critical: true
+          note: >-
+            Die Missionsnummer aus dem Einsatzbefehl. Damit ordnet der AWACS dich seinem Auftrag zu – Anzahl,
+            Typ und Beladung kennt er dann schon.
+        - text: checking in as fragged
+          role: intent
+          critical: true
+          alt: [as fragged]
+          note: >-
+            „As fragged“ heißt: Der Flight fliegt wie geplant. Gibt es Abweichungen, sagst du stattdessen
+            „with exceptions“ (nächster Funkspruch).
+        - text: request alpha check bullseye
+          role: request
+          critical: true
+          alt: [request alpha check, alpha check, alpha check bullseye]
+          note: >-
+            Bitte um eine Positionsprüfung vom Bullseye. Ist im Briefing ein Codename für den Bullseye
+            festgelegt, nennst du ihn statt „bullseye“.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Der AWACS ruft dich. }
+        - { text: "{awacs}", role: callsign }
+        - text: contact
+          role: info
+          note: >-
+            „Ich habe dich.“ Im Beispiel der ATP 3-52.4 steht an dieser Stelle „contact“ – nicht „radar contact“. Gemeint ist der Sensorkontakt, nicht der Frequenzwechsel „contact Departure“.
+        - text: "alpha check bullseye {pic.own.bulls|spoken}"
+          role: value
+          note: "Deine Position, bezogen auf den Bullseye: {pic.own.bulls}. Stimmt sie mit deinem Navigationssystem überein, ist der Check-in durch."
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: >-
+            Bestätigt wird nur mit dem Rufzeichen – auch die Beispiele der ATP 3-52.4 zeigen es so. Ob die
+            Position stimmt (innerhalb von 3 NM), prüfst du selbst.
+
+- id: m5-awacs-checkin-exceptions
+  title: Check-in „with exceptions“
+  # Ablauf und Wortlaut laut ACC (2021), S. 8–9, Beispiel #1. Die Wortwahl der Abweichung selbst ist ein
+  # Beispiel (ACC zählt die Arten auf, nicht den Wortlaut).
+  layer: core
+  context: >-
+    Dein Flight weicht vom Plan ab. Das sagst du gleich im Check-in: erst „with exceptions“ und der Alpha
+    Check, dann nennst du die Abweichung. Welche Arten von Abweichung gemeldet werden müssen, steht in der
+    ATP 3-52.4; die genaue Wortwahl legt das Briefing fest.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    mn: { int: [1000, 9999] }
+    pic: { geo: true, groups: 1 }
+    exc: { oneOf: [weapons yellow, fuel yellow, weapons red, fuel red] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: "mission number {mn|spoken}", role: info, critical: true }
+        - text: checking in with exceptions
+          role: intent
+          critical: true
+          alt: [with exceptions]
+          note: Kündigt an, dass etwas nicht wie geplant ist – die Einzelheiten kommen gleich.
+        - text: request alpha check bullseye
+          role: request
+          critical: true
+          alt: [request alpha check, alpha check, alpha check bullseye]
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - { text: "alpha check bullseye {pic.own.bulls|spoken}", role: value, note: "Deine Position vom Bullseye: {pic.own.bulls}." }
+        - text: continue with check in
+          role: instruction
+          note: „Weiter mit dem Check-in.“ Jetzt nennst du die Abweichung.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "{exc}"
+          role: info
+          critical: true
+          note: >-
+            Die Abweichung vom Plan. Melden musst du u. a.: weniger oder mehr Flugzeuge als geplant, WEAPONS
+            oder FUEL yellow bzw. red, geänderte Beladung und eingeschränkte Fähigkeiten.
+
+- id: m5-awacs-checkin
+  title: Check-in beim AWACS – Sim-Kurzform
+  layer: community
+  context: >-
+    Dein Flight kommt in das Gebiet des AWACS und meldet sich so an, wie es in Sim-Staffeln üblich ist: wer,
+    wie viele, wo, wie hoch und wozu – ohne Missionsnummer. Die ATP 3-52.4 kennt dafür das Format mit
+    Missionsnummer (siehe „as fragged“); im Briefing kann ein eigenes Muster festgelegt sein.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    ac: { pool: aircraft, where: { role: multirole, era: modern } }
+    af: { pool: airfields }
+    pdist: { oneOf: [{ text: "10", spoken: ten }, { text: "15", spoken: fifteen }, { text: "20", spoken: twenty }, { text: "25", spoken: twenty-five }, { text: "30", spoken: thirty }] }
+    pcard: { oneOf: [north, east, south, west, northeast, northwest, southeast, southwest] }
+    ang: { number: angels, range: [15, 30] }
+    pt: { number: playtime, range: [30, 90] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true, note: Wen du rufst – das Rufzeichen des AWACS aus dem Briefing. }
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Du sprichst als Lead für den ganzen Flight.
+        - text: "flight of {flightSize|spoken}"
+          role: info
+          alt: ["{flightSize|spoken} ship", "{flightSize|spoken}-ship"]
+          note: Wie viele. Der AWACS weiß damit, wie viele Echos zu dir gehören.
+        - text: "{ac.type}"
+          role: info
+          optional: true
+          alt: ["{ac.radio}", "{ac.radio}s"]
+          note: Was du fliegst – daraus liest der AWACS Waffen und Reichweite ab.
+        - text: "{pdist|spoken} miles {pcard} of {af.name}"
+          role: position
+          critical: true
+          note: Wo du bist – über einen Bezugspunkt, den beide kennen. So findet er dein Echo.
+        - text: "angels {ang|spoken}"
+          role: value
+          critical: true
+          note: Deine Höhe in angels – das Wort gilt nur für Freunde.
+        - text: checking in for CAP
+          role: intent
+          alt: ["checking in as fragged", "as fragged", "for CAP"]
+          note: >-
+            Wozu du da bist, hier Combat Air Patrol (Luftraum sichern, mehr in Lektion 6). Steht alles im Einsatzbefehl, reicht „as fragged“.
+        - text: "playtime {pt|spoken}"
+          role: value
+          optional: true
+          note: Wie lange du bleiben kannst ({pt} = Stunden plus Minuten). Hilft dem AWACS bei der Planung.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Der AWACS ruft dich. }
+        - { text: "{awacs}", role: callsign }
+        - text: contact
+          role: info
+          note: „Ich habe dich auf dem Schirm.“ So steht es auch in den Beispielen der ATP 3-52.4.
+        - text: picture clean
+          role: brevity
+          note: >-
+            Keine Kontakte im Lagebild. Praxis aus Sim-Staffeln – als Antwort auf einen Check-in steht es in
+            der ATP 3-52.4 nicht. ⚠
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Bestätigt wird nur mit dem Rufzeichen. Kein roger, kein Zurücklesen.
+
+- id: m5-relay
+  title: Eine Meldung weiterleiten (relay)
+  # Wortlaut laut ACC (2021), S. 6, Abschnitt „Relaying a Call“. Die Meldung selbst ist ein Beispiel.
+  layer: core
+  context: >-
+    Ein anderer Flight kommt beim AWACS nicht durch, du hörst ihn aber. Du gibst seine Meldung weiter – mit
+    „relay“ und seinem Rufzeichen, nicht mit deinem.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    oth: { pool: callsigns.fighter }
+    onum: { int: [1, 4] }
+    rmsg: { oneOf: [fuel yellow, weapons yellow] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true, note: "Wen du rufst – der AWACS, für den die Meldung gedacht ist." }
+        - text: relay
+          role: instruction
+          critical: true
+          note: "Sagt: Was jetzt kommt, ist nicht von mir, sondern wird nur durch mich weitergegeben."
+        - text: "{oth} {onum|spoken}"
+          role: callsign
+          critical: true
+          note: >-
+            Das Rufzeichen des **ursprünglichen** Senders. Dein eigenes Rufzeichen lässt du weg – sonst
+            hält der AWACS die Meldung für deine.
+        - { text: "{rmsg}", role: info, critical: true, note: "Die Meldung selbst, unverändert." }
+
+- id: m5-awacs-checkout
+  title: Abmelden mit Pigeons
+  # PIGEONS und HOME PLATE sind core. Die Form der Bitte ist Staffelpraxis ⚠.
+  layer: community
+  context: >-
+    Bingo – Zeit für den Heimweg. Du meldest dich beim AWACS ab und lässt dir Peilung und Entfernung
+    nach Hause geben.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pb: { number: bearing }
+    pr: { oneOf: [{ text: "35", spoken: thirty-five }, { text: "45", spoken: forty-five }, { text: "60", spoken: sixty }, { text: "75", spoken: seventy-five }, { text: "90", spoken: ninety }] }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: bingo, role: brevity, optional: true, note: "Der Grund – darf fehlen, RTB genügt." }
+        - { text: RTB, role: intent, critical: true, note: Du fliegst nach Hause (Modul 4). }
+        - text: request pigeons
+          role: request
+          alt: [pigeons, "say pigeons", "request pigeons home plate"]
+          note: Bitte um Peilung und Entfernung zum Heimatplatz. ⚠ Die Form der Bitte ist Praxis, nicht Norm.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - text: pigeons home plate
+          role: brevity
+          note: PIGEONS = Peilung und Entfernung zur HOME PLATE, deinem Heimatplatz.
+        - text: "{pb|spoken}"
+          role: value
+          note: Die missweisende Peilung von dir nach Hause – {pb}. Das ist dein Kurs.
+        - text: "{pr|spoken}"
+          role: value
+          note: Die Entfernung in Meilen – {pr}.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: Bestätigung – danach wechselst du zu Approach bzw. Marshal (der Anflugkontrolle des Trägers). }
+
+# ------------------------------------------------------------ Lektion 2: Bullseye
+- id: m5-alpha-check
+  title: Alpha Check – wo bin ich?
+  # Wortlaut und Einsatz im Check-in: ACC (2021), S. 7–9. Die Richtung der Zahlen erklärt ACC nicht ausdrücklich;
+  # die Lesart „vom Bullseye zu dir“ folgt Hoggit/SkyEye und passt zur Prüftabelle („von“ dem Bullseye) ⚠.
+  layer: core
+  context: >-
+    Du willst prüfen, ob dein Navigationssystem stimmt. Der AWACS nennt dir deine Position – bezogen auf
+    den Bullseye. Beim Check-in gehört diese Frage fest dazu.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: request alpha check bullseye
+          role: request
+          critical: true
+          alt: [alpha check, "request alpha check", "alpha check bullseye"]
+          note: Bitte, deine Position zu bestätigen. Der Wortlaut steht so in der ATP 3-52.4.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - text: "alpha check bullseye {pic.own.bulls|spoken}"
+          role: value
+          note: >-
+            Wo du stehst, vom Bullseye aus: {pic.own.bulls}. Erst die Peilung (drei Ziffern), dann die
+            Entfernung in Meilen.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: >-
+            Bestätigung. Zeigt dein Bullseye-Cursor dasselbe (Toleranz laut ATP 3-52.4: 3 NM), kannst du dich
+            auf deine Navigation verlassen. Passt es nicht, löst du das selbst – der Check-in-Flug ist dafür
+            zuständig.
+
+- id: m5-single-group
+  title: Eine Gruppe im Bullseye-Format
+  # Format laut ACC (2021), S. 21–26 und Beispiel „SINGLE GROUP BULLSEYE 360/20 …“ (S. 36). Das Wort „picture“
+  # steht nur in der Anfrage, nicht in der Antwort.
+  context: >-
+    Der AWACS gibt ein Lagebild mit einer einzigen Gruppe. Es gilt für alle auf der Frequenz – deshalb
+    nennt er nur sein eigenes Rufzeichen. Das Wort „picture“ sagt nur, wer danach fragt.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign, note: Kein Adressat – das Lagebild gilt allen. }
+        - text: single group
+          role: brevity
+          note: Genau eine Gruppe. Eine GROUP sind Kontakte, die höchstens 3 Meilen auseinander liegen.
+        - text: "bullseye {pic.g1.bulls|spoken}"
+          role: value
+          note: >-
+            Wo: Peilung vom Bullseye zur Gruppe, dann die Entfernung – {pic.g1.bulls}. Für alle Jäger
+            dieselben Zahlen, egal wo sie stehen.
+        - text: "{pic.g1.alt|spoken}"
+          role: value
+          note: >-
+            Höhe in Tausend Fuß – {pic.g1.alt}, gesprochen als ganze Zahl wie in der ATP 3-52.4. Bei Kontakten
+            heißt es thousand, nie angels.
+        - text: "track {pic.g1.track}"
+          role: info
+          note: Wohin die Gruppe fliegt, als Himmelsrichtung. Absolut – nicht relativ zu dir.
+        - text: "{pic.g1.id}"
+          role: brevity
+          note: Die Identität, z. B. hostile = feindlich und nach den Einsatzregeln freigegeben (Lektion 5).
+
+# ------------------------------------------------------------ Lektion 3: BRAA und Bogey Dope
+- id: m5-bogey-dope
+  title: Bogey Dope – wo ist die nächste Gruppe?
+  # BOGEY DOPE und BRAA sind core (ATP 1-02.1, ACC S. 22); die genaue Gesprächsform folgt Hoggit (community).
+  layer: community
+  context: >-
+    Du willst wissen, was dir am nächsten ist. Die Antwort kommt in BRAA – gerechnet von dir aus. Mit der
+    Frage greifst du nichts an und übernimmst keine Gruppe als Ziel: Bogey dope bedeutet kein Targeting.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: bogey dope
+          role: brevity
+          critical: true
+          note: Bitte um BRAA zur nächsten Gruppe. Kürzer geht es nicht.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Die Antwort gilt nur dir – BRAA passt nur für dein Flugzeug. }
+        - { text: "{awacs}", role: callsign }
+        - text: "group BRAA {pic.near.braa|spoken}"
+          role: value
+          note: >-
+            Bearing und Range: Peilung von dir zur Gruppe, dann die Entfernung – {pic.near.braa}.
+        - text: "{pic.near.alt|spoken}"
+          role: value
+          note: "Altitude: die Höhe der Gruppe – {pic.near.alt}."
+        - text: "{pic.near.aspect}"
+          role: brevity
+          note: >-
+            Aspect: wie die Gruppe zu dir steht. hot = kommt auf dich zu, flank = schräg, beam = quer,
+            drag = fliegt weg. flank, beam und drag tragen die Himmelsrichtung, in die die Gruppe fliegt (z. B.
+            „drag west“) – hot nicht.
+        - { text: "{pic.near.id}", role: brevity, note: Die Identität. }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: Bestätigung mit dem Rufzeichen – nicht zurücklesen. }
+
+- id: m5-bogey-dope-group
+  title: Bogey Dope zu einer genannten Gruppe
+  # ACC (2021), S. 22: BOGEY DOPE wird mit BRAA beantwortet; nach einem Picture mit Namen kann der Jäger die
+  # Gruppe nennen (Korea-BEM 2005 kennt „bogey dope north group“). Die Gesprächsform ist Beispiel.
+  layer: core
+  context: >-
+    Du hast ein Picture mit benannten Gruppen gehört und willst wissen, wo eine bestimmte Gruppe von dir aus
+    liegt. Du hängst ihren Namen an „bogey dope“.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: bogey dope
+          role: brevity
+          critical: true
+        - text: "{pic.g1.name}"
+          role: info
+          critical: true
+          note: Der Gruppenname aus dem Picture. Ohne Namen bekommst du die nächste Gruppe.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - { text: "{pic.g1.name}", role: info, note: "Er nennt den Namen wieder – so weißt du, dass es die gefragte Gruppe ist." }
+        - text: "BRAA {pic.g1.braa|spoken}"
+          role: value
+          note: "Von dir aus: {pic.g1.braa}."
+        - { text: "{pic.g1.alt|spoken}", role: value }
+        - { text: "{pic.g1.aspect}", role: brevity }
+        - { text: "{pic.g1.id}", role: brevity }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+
+- id: m5-bogey-clean
+  title: Bogey Dope – nichts da
+  layer: community
+  context: Du fragst nach der nächsten Gruppe, aber der AWACS sieht nichts.
+  vars:
+    awacs: { pool: callsigns.awacs }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee }
+        - { text: "{callsign|spoken}", role: callsign }
+        - { text: bogey dope, role: brevity }
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - text: clean
+          role: brevity
+          note: CLEAN heißt hier – keine Radardaten zu einer Gruppe. Dasselbe Wort wie beim Battle Damage Check, andere Bedeutung.
+
+- id: m5-threat
+  title: THREAT – die ungefragte Warnung
+  # Format laut ACC (2021), S. 22–23 und S. 61: „[Gruppe] threat BRAA …“, Standardschwelle 35 NM; Beispiel
+  # „ADDITIONAL GROUP THREAT BRAA 125/35, THIRTY-FIVE THOUSAND, HOT, HOSTILE“. Die Lage kommt aus `{pic.threat}`:
+  # 20–35 NM von dir, hot oder flank.
+  layer: core
+  context: >-
+    Der AWACS ruft dich, ohne dass du gefragt hast. Eine Gruppe, die noch kein Jäger als Ziel übernommen hat,
+    kommt in deine Bedrohungsreichweite – der AWACS warnt spätestens, wenn sie erreicht ist. Als Standard nennt die
+    ATP 3-52.4 dafür 35 NM, unabhängig vom Aspekt; im Briefing kann etwas anderes stehen.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+    gname: { oneOf: [additional group, north group, south group, east group, west group, lead group, trail group] }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee, note: Dein Rufzeichen – ungefragt. Jetzt aufpassen! }
+        - { text: "{awacs}", role: callsign }
+        - { text: "{gname}", role: info, note: "Der Name der Gruppe aus dem Picture (oder „additional group“) – so wissen alle, wer gemeint ist." }
+        - text: threat
+          role: brevity
+          note: >-
+            Eine Gruppe, die du (noch) nicht als Ziel übernommen hast, ist innerhalb der gebrieften Distanz.
+            „threat“ steht unmittelbar vor „BRAA“.
+        - { text: "BRAA {pic.threat.braa|spoken}", role: value, note: "Von dir aus: {pic.threat.braa} – innerhalb der 35 NM. Eine Warnung an einen einzelnen Jäger kommt in BRAA." }
+        - { text: "{pic.threat.alt|spoken}", role: value }
+        - { text: "{pic.threat.aspect}", role: brevity, note: "Der Aspekt – hier kommt die Gruppe näher. Die 35 NM gelten aber unabhängig vom Aspekt, also auch bei beam." }
+        - { text: "{pic.threat.id}", role: brevity }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{callsign|spoken}"
+          role: callsign
+          critical: true
+          note: Bestätigung. Was du dann tust – abdrehen, angreifen –, gehört zur später geplanten Spur Luftkampf.
+
+- id: m5-threat-bullseye
+  title: THREAT mit Bullseye
+  # Format laut ACC (2021), S. 23: „[Gruppe] threat bullseye …“; der Jäger antwortet mit seinem Rufzeichen.
+  layer: core
+  context: >-
+    Die Warnung gilt mehreren Jägern, oder der AWACS kennt deine Position nicht genau. Dann gibt er sie im
+    Bullseye-Format – so passt sie für jeden auf der Frequenz.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - { text: "{pic.near.name}", role: info }
+        - text: threat
+          role: brevity
+        - text: "bullseye {pic.near.bulls|spoken}"
+          role: value
+          note: "Nicht von dir aus, sondern vom Bullseye: {pic.near.bulls}."
+        - { text: "{pic.near.alt|spoken}", role: value }
+        - { text: "track {pic.near.track}", role: info, note: "Beim Bullseye-Format steht der Track, nicht der Aspekt." }
+        - { text: "{pic.near.id}", role: brevity }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: "Antwort mit dem eigenen Rufzeichen – so weiß der AWACS, dass du es gehört hast." }
+
+# ------------------------------------------------------------ Lektion 4: Picture
+- id: m5-picture-core
+  title: Picture als Core Information
+  # Format laut ACC (2021), S. 21 und S. 28–29, Kap. „Core Information Concerning a PICTURE“.
+  layer: core
+  context: >-
+    Du bittest um das Lagebild, bevor dein Flight „commit“ gegangen ist. Der AWACS nennt die Gesamtzahl der
+    Gruppen und dann je Gruppe Position, Höhe, Track und Identität – ohne Label und ohne Gruppennamen. Die
+    ATP 3-52.4 nutzt diese Form vor dem Commit und bei höchstens drei Gruppen.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2, labelled: false }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: picture
+          role: request
+          critical: true
+          note: Bitte um das Lagebild. Auf vollen Frequenzen sparsam – die Antwort ist lang.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign, note: Ohne Adressat – das Picture gilt allen. }
+        - text: "{pic.label|spoken}"
+          role: info
+          note: Zuerst die Gesamtzahl. Dann weiß jeder, wie viel noch kommt.
+        - text: "{pic.g1.call|spoken}"
+          role: value
+          note: >-
+            Erste Gruppe, immer in dieser Reihenfolge: Position, Höhe, Track, Identität – {pic.g1.call}. Die
+            wichtigste Gruppe wird zuerst genannt.
+        - text: "{pic.g2.call|spoken}"
+          role: value
+          note: >-
+            Zweite Gruppe im selben Muster, mit eigenem Bullseye – {pic.g2.call}. Ohne Label heißt jede Gruppe
+            einfach „group“.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: Bestätigung mit dem Rufzeichen. ⚠ Manche bestätigen ein Picture gar nicht. }
+
+- id: m5-picture-two
+  title: Picture mit zwei Gruppen (Label)
+  # Labels laut ACC (2021), S. 29–37 (nach COMMIT). Das Wort „picture“ steht nicht in der Antwort. Track nach
+  # ACC IV-6.b und IV-13.d (S. 23, 32–33): einmal hinter dem Label, je Gruppe oder gar nicht.
+  context: >-
+    Dein Flight ist „commit“ gegangen, und die Formation der Gegner ist erkennbar. Jetzt nennt der AWACS
+    erst Anzahl, Label und Abstand der Gruppen, dann die Gruppen selbst – die vorderen mit Bullseye.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: picture
+          role: request
+          critical: true
+          note: Bitte um das Lagebild. Auf vollen Frequenzen sparsam – die Antwort ist lang.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign, note: Ohne Adressat – das Picture gilt allen. }
+        - text: "{pic.head|spoken}"
+          role: brevity
+          note: >-
+            Erst die Anzahl, dann das Label, dann der Abstand in Meilen – {pic.head}. azimuth heißt nebeneinander
+            aus Sicht der Jäger, range hintereinander. Fliegen alle Gruppen in dieselbe Richtung und nicht auf die
+            Jäger zu, folgt hier einmal „track …“ für das ganze Picture; kommen alle heiß auf die Jäger zu, entfällt
+            der Track.
+        - text: "{pic.g1.call|spoken}"
+          role: value
+          note: >-
+            Die erste Gruppe: Name aus dem Label, Bullseye, Höhe, Identität – {pic.g1.call}. Einen eigenen Track
+            bekommt eine Gruppe nur, wenn die Gruppen in verschiedene Richtungen fliegen.
+        - text: "{pic.g2.call|spoken}"
+          role: value
+          note: >-
+            Die zweite Gruppe – {pic.g2.call}. Steht sie daneben (azimuth), bekommt sie ihren eigenen Bullseye.
+            Steht sie dahinter (range), nennt der AWACS nur Name, Höhe und Identität: Wo sie ist, sagt das
+            Label – so viele Meilen hinter der lead group.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: Bestätigung mit dem Rufzeichen. ⚠ Manche bestätigen ein Picture gar nicht. }
+
+- id: m5-picture-three
+  title: Picture mit drei Gruppen (Label)
+  context: >-
+    Drei Gruppen. Das Label sagt, wie sie zueinander stehen – wall, ladder, vic oder champagne.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 3 }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign }
+        - text: "{pic.head|spoken}"
+          role: brevity
+          note: >-
+            Anzahl, Label und Maße – {pic.head}. Bei drei Gruppen heißen die Maße „wide“ (Breite) und „deep“
+            (Tiefe): wall nur wide, ladder nur deep, vic erst deep, dann wide, champagne erst wide, dann deep. Ein
+            gemeinsamer Track steht einmal dahinter; sind alle Gruppen heiß auf die Jäger, fehlt er.
+        - { text: "{pic.g1.call|spoken}", role: value, note: "{pic.g1.call}" }
+        - { text: "{pic.g2.call|spoken}", role: value, note: "{pic.g2.call}" }
+        - text: "{pic.g3.call|spoken}"
+          role: value
+          note: >-
+            {pic.g3.call}. Gruppen hinter dem vorderen Rand (bei ladder, vic und champagne) nennt der AWACS ohne
+            Bullseye – ihre Lage folgt aus Label und Maßen.
+
+- id: m5-faded
+  title: FADED – eine Gruppe ist weg
+  # Wortlaut laut ACC (2021), S. 63–64: „SINGLE CONTACT FADED LAST KNOWN BULLSEYE …“ innerhalb einer Minute.
+  layer: core
+  context: >-
+    Eine Gruppe wurde vor Kurzem noch geführt, dann 30 Sekunden lang von keinem Sensor aktualisiert. Fragst du
+    innerhalb einer Minute nach dem Picture, nennt der AWACS die letzte bekannte Position.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+    lost: { geo: true, groups: 1 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: picture, role: request, critical: true }
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign }
+        - { text: "{pic.g1.call|spoken}", role: value, note: "Die Gruppe, die er noch sieht – {pic.g1.call}." }
+        - { text: single contact, role: info, note: Wie viele Kontakte aus der verlorenen Gruppe fehlen. }
+        - text: faded last known
+          role: brevity
+          note: >-
+            „Verloren, letzte bekannte Position“. Gilt nur für Gegner; für Freunde heißt es „negative
+            contact“.
+        - { text: "bullseye {lost.g1.bulls|spoken}", role: value, note: "Wo die Gruppe zuletzt war: {lost.g1.bulls}." }
+        - { text: "track {lost.g1.track}", role: info, note: Wohin sie zuletzt flog. }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+
+# ------------------------------------------------------------ Lektion 5: Declare
+- id: m5-declare
+  title: DECLARE – wer ist das?
+  # Format laut ACC (2021), S. 50–51: „[Stelle], [Rufzeichen], declare bullseye …, [Höhe]“; Antwort mit Bullseye,
+  # Höhe, Track, Declaration.
+  layer: core
+  context: >-
+    Dein Radar zeigt eine Gruppe. Du nennst ihre Position und Höhe, der AWACS sagt dir, wer das ist. „declare“
+    steht in der ATP 3-52.4 vorn.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1, id: mixed }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: declare
+          role: brevity
+          critical: true
+          free: true
+          note: >-
+            „Welche Identität hat diese Gruppe?“ In der ATP 3-52.4 steht „declare“ vorn, Hoggit stellt es ans
+            Ende – die App akzeptiert beides.
+        - text: "bullseye {pic.g1.bulls|spoken}"
+          role: position
+          critical: true
+          tolerance: 3
+          alt: ["group bullseye {pic.g1.bulls|spoken}"]
+          note: Welche Gruppe du meinst – im Bullseye-Format, abgelesen von deinem Radar ({pic.g1.bulls}).
+        - text: "{pic.g1.alt|spoken}"
+          role: value
+          tolerance: 2
+          note: Die Höhe hilft, übereinanderliegende Gruppen zu trennen.
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign, note: "Die Antwort beginnt mit dem Namen der Stelle, die antwortet." }
+        - text: "group bullseye {pic.g1.bulls|spoken}"
+          role: position
+          note: Er wiederholt die Position, damit klar ist, welche Gruppe gemeint ist.
+        - { text: "{pic.g1.alt|spoken}", role: value, note: Die Antwort enthält immer Höhe und Track. }
+        - { text: "track {pic.g1.track}", role: info }
+        - text: "{pic.g1.id}"
+          role: brevity
+          note: >-
+            Die Identität. bogey = unbekannt, bandit = feindlich, aber nicht automatisch freigegeben,
+            hostile = feindlich und nach den Einsatzregeln freigegeben.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: "Bestätigung. Was daraus folgt, regeln Einsatzregeln und Briefing." }
+
+- id: m5-declare-group
+  title: DECLARE nach einem Label
+  # ACC (2021), S. 50–51: Nach einem Label genügt der Gruppenname statt der Position.
+  layer: core
+  context: >-
+    Der AWACS hat dir das Picture mit benannten Gruppen gegeben. Jetzt genügt der Gruppenname, um nach der
+    Identität zu fragen – die Position brauchst du nicht mehr.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2, id: mixed }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{awacs}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: declare, role: brevity, critical: true, free: true }
+        - { text: "{pic.g1.name}", role: info, critical: true, note: Der Gruppenname aus dem Picture ersetzt die Bullseye-Position. }
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{awacs}", role: callsign }
+        - { text: "{pic.g1.name} bullseye {pic.g1.bulls|spoken}", role: position }
+        - { text: "{pic.g1.alt|spoken}", role: value }
+        - { text: "track {pic.g1.track}", role: info }
+        - { text: "{pic.g1.id}", role: brevity }
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+
+# ------------------------------------------------------------ Lektion 6: Auf CAP-Station
+- id: m5-anchor
+  title: CAP oder ANCHOR – Station beziehen
+  # CAP [location] und ANCHOR [location] sind core (ATP 1-02.1, 2020/21: CAP(ING) „establish a combat air patrol at
+  # a specified point“, ANCHOR „orbit about a specific point“); die Gesprächsform folgt Hoggit (community).
+  layer: community
+  context: >-
+    Der AWACS schickt dich auf deine CAP-Station. Das genaue Wort dafür ist CAP mit dem Punkt; viele Controller und
+    Sim-Server sagen ANCHOR – beides heißt hier: dort kreisen und den Luftraum sichern.
+  vars:
+    awacs: { pool: callsigns.awacs }
+    stn: { oneOf: [CAP, anchor] }
+    ab: { number: bearing }
+    ar: { oneOf: [{ text: "20", spoken: twenty }, { text: "25", spoken: twenty-five }, { text: "30", spoken: thirty }, { text: "40", spoken: forty }] }
+  transmissions:
+    - speaker: "{awacs}"
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "{awacs}", role: callsign }
+        - text: "{stn}"
+          role: brevity
+          note: >-
+            CAP = „richte deine Combat Air Patrol an diesem Punkt ein“, ANCHOR = „kreise über diesem Punkt“. Für die
+            CAP-Station meinen beide dasselbe.
+        - text: "bullseye {ab|spoken}, {ar|spoken}"
+          role: value
+          note: Der Punkt, im Bullseye-Format ({ab}/{ar}). Es kann auch ein benannter Ort aus dem Briefing sein.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true, note: Bestätigung mit dem Rufzeichen. }

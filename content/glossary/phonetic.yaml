@@ -1,0 +1,40 @@
+# ICAO/NATO-Buchstabieralphabet und Ziffern.
+# word = Schreibweise (ICAO), say = Aussprachehilfe für Deutschsprachige
+letters:
+  - { letter: A, word: Alfa, say: "ÄL-fa" }
+  - { letter: B, word: Bravo, say: "BRA-wo" }
+  - { letter: C, word: Charlie, say: "TSCHAR-li (oder SCHAR-li)" }
+  - { letter: D, word: Delta, say: "DEL-ta" }
+  - { letter: E, word: Echo, say: "ÄK-o" }
+  - { letter: F, word: Foxtrot, say: "FOX-trott" }
+  - { letter: G, word: Golf, say: "GOLF" }
+  - { letter: H, word: Hotel, say: "ho-TELL" }
+  - { letter: I, word: India, say: "IN-di-a" }
+  - { letter: J, word: Juliett, say: "DSCHU-li-ett" }
+  - { letter: K, word: Kilo, say: "KI-lo" }
+  - { letter: L, word: Lima, say: "LI-ma" }
+  - { letter: M, word: Mike, say: "MEIK" }
+  - { letter: N, word: November, say: "no-WEMM-ber" }
+  - { letter: O, word: Oscar, say: "OSS-kar" }
+  - { letter: P, word: Papa, say: "pa-PA" }
+  - { letter: Q, word: Quebec, say: "ke-BÄK" }
+  - { letter: R, word: Romeo, say: "RO-mi-o" }
+  - { letter: S, word: Sierra, say: "si-ÄR-ra" }
+  - { letter: T, word: Tango, say: "TÄNG-go" }
+  - { letter: U, word: Uniform, say: "JU-ni-form" }
+  - { letter: V, word: Victor, say: "WIK-ter" }
+  - { letter: W, word: Whiskey, say: "WISS-ki" }
+  - { letter: X, word: X-ray, say: "ÄX-rei" }
+  - { letter: Y, word: Yankee, say: "JÄNG-ki" }
+  - { letter: Z, word: Zulu, say: "SU-lu" }
+digits:
+  - { digit: "0", word: zero, icao: zero, say: "SI-ro" }
+  - { digit: "1", word: one, icao: wun, say: "WANN" }
+  - { digit: "2", word: two, icao: too, say: "TUH" }
+  - { digit: "3", word: three, icao: tree, say: "TRIE" }
+  - { digit: "4", word: four, icao: fower, say: "FAU-er" }
+  - { digit: "5", word: five, icao: fife, say: "FEIF" }
+  - { digit: "6", word: six, icao: six, say: "SIX" }
+  - { digit: "7", word: seven, icao: seven, say: "SÄW-en" }
+  - { digit: "8", word: eight, icao: ait, say: "ÄIT" }
+  - { digit: "9", word: niner, icao: niner, say: "NEI-ner" }

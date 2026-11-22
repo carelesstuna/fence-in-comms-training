@@ -1,0 +1,466 @@
+# Spur C, Lektionen 4–7: Talk-on, Laser und IR, Angriff, 5-Line und SEAD-Calls. Rollen wie in content/README.md.
+# Brevity laut ATP 1-02.1 (Zusammenfassung der Ausgabe April 2025 auf Wikipedia) und Korea-BEM (2005);
+# Abläufe aus DCS-Handbüchern (A-10C S. 786–788), DCS JFO/JTAC Pilot Guide (JTG) und Hoggit-Wiki JTAC.
+
+# ------------------------------------------------------------------ Lektion 4: Talk-on
+- id: track-c-talkon
+  title: Talk-on – vom Großen zum Kleinen
+  context: >-
+    Der JTAC führt deine Augen zum Ziel: erst etwas Großes, das man sicher findet, dann Schritt für Schritt kleiner.
+    Du meldest jedes Mal, was du siehst.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+    ref1: { oneOf: [bridge, road junction, river bend, village church] }
+    d1: { number: meters, range: [300, 1200], step: 100 }
+    dir1: { number: cardinal }
+    ref2: { oneOf: [tree line, white building, small farm, dirt road] }
+    side: { oneOf: [north, east, south, west] }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: "from the {ref1}"
+          role: position
+          note: Start an etwas Großem, das man aus der Luft sicher findet („Big to Small“ im JTAC-Leitfaden der Community).
+        - { text: "{d1|spoken} meters {dir1}", role: position, note: "Richtung und Entfernung in Himmelsrichtungen und Metern." }
+        - { text: "{ref2}", role: info, note: "Das nächste, kleinere Objekt." }
+        - { text: call contact, role: request, note: "„Sag Bescheid, wenn du es siehst.“" }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: contact
+          role: brevity
+          critical: true
+          note: CONTACT – Bezugspunkt gesehen. Noch nicht das Ziel!
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: "on the {side} side of the {ref2}", role: position, note: "Vom kleinen Bezugspunkt zum Ziel." }
+        - { text: "{cas.target}", role: info }
+        - { text: "that is your target, call tally", role: request }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "tally {cas.target.count|spoken}"
+          role: brevity
+          critical: true
+          alt: ["tally {cas.target.count}", tally]
+          note: TALLY – Ziel gesehen. Die Anzahl zeigt, dass du das Richtige siehst.
+
+- id: track-c-mark-smoke
+  title: Markierung mit Rauch
+  context: >-
+    Der JTAC markiert das Ziel mit Rauch. Die Markierung liegt fast nie genau auf dem Ziel – die Korrektur kommt von dort aus.
+  freq: VHF-FM (fox mike)
+  layer: sim
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+    corr: { number: meters, range: [50, 400], step: 50 }
+    corrDir: { number: cardinal }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: mark is on the deck
+          role: info
+          note: Die Markierung liegt am Boden. Wortlaut aus dem DCS-Handbuch der A-10C (real ⚠).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: contact the mark
+          role: brevity
+          critical: true
+          note: Markierung gesehen (Wortlaut aus dem DCS-Handbuch).
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: "from the mark, {corr|spoken} meters {corrDir}"
+          role: position
+          note: Korrektur von der Markierung aus, in Himmelsrichtungen und Metern – nicht „links“ oder „rechts“ (JTG).
+        - { text: "{cas.target}", role: info }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: tally, role: brevity, critical: true }
+
+- id: track-c-lead-hits
+  title: Talk-on von den Einschlägen des Leads
+  context: Der Lead hat getroffen. Jetzt führt der JTAC Two von den Einschlägen aus auf das nächste Ziel.
+  freq: VHF-FM (fox mike)
+  layer: community
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    corr: { number: meters, range: [50, 300], step: 50 }
+    corrDir: { number: cardinal }
+    t2: { oneOf: [second BMP-2, two trucks, one technical vehicle] }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{two|spoken}", role: addressee, note: "Jetzt ist Two dran." }
+        - text: "from lead's hits, {corr|spoken} meters {corrDir}"
+          role: position
+          note: Die Einschläge des Leads sind die neue Markierung (Wortlaut ⚠; der JTG nennt zerstörte Ziele als Bezugspunkt).
+        - { text: "{t2}", role: info }
+    - speaker: "{two}"
+      station: two
+      radio: fm
+      segments:
+        - { text: "{two|spoken}", role: callsign }
+        - { text: tally, role: brevity }
+
+# ------------------------------------------------------------------ Lektion 5: Laser und IR
+- id: track-c-laser
+  title: Laser-Markierung durch den JTAC
+  context: >-
+    Line 7 war „laser“. Du stellst den Code ein und sagst dem JTAC, wann er lasern soll. Den Laser startest du, nicht er.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: ten seconds
+          role: brevity
+          critical: true
+          note: TEN SECONDS – in etwa zehn Sekunden kommt „laser on“. Der JTAC macht sich bereit.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: laser on
+          role: brevity
+          critical: true
+          note: LASER ON – jetzt lasern. Die Anweisung kommt vom Angreifer.
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: lasing, role: brevity, note: "LASING – „Ich lasere jetzt.“ Die Antwort auf LASER ON." }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: spot
+          role: brevity
+          critical: true
+          note: SPOT – dein Sensor hat den Laserfleck gefunden.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: cease laser
+          role: brevity
+          critical: true
+          note: >-
+            CEASE LASER – Laser aus, die Waffe ist eingeschlagen (ATP 1-02.1, 2020: CEASE [Tätigkeit]). Ältere Quellen
+            sagen dafür TERMINATE; in der aktuellen ATP heißt das nur noch „im Training das Gefecht beenden“.
+
+- id: track-c-ir
+  title: IR-Pointer bei Nacht
+  context: Bei Nacht markiert der JTAC mit einem Infrarot-Pointer. Den Strahl siehst du nur durch die Nachtsichtbrille.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: sparkle, role: brevity, note: "SPARKLE – das Ziel ist mit dem IR-Pointer markiert." }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign }
+        - text: contact sparkle
+          role: brevity
+          note: IR-Markierung gesehen (⚠ als eigener Eintrag nicht in der Brevity-Liste, aus CONTACT und SPARKLE gebildet).
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: snake, role: brevity, note: "SNAKE – der Strahl kreist um das Ziel, damit du es leichter findest." }
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: steady, role: brevity, note: "STEADY – der Strahl steht still, genau auf dem Ziel." }
+
+# ------------------------------------------------------------------ Lektion 6: Angriff
+- id: track-c-attack
+  title: IP inbound, IN, Cleared Hot, OFF
+  context: >-
+    Der eigentliche Angriff. Du sagst, wann du losfliegst und aus welcher Richtung du kommst. Erst nach „cleared hot“ wird
+    ausgelöst.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, control: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: IP inbound
+          role: intent
+          critical: true
+          note: Du verlässt den IP Richtung Ziel. In DCS und beim BMS-JTAC ist das ein Menüpunkt (Status als Wortlaut ⚠).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "IN from the {cas.inDir}"
+          role: brevity
+          critical: true
+          alt: ["IN {cas.inDir}"]
+          note: IN – du beginnst die Endphase des Angriffs. Die Richtung zeigt dem JTAC, wo er hinschauen muss (Form ⚠).
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: cleared hot
+          role: brevity
+          note: CLEARED HOT – Waffeneinsatz freigegeben (Type 1 und 2). Eine Freigabe, kein Befehl.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "{cas.weapon.call}"
+          role: info
+          critical: true
+          note: >-
+            Ruf beim Auslösen: RIFLE für eine Luft-Boden-Rakete, GUNS für die Kanone, bei Bomben „bombs away“ (⚠ nicht als
+            Brevity belegt).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "OFF {cas.offDir}"
+          role: brevity
+          critical: true
+          note: OFF – Angriff beendet, du drehst in diese Richtung ab (Line 9).
+
+- id: track-c-abort
+  title: Abbruch
+  context: Der JTAC sieht etwas, das du nicht siehst – und bricht deinen Angriff ab.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, control: 2 }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign }
+        - { text: "IN from the {cas.inDir}", role: brevity }
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: abort, abort, abort
+          role: brevity
+          note: ABORT – Angriff vor dem Auslösen abbrechen. Dreimal ist üblich (⚠).
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: aborting
+          role: intent
+          critical: true
+          note: Bestätigung, dass du abbrichst (Wortlaut ⚠). Nichts auslösen!
+
+- id: track-c-type3
+  title: Type 3 – Cleared to Engage
+  context: Bei geringem Risiko für die eigenen Leute gibt der JTAC nicht jeden Angriff einzeln frei, sondern einen Rahmen.
+  freq: VHF-FM (fox mike)
+  layer: core
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, control: 3 }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          note: Die Grenze, innerhalb derer du frei angreifen darfst.
+        - text: cleared to engage
+          role: brevity
+          note: CLEARED TO ENGAGE – Freigabe unter Type 3 für mehrere Angriffe innerhalb der Grenzen.
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: engagement complete
+          role: brevity
+          critical: true
+          alt: [attack complete]
+          note: >-
+            ENGAGEMENT COMPLETE – Pflichtmeldung nach dem Ausklinken unter Type 3 (ATP 1-02.1, 2020). Ältere Quellen,
+            DCS und viele Kneeboards sagen noch „attack complete“ – das zählt hier auch.
+
+- id: track-c-bda
+  title: BDA und Check-out
+  context: Der JTAC meldet das Ergebnis. Ohne Munition meldest du dich ab.
+  freq: VHF-FM (fox mike)
+  layer: community
+  callsignPool: attack
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - { text: BDA, role: info, note: "Battle Damage Assessment – das Ergebnis des Angriffs (Format ⚠)." }
+        - { text: "{cas.target.bda}", role: info }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{jtac}", role: addressee, critical: true }
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - { text: winchester, role: brevity, critical: true, note: "WINCHESTER – keine Munition mehr." }
+        - { text: checking out, role: intent, critical: true, note: "Abmeldung vom JTAC-Netz." }
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: cleared off station
+          role: instruction
+          note: Wortlaut aus einem Community-Leitfaden (1st RRF). In BMS gibt es den Check-out mit BDA als Menüpunkt.
+
+# ------------------------------------------------------------------ Lektion 7: 5-Line und SEAD-Calls
+- id: track-c-fiveline
+  title: Der 5-Line für Kampfhubschrauber
+  context: >-
+    Hubschrauber greifen tief und nah an. Ihr Brief ist kürzer und beginnt bei den eigenen Leuten. Aufbau laut einem
+    Community-Leitfaden (1st RRF); die Vorlage der Heeresvorschrift ist nicht geprüft ⚠.
+  freq: VHF-FM (fox mike)
+  layer: community
+  callsignPool: helo
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, aircraft: ah64, dangerClose: any }
+  transmissions:
+    - speaker: "{jtac}"
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: addressee }
+        - text: "{jtac}"
+          role: callsign
+          note: "**Line 1 – Observer / Warning Order:** wer spricht, und dass ein Brief folgt."
+        - { text: five-line, role: info }
+        - text: "friendlies {cas.friend.grid|spoken}"
+          role: position
+          note: "**Line 2 – Friendly Location / Mark:** beim Hubschrauber zuerst die eigenen Leute."
+        - text: "target {cas.fromFriend|spoken} meters"
+          role: position
+          note: "**Line 3 – Target Location:** von den Freunden aus in Richtung und Metern (oder als Koordinate)."
+        - text: "{cas.target}"
+          role: info
+          note: "**Line 4 – Target Description / Mark:** was und wie viele."
+        - text: "attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          note: "**Line 5 – Remarks / Restrictions:** hier der erlaubte Angriffssektor."
+        - { text: danger close, role: info, when: cas.dc }
+    - speaker: "{callsign}"
+      you: true
+      radio: fm
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+          role: instruction
+          critical: true
+          alt: ["attack heading {cas.fah.from} to {cas.fah.to}", "attack heading {cas.fah.from}, {cas.fah.to}"]
+          note: Mindestens die Restriktionen zurücklesen (welchen Umfang der Readback beim 5-Line hat, ist offen ⚠).
+        - { text: danger close, role: info, critical: true, when: cas.dc }
+
+- id: track-c-magnum
+  title: Magnum – eine HARM ist unterwegs
+  context: >-
+    Auf dem Package-Netz meldet ein F-16-Flight, der gegen die Flugabwehr fliegt, einen Schuss. Für dich in der A-10 heißt
+    das: Das Radar dort soll gleich schweigen.
+  freq: UHF (Package)
+  layer: core
+  vars:
+    sead: { pool: callsigns.fighter }
+    samType: { oneOf: [SA-6, SA-8, SA-11, SA-15] }
+    samDir: { number: cardinal }
+  transmissions:
+    - speaker: "{sead} 1-1"
+      radio: uhf
+      segments:
+        - { text: "{sead} one one", role: callsign }
+        - { text: magnum, role: brevity, note: "MAGNUM – eine eigene Anti-Radar-Rakete (HARM) ist unterwegs." }
+        - { text: "{samType}", role: info, note: "Welches System." }
+        - { text: "{samDir}", role: position, note: "Wo, grob (Format ⚠)." }
+
+- id: track-c-singer
+  title: Singer – SAM-Start auf dem RWR
+  context: Dein Radarwarngerät zeigt einen Start. Das muss dein Flight sofort wissen.
+  freq: UHF (Flight)
+  layer: core
+  callsignPool: attack
+  vars:
+    samType: { oneOf: [SA-6, SA-8, SA-11, SA-15] }
+    samDir: { number: cardinal }
+    defDir: { number: cardinal }
+  transmissions:
+    - speaker: "{callsign}"
+      you: true
+      radio: uhf
+      segments:
+        - { text: "{callsign|spoken}", role: callsign, critical: true }
+        - text: "singer {samType} {samDir}"
+          role: brevity
+          critical: true
+          note: SINGER – dein RWR zeigt einen SAM-Start. MUD hieße nur „Bodenradar verfolgt mich“, ohne Start.
+        - text: "defending {defDir}"
+          role: brevity
+          critical: true
+          note: DEFENDING – du manövrierst gegen die Bedrohung. Alle wissen, dass du gerade nicht angreifst.

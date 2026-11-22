@@ -1,0 +1,395 @@
+# Spur C, Checkride „Hawg auf Station“ (Lektion track-c-l8): eine ganze CAS-Station als Lead.
+# Ablauf: Übergabe → FM einstellen → Check-in → Lage → Game Plan → 9-Line → Mitschrift → Readback → IP inbound
+# → Laser (ten seconds, laser on, spot) → IN → cleared hot → Waffe → OFF → cease laser → Two wird auf die Einschläge
+# geführt, der JTAC bricht ab (du schweigst) → Magnum auf dem Package-Netz → BDA → Check-out.
+# Gewürfelt: AWACS, JTAC, SEAD-Flight, Frequenzen, Einsatzraum (Laser, Type 2, bei Tag), Bewaffnung, Playtime.
+# Kritisch: FM einstellen, Readback, IN, Schweigen bei Twos Abbruch.
+id: track-c-s2-hawg-auf-station
+title: "Checkride: {flightName} auf Station"
+summary: Eine ganze CAS-Station – vom AWACS zum JTAC, 9-Line, Laser, Angriff, Abbruch für Two und Check-out.
+layer: core
+as: lead
+callsignPool: attack
+sources:
+  - title: "DCS A-10C Flight Manual, S. 784–788 (JTAC-Ablauf, Laser On, Spot, In, cleared hot, Off)"
+  - title: "DCS JFO/JTAC Pilot Guide (Community, 562nd Tactical School)"
+  - title: "Wikipedia: Multiservice tactical brevity code (Zusammenfassung der ATP 1-02.1, April 2025)"
+    url: https://en.wikipedia.org/wiki/Multiservice_tactical_brevity_code
+  - title: "Hoggit-Wiki: JTAC"
+    url: https://wiki.hoggitworld.com/view/JTAC
+vars:
+  awacs: { pool: callsigns.awacs }
+  jtac: { pool: callsigns.jtac }
+  sead: { pool: callsigns.fighter }
+  aw: { number: uhf }
+  fm: { number: vhf-fm }
+  cas: { casArea: true, mark: laser, control: 2, time: day }
+  ord:
+    oneOf:
+      - { text: "4 GBU-12, 2 Maverick, 30 mm", spoken: "four GBU-12, two Maverick, thirty millimeter" }
+      - { text: "2 GBU-38, 2 GBU-12, rockets, 30 mm", spoken: "two GBU-38, two GBU-12, rockets, thirty millimeter" }
+  playtime: { number: playtime, range: [40, 90], step: 10 }
+  corr: { number: meters, range: [100, 300], step: 50 }
+  corrDir: { number: cardinal }
+  samType: { oneOf: [SA-6, SA-8, SA-11, SA-15] }
+  samDir: { number: cardinal }
+kneeboard:
+  title: "Line-up-Card {flight} – CAS"
+  rows:
+    - { label: "AWACS", value: "{awacs}" }
+    - { label: "AWACS (UHF)", value: "{aw}" }
+    - { label: "JTAC", value: "{jtac}" }
+    - { label: "JTAC (VHF-FM)", value: "{fm}" }
+    - { label: "Flight", value: "{flightSize}× A-10C" }
+    - { label: "IP", value: "{cas.ip}" }
+    - { label: "Bewaffnung (Flight)", value: "{ord}" }
+    - { label: "Playtime", value: "{playtime}" }
+  where:
+    dcs: "Missionsbriefing bzw. Kneeboard der Mission. In der A-10C stellst du den JTAC am VHF-FM-Gerät ein."
+    bms: "Comm Plan im Briefing; in BMS liegt der JTAC auf dem Tactical-Netz (UHF-Preset 6)."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Frequenz steht im Briefing oder in der Serverinfo."
+steps:
+  - stage: Übergabe
+    freq: "{aw} · {awacs}"
+    situation: Dein Flight ({flightSize}× A-10C) erreicht das Einsatzgebiet. Der AWACS meldet sich.
+    hear:
+      - speaker: "{awacs}"
+        radio: uhf
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: "contact {jtac}", role: instruction }
+          - { text: fox mike, role: brevity }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: uhf
+        segments:
+          - { text: fox mike, role: brevity, critical: true, alt: ["contact {jtac} fox mike", "{jtac} fox mike"] }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+
+  - stage: Check-in
+    critical: true
+    tune: { name: "{jtac} (JTAC, VHF-FM)", freq: "{fm}" }
+    situation: Du bist am IP {cas.ip} auf angels {cas.hold}. Melde dich beim JTAC an.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{jtac}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "{flightSize|spoken} A-10C", role: info, alt: ["{flightSize} A-10C", "{flightSize} A-10"] }
+          - { text: "IP {cas.ip}", role: position }
+          - { text: "angels {cas.hold|spoken}", role: value, alt: ["angels {cas.hold}"] }
+          - { text: "{ord|spoken}", role: info, alt: ["{ord}"] }
+          - { text: "playtime {playtime|spoken}", role: value, alt: ["playtime {playtime}"] }
+          - { text: "targeting pod", role: info, optional: true, free: true }
+          - { text: abort code in the clear, role: info }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{jtac}", role: callsign }
+          - { text: copy all, role: proword }
+          - { text: ready to copy situation update?, role: request }
+
+  - stage: Lage
+    situation: Der JTAC will dir die Lage geben.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ready to copy, role: request, critical: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "threat {cas.threat}, {cas.threat.dist|spoken} kilometers {cas.threat.dir} of the target area", role: info }
+          - { text: "targets {cas.target}", role: info }
+          - { text: "friendlies {cas.friend.dir} {cas.friend.dist|spoken} meters", role: position }
+          - { text: no artillery, role: info }
+          - { text: "remain at or above angels {cas.minAlt|spoken}", role: instruction }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "type {cas.ctrl|spoken} in effect", role: info }
+          - { text: "{cas.attack}", role: info, when: cas.bomb }
+          - { text: "{cas.weapon.effect}", role: request }
+          - { text: advise when ready for nine-line, role: request }
+
+  - stage: 9-Line
+    situation: Lage und Game Plan sind durch. Hol das Kneeboard raus.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ready to copy, role: request, critical: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "IP {cas.ip}", role: position }
+          - { text: "{cas.hdg|spoken} offset {cas.offset}", role: value }
+          - { text: "{cas.dist|spoken}", role: value }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{cas.elev|spoken} feet", role: value }
+          - { text: "{cas.target}", role: info }
+          - { text: "{cas.grid|spoken}", role: position }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{cas.mark|spoken}", role: info }
+          - { text: "{cas.friend|spoken}", role: position }
+          - { text: "egress {cas.egress}", role: instruction }
+          - { text: advise when ready for remarks, role: request }
+
+  - stage: 9-Line
+    situation: Jetzt die Remarks.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ready to copy remarks, role: request, critical: true, alt: [ready for remarks, ready to copy] }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}", role: instruction }
+          - { text: "laser-target line {cas.ltl|spoken}", role: value }
+          - { text: "threat {cas.threat} {cas.threat.dir} {cas.threat.dist|spoken} kilometers", role: info }
+          - { text: "time on target {cas.tot|spoken}", role: instruction }
+
+  - stage: Mitschrift
+    situation: Trag den 9-Line und die Remarks ein.
+    decode: { area: cas }
+
+  - stage: Readback
+    critical: true
+    situation: Lies zurück, was Pflicht ist.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{jtac}", role: addressee, optional: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "{cas.elev|spoken} feet", role: value, critical: true, alt: ["{cas.elev}", "{cas.elev} feet", "{cas.elev} ft", "elevation {cas.elev}"] }
+          - { text: "{cas.grid|spoken}", role: position, critical: true, alt: ["{cas.grid}", "grid {cas.grid}"] }
+          - text: "final attack heading {cas.fah.from|spoken} to {cas.fah.to|spoken}"
+            role: instruction
+            critical: true
+            alt:
+              - "final attack heading {cas.fah.from} to {cas.fah.to}"
+              - "final attack heading {cas.fah.from}, {cas.fah.to}"
+              - "FAH {cas.fah.from} to {cas.fah.to}"
+              - "FAH {cas.fah.from}, {cas.fah.to}"
+          - { text: "IP {cas.ip}", role: position, optional: true, free: true }
+          - { text: "{cas.hdg|spoken} offset {cas.offset}", role: value, optional: true, free: true }
+          - { text: "{cas.dist|spoken}", role: value, optional: true, free: true }
+          - { text: "{cas.target}", role: info, optional: true, free: true }
+          - { text: "{cas.mark|spoken}", role: info, optional: true, free: true }
+          - { text: "{cas.friend|spoken}", role: position, optional: true, free: true }
+          - { text: "egress {cas.egress}", role: instruction, optional: true, free: true }
+          - { text: "laser-target line {cas.ltl|spoken}", role: value, optional: true, free: true }
+          - { text: "time on target {cas.tot|spoken}", role: instruction, optional: true, free: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: readback correct, role: proword }
+    explain: Pflicht sind Line 4, Line 6 und das Final Attack Heading.
+
+  - stage: Anflug
+    situation: Code {cas.code} ist im Zielbehälter. Du verlässt den IP {cas.ip} Richtung Ziel.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: IP inbound, role: intent, critical: true }
+
+  - stage: Laser
+    situation: In etwa zehn Sekunden brauchst du den Laserfleck. Sag es dem JTAC.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: ten seconds, role: brevity, critical: true }
+
+  - stage: Laser
+    situation: Jetzt.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: laser on, role: brevity, critical: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: lasing, role: brevity }
+
+  - stage: Laser
+    situation: Dein Zielbehälter zeigt den Laserfleck.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: spot, role: brevity, critical: true }
+
+  - stage: Angriff
+    critical: true
+    situation: Du drehst mit Kurs {cas.hdg} auf das Ziel ein und beginnst den Angriff.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "IN from the {cas.inDir}", role: brevity, critical: true, alt: ["IN {cas.inDir}"] }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: cleared hot, role: brevity }
+    explain: Kurs {cas.hdg} heißt Anflug aus Richtung {cas.inDir} – „IN from the {cas.inDir}“.
+
+  - stage: Angriff
+    situation: Die Waffe ({cas.weapon}) ist ausgelöst.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "{cas.weapon.call}", role: info, critical: true }
+
+  - stage: Angriff
+    situation: Du drehst ab, wie in Line 9 vorgegeben.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "OFF {cas.offDir}", role: brevity, critical: true }
+
+  - stage: Angriff
+    situation: Einschlag. Der Laser wird nicht mehr gebraucht.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: cease laser, role: brevity, critical: true }
+
+  - stage: Two
+    critical: true
+    situation: Der JTAC führt deinen Wingman auf das nächste Ziel. Du hörst mit.
+    hear:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{two|spoken}", role: addressee }
+          - { text: "from lead's hits, {corr|spoken} meters {corrDir}", role: position }
+          - { text: second target, role: info }
+      - speaker: "{two}"
+        radio: fm
+        segments:
+          - { text: "{two|spoken}", role: callsign }
+          - { text: tally, role: brevity }
+      - speaker: "{two}"
+        radio: fm
+        segments:
+          - { text: "{two|spoken}", role: callsign }
+          - { text: "IN from the {cas.inDir}", role: brevity }
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{two|spoken}", role: addressee }
+          - { text: "abort, abort, abort", role: brevity }
+          - { text: friendlies moving into the target area, role: info }
+      - speaker: "{two}"
+        radio: fm
+        segments:
+          - { text: "{two|spoken}", role: callsign }
+          - { text: aborting, role: intent }
+    silence: true
+    explain: >-
+      Das Gespräch gehört Two und dem JTAC. Wer jetzt dazwischenfunkt, blockiert das Netz in dem Moment, in dem ein Abbruch
+      durchkommen muss.
+
+  - stage: SEAD
+    situation: Auf dem Package-Netz (UHF) meldet sich ein F-16-Flight.
+    hear:
+      - speaker: "{sead} 1-1"
+        radio: uhf
+        segments:
+          - { text: "{sead} one one", role: callsign }
+          - { text: magnum, role: brevity }
+          - { text: "{samType}", role: info }
+          - { text: "{samDir}", role: position }
+    explain: MAGNUM – eine eigene HARM fliegt auf das {samType}. Für dich heißt das nur, dass das Radar dort gleich schweigen soll.
+
+  - stage: Check-out
+    situation: Der JTAC meldet das Ergebnis. Dein Flight hat keine Munition mehr – melde dich ab.
+    hear:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: BDA, role: info }
+          - { text: "{cas.target.bda}", role: info }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        radio: fm
+        segments:
+          - { text: "{jtac}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: winchester, role: brevity, critical: true }
+          - { text: checking out, role: intent, critical: true }
+    reply:
+      - speaker: "{jtac}"
+        radio: fm
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: cleared off station, role: instruction }

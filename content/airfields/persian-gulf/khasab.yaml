@@ -1,0 +1,12 @@
+id: khasab
+name: Khasab
+map: persian-gulf
+icao: OOKB
+runways: ["01/19"]
+atc: { vhf: 124.35 }
+verified: dcs-data
+notes:
+  - Anflug zwischen Bergen und Fjorden, kurze Piste (ca. 2.500 m).
+  - Nur etwa zwölf Abstellplätze.
+  - Platzhöhe offen – Khasab hat in den DCS-Funkfeuerdaten (Beacons.lua) keinen Eintrag, und DCS liefert für den Persischen Golf keine Platzkarten mit. Im F10-Fenster (ELEVATION) ablesen.
+  - "Funk laut DCS-Funkdaten (Mods/terrains/PersianGulf/radio.lua) nur auf VHF 124.35 – kein UHF. Ältere Kartenstände (pydcs-Tabelle) nannten UHF 250.0; im F10-Fenster (Airdrome Data) gegenprüfen."

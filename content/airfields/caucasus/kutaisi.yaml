@@ -1,0 +1,24 @@
+id: kutaisi
+name: Kutaisi
+map: caucasus
+icao: UGKO
+elevationFt: 148
+runways: ["07/25"]
+atc: { uhf: 263.0, vhf: 134.0, hf: 4.4, vhfLow: 41.0 }
+tacan: 44X
+ils: "ILS 07: 109.75 (IKS)"
+# Echte Frequenzen laut georgischem eAIP – in DCS gelten die Sim-Frequenzen oben (atc).
+realFreqs: { approach: 127.1, tower: 125.5 }
+realSource: "Georgisches eAIP, AIRAC 2023-03-23, AD 2 UGKO – https://airnav.ge/eaip/2023-03-23-AIRAC/html/eAIP/UG-AD-2.UGKO-en-GB.html"
+# Mitgelieferte Kneeboard-Karten (DCS zeigt sie auf dieser Karte im Kneeboard an)
+charts:
+  - { sim: dcs, name: "Visual Operation Chart RWY 07/25 (VAD 05), Seite 1", path: "Mods/terrains/Caucasus/Kneeboard/05_VAD_UGKO_Kutaisi_Kopitnari_P1.png" }
+  - { sim: dcs, name: "Visual Operation Chart RWY 07/25 (VAD 05), Seite 2", path: "Mods/terrains/Caucasus/Kneeboard/05_VAD_UGKO_Kutaisi_Kopitnari_P2.png" }
+  - { sim: dcs, name: "Aerodrome Chart (GND 05)", path: "Mods/terrains/Caucasus/Kneeboard/05_GND_UGKO_Kutaisi_Kopitnari_18.png" }
+verified: dcs-data
+notes:
+  - Typischer NATO-Hauptstützpunkt in Kaukasus-Missionen, großes Vorfeld.
+  - Senaki-Kolkhi liegt nah – Luftraum wird geteilt.
+  - TACAN, ILS und VOR (113.60, KT) laut DCS-Funkfeuerdaten (Mods/terrains/Caucasus/Beacons.lua) bestätigt.
+  - Platzhöhe 148 ft (45 m), ILS auf RWY 07 und Tower 134.000 laut mitgelieferter Karte VAD 05; die Höhe der Funkfeuer in Beacons.lua (45 m) passt dazu.
+  - "HF und tiefes VHF (Flugplatzfenster der F10-Karte) laut DCS-Funkdaten (radio.lua der Karte)."

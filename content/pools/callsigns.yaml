@@ -1,0 +1,82 @@
+# Würfelpools für Rufzeichen. Pool-Name in Variablen: "callsigns.<kategorie>".
+# Keine Brevity-Wörter (Bandit, Splash, ...; geprüft gegen ATP 1-02.1) und keine Flugzeugnamen (Hornet, Viper wäre
+# die F-16 – als Rufzeichen aber sehr verbreitet und daher erlaubt).
+# Ausnahme: DCS-Standardrufzeichen, die zugleich Brevity sind, bleiben drin, wenn sie im Funk dieser Rolle nicht
+# vorkommen – Pig (A-10; PIG = Gleitbombe) und Darkstar (AWACS; DARK STAR = versagende Leuchtgranate, auch Beispielrufzeichen
+# der ATP 3-52.4). Nicht im Pool: Eyeball und Pinpoint (JTAC) – EYEBALL ist ein Pflichtruf an den JTAC, PINPOINT eine
+# Anfrage im Seeziel-Funk.
+
+# Jäger/Mehrzweck – enthält die NATO-Standardrufzeichen aus DCS (Enfield … Pontiac)
+fighter:
+  - Enfield
+  - Springfield
+  - Uzi
+  - Colt
+  - Dodge
+  - Ford
+  - Chevy
+  - Pontiac
+  - Viper
+  - Cobra
+  - Rage
+  - Sting
+  - Mako
+  - Ghost
+  - Raven
+  - Wolf
+  - Fury
+  - Hammer
+
+# Erdkampf (DCS-Standard für die A-10: Hawg, Boar, Pig, Tusk)
+attack:
+  - Hawg
+  - Boar
+  - Pig
+  - Tusk
+  - Sandy
+  - Bone
+
+# Kampfhubschrauber (Spur C, 5-Line) – frei gewählte Namen, keine Typbezeichnung
+helo:
+  - Gunslinger
+  - Hammerhead
+  - Palehorse
+  - Saber
+  - Crow
+  - Bootleg
+
+# AWACS / GCI (DCS-Standard: Overlord, Magic, Wizard, Focus, Darkstar)
+awacs:
+  - Overlord
+  - Magic
+  - Wizard
+  - Focus
+  - Darkstar
+
+# Leitstellen am Boden (GCI/EWR), Spur W – frei gewählte Namen, kein Standard einer Sim (alle nicht in ATP 1-02.1)
+gci:
+  - Kingpin
+  - Lighthouse
+  - Watchtower
+  - Sentinel
+  - Lantern
+
+# Tanker (DCS-Standard: Texaco, Arco, Shell)
+tanker:
+  - Texaco
+  - Arco
+  - Shell
+
+# JTAC (Auswahl aus den DCS-Standardrufzeichen)
+jtac:
+  - Axeman
+  - Darknight
+  - Warrior
+  - Pointer
+  - Moonbeam
+  - Whiplash
+  - Jaguar
+  - Anvil
+  - Firefly
+  - Mantis
+  - Badger

@@ -1,0 +1,19 @@
+id: kobuleti
+name: Kobuleti
+map: caucasus
+icao: UG5X
+elevationFt: 59
+runways: ["07/25"]
+atc: { uhf: 262.0, vhf: 133.0, hf: 4.35, vhfLow: 40.8 }
+tacan: 67X
+ils: "ILS 07: 111.50"
+# Mitgelieferte Kneeboard-Karten (DCS zeigt sie auf dieser Karte im Kneeboard an)
+charts:
+  - { sim: dcs, name: "Visual Operation Chart RWY 07/25 (VAD 01)", path: "Mods/terrains/Caucasus/Kneeboard/01_VAD_UG5X_Kobuleti.png" }
+  - { sim: dcs, name: "Aerodrome Chart (GND 01)", path: "Mods/terrains/Caucasus/Kneeboard/01_GND_UG5X_Kobuleti_18.png" }
+verified: dcs-data
+notes:
+  - Küstenplatz nördlich von Batumi – gute Übung für Staffelung mit dem Nachbarplatz.
+  - TACAN und ILS laut DCS-Funkfeuerdaten (Mods/terrains/Caucasus/Beacons.lua) bestätigt.
+  - Platzhöhe 59 ft (18 m) und ILS auf RWY 07 laut mitgelieferter Karte VAD 01, passt zu Beacons.lua (18 m).
+  - "HF und tiefes VHF (Flugplatzfenster der F10-Karte) laut DCS-Funkdaten (radio.lua der Karte)."

@@ -1,0 +1,390 @@
+# Prüfungsfragen für Modul 5 (AWACS-Grundlagen). Die Fragen kommen nur in der Modulprüfung vor (`exam: true`), in keiner
+# Lektion und keiner Einstufung. Die Lektion einer Frage steht am Anfang der ID (m5-l3-x-… gehört zu m5-l3).
+# Dazu zählen auch drei Übungen in content/drills/m5.yaml, die mit `exam: true` markiert sind: m5-l2-anatomy-track,
+# m5-l3-why-braa und m5-l3-clean.
+# Quelle für Check-in, Relay, Picture, Labels, Threat, Declare, Faded und Rangfolge: ATP 3-52.4 „Air Control
+# Communication“ (2021); ANCHOR und die Aspekt-Winkel: ATP 1-02.1. Die Funksprüche stehen in content/calls/m5.yaml.
+# Gewürfelt wird, was nichts an der Antwort ändert (Rufzeichen, Zahlen, Lage) oder was die Antwort mitrechnet.
+
+# ------------------------------------------------------------ Lektion 1: Anmelden beim AWACS
+- id: m5-l1-x-mnpopca-match
+  type: match
+  exam: true
+  prompt: >-
+    Im vollständigen Check-in beim AWACS gibt dir das Merkwort MNPOPCA die Reihenfolge vor. Ordne die Buchstaben ihrer
+    Bedeutung zu (die beiden P lassen wir weg).
+  pairs:
+    - ["M", "Missionsnummer"]
+    - ["N", "Anzahl und Typ der Flugzeuge"]
+    - ["O", "Bewaffnung (falls zutreffend)"]
+    - ["C", "Fähigkeiten (z. B. Laser, Infrarot-Pod, Datalink)"]
+    - ["A", "Abort-Code"]
+  explain: >-
+    Mission number – Number and type – Position and altitude – Ordnance – Playtime – Capabilities – Abort code. Fliegst
+    du wie geplant, genügen Missionsnummer und „as fragged“.
+
+- id: m5-l1-x-call-exc-detail
+  type: call
+  exam: true
+  call: m5-awacs-checkin-exceptions
+  transmission: 2
+  prompt: >-
+    Du hast dich beim AWACS **{awacs}** „with exceptions“ angemeldet (Missionsnummer **{mn}**). Er hat dir den Alpha
+    Check gegeben und sagt „continue with check in“. Deine Abweichung vom Plan: **{exc}**. Was funkst du jetzt?
+  explain: >-
+    Jetzt kommt die Abweichung: dein Rufzeichen, dann die Meldung – ohne „roger“ und ohne den Alpha Check zurückzulesen.
+    So zeigt es auch das Beispiel der ATP 3-52.4.
+
+- id: m5-l1-x-call-relay
+  type: call
+  exam: true
+  call: m5-relay
+  prompt: >-
+    **{oth} {onum}** kommt bei AWACS **{awacs}** nicht durch. Du hörst seine Meldung „{rmsg}“ aber klar. Gib sie an den
+    AWACS weiter.
+  explain: >-
+    Adressat, „relay“, Rufzeichen des **ursprünglichen** Senders, dann die Meldung. Dein eigenes Rufzeichen lässt du
+    weg – sonst hielte der AWACS die Meldung für deine (ATP 3-52.4, S. 6).
+
+- id: m5-l1-x-angels-own
+  type: input
+  exam: true
+  vars:
+    ang: { number: angels, range: [10, 35] }
+  prompt: Du fliegst auf **{ang}.000 Fuß** und meldest dem AWACS deine eigene Höhe. Welche Höhenangabe funkst du?
+  accept: ["angels {ang}", "angels {ang|spoken}"]
+  hint: Das Stichwort gilt für die Höhe von Freunden. Danach kommen die Ziffern einzeln.
+  explain: >-
+    Die Höhe eines Freundes – hier deine eigene – heißt „angels“, danach Ziffer für Ziffer: angels {ang|spoken}. „Thousand“
+    sagst du nur bei der Höhe von Kontakten.
+
+# ------------------------------------------------------------ Lektion 2: Bullseye
+- id: m5-l2-x-plot-place
+  type: plot
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+  geo: pic
+  mode: place
+  group: 1
+  prompt: Der AWACS meldet dir eine einzelne Gruppe im Bullseye-Format. Setze sie auf die Karte.
+  context: "„{awacs}, single group bullseye {pic.g1.bulls|spoken}, {pic.g1.alt|spoken}, track {pic.g1.track}, {pic.g1.id}.“"
+  explain: >-
+    Bullseye-Angaben sind Peilung und Entfernung **vom** Bullseye zur Gruppe – egal, wo du gerade fliegst. Den Strahl legst
+    du am Bullseye an, nicht an deinem Flugzeug.
+
+- id: m5-l2-x-single-order
+  type: sequence
+  exam: true
+  vars:
+    pic: { geo: true, groups: 1 }
+  prompt: >-
+    Der AWACS meldet eine einzelne Gruppe im Bullseye-Format. Nach seinem eigenen Rufzeichen nennt er diese Teile. In
+    welcher Reihenfolge?
+  items:
+    - single group
+    - "bullseye {pic.g1.bulls|spoken}"
+    - "{pic.g1.alt|spoken}"
+    - "track {pic.g1.track}"
+    - "{pic.g1.id}"
+  explain: >-
+    Erst „single group“, dann Position (Bullseye), Höhe, Track und Identität. Die Höhe heißt bei Kontakten „thousand“, der
+    Track ist die Flugrichtung der Gruppe als Himmelsrichtung.
+
+- id: m5-l2-x-fly-to-group
+  type: input
+  exam: true
+  vars:
+    gb: { number: bearing }
+    gr: { oneOf: ["20", "30", "40", "50", "60"] }
+  prompt: >-
+    Du stehst genau über dem Bullseye. Der AWACS meldet eine Gruppe bei **bullseye {gb}/{gr}**. Welchen Kurs fliegst du,
+    um direkt auf sie zuzuhalten?
+  accept: ["{gb}", "{gb|spoken}", "heading {gb}"]
+  placeholder: dreistellig
+  explain: >-
+    Die Peilung zeigt immer **vom** Bullseye **zur** Gruppe. Stehst du am Bullseye, ist {gb} direkt dein Kurs; den
+    Gegenkurs brauchst du nur, wenn du **zum** Bullseye fliegen willst.
+
+# ------------------------------------------------------------ Lektion 3: BRAA und Bogey Dope
+- id: m5-l3-x-read-braa
+  type: form
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 2 }
+  prompt: Du hast „bogey dope“ gefragt und bekommst die Antwort unten. Schreib die Werte mit.
+  context: "„{callsign|spoken}, {awacs}, group BRAA {pic.near.braa|spoken}, {pic.near.alt|spoken}, {pic.near.aspect}, {pic.near.id}.“"
+  fields:
+    - { label: Peilung zur Gruppe (von dir aus), accept: ["{pic.near.braa.bearing}", "{pic.near.braa.bearing|spoken}"], placeholder: dreistellig }
+    - { label: "Entfernung (NM)", accept: ["{pic.near.braa.range}", "{pic.near.braa.range|spoken}"], placeholder: z. B. 25 }
+    - { label: "Höhe (tausend Fuß)", accept: ["{pic.near.angels}", "{pic.near.alt}", "{pic.near.alt|spoken}"], placeholder: z. B. 25 }
+  explain: >-
+    BRAA heißt Bearing, Range, Altitude, Aspect – alles von dir aus gesehen: Peilung {pic.near.braa.bearing}, Entfernung
+    {pic.near.braa.range} Meilen, Höhe {pic.near.alt} (bei Kontakten „thousand“), dazu der Aspekt.
+
+- id: m5-l3-x-aspect-angle
+  type: input
+  exam: true
+  vars:
+    asp:
+      oneOf:
+        - { text: hot, spoken: "5" }
+        - { text: hot, spoken: "10" }
+        - { text: hot, spoken: "15" }
+        - { text: flank, spoken: "35" }
+        - { text: flank, spoken: "45" }
+        - { text: flank, spoken: "55" }
+        - { text: beam, spoken: "75" }
+        - { text: beam, spoken: "90" }
+        - { text: beam, spoken: "105" }
+        - { text: drag, spoken: "125" }
+        - { text: drag, spoken: "150" }
+        - { text: drag, spoken: "175" }
+  prompt: >-
+    Der Winkel zwischen dem Kurs einer Gruppe und der Linie von ihr zu dir beträgt **{asp|spoken}°** (0° = direkt auf
+    dich zu, 180° = direkt von dir weg). Welches Aspekt-Wort nennt der AWACS? Nur das Wort, ohne Himmelsrichtung.
+  accept: ["{asp}"]
+  placeholder: ein Wort
+  explain: >-
+    hot 0–20°, flank 30–60°, beam 70–110°, drag 120–180° (ATP 1-02.1). Bei {asp|spoken}° ist das **{asp}**. Bei flank,
+    beam und drag käme noch die Himmelsrichtung dazu, in die die Gruppe fliegt.
+
+- id: m5-l3-x-threat-order
+  type: sequence
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1 }
+    gname: { oneOf: [additional group, north group, south group, east group, west group, lead group, trail group] }
+  prompt: >-
+    Der AWACS **{awacs}** warnt dich ungefragt vor einer Gruppe, die in deine Bedrohungsreichweite kommt. Nach deinem und
+    seinem Rufzeichen nennt er diese Teile. In welcher Reihenfolge?
+  items:
+    - "{gname}"
+    - "threat BRAA {pic.threat.braa|spoken}"
+    - "{pic.threat.alt|spoken}"
+    - "{pic.threat.aspect}"
+    - "{pic.threat.id}"
+  explain: >-
+    Gruppenname, dann „threat BRAA“ mit Peilung und Entfernung, Höhe, Aspekt und Identität. „Threat“ steht unmittelbar vor
+    „BRAA“, und die Zahlen gelten von dir aus (ATP 3-52.4, S. 61) – hier {pic.threat.braa.range} Meilen, also innerhalb
+    der Standard-Reichweite von 35 NM.
+
+- id: m5-l3-x-call-bogey-group
+  type: call
+  exam: true
+  call: m5-bogey-dope-group
+  prompt: >-
+    Der AWACS **{awacs}** hat dir ein Picture mit benannten Gruppen gegeben ({pic.label}). Du willst wissen, wo die
+    **{pic.g1.name}** von dir aus liegt – nicht die nächste Gruppe. Was funkst du?
+  explain: >-
+    Adressat, dein Rufzeichen, „bogey dope“ und der Gruppenname. Ohne Namen bekommst du das BRAA zur nächsten Gruppe;
+    mit Namen zu genau dieser (ATP 3-52.4, S. 22).
+
+# ------------------------------------------------------------ Lektion 4: Picture
+- id: m5-l4-x-plot-ladder-trail
+  type: plot
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 3, label: ladder }
+  geo: pic
+  mode: place
+  group: 3
+  rangeTolerance: 3.5
+  prompt: >-
+    Der AWACS gibt dir das Picture unten. Setze die **trail group** auf die Karte – ihren Bullseye nennt er nicht. Dein
+    Flugzeug ist das blaue Dreieck.
+  context: "„{awacs}, {pic.call|spoken}.“"
+  explain: >-
+    Ladder heißt: drei Gruppen hintereinander, aus Sicht der Jäger. Die trail group steht {pic.deep} Meilen **hinter** der
+    lead group – von dir aus gesehen auf derselben Linie, nur weiter weg. Einen eigenen Bullseye nennt der AWACS nur für
+    die lead group.
+
+- id: m5-l4-x-groups-count
+  type: input
+  exam: true
+  vars:
+    gap: { int: [6, 12] }
+  prompt: >-
+    Vier Kontakte fliegen in zwei Paaren. Die zwei Flugzeuge jedes Paares sind keine 2 Meilen voneinander entfernt, die
+    beiden Paare stehen aber **{gap} Meilen** seitlich auseinander. Wie viele Gruppen zählt der AWACS?
+  accept: ["2", "two", "two groups", "2 groups", "zwei", "zwei Gruppen"]
+  placeholder: Zahl eintippen …
+  explain: >-
+    Eine Gruppe sind Kontakte, die höchstens 3 Meilen auseinander liegen – in Azimut **und** Entfernung. Die Paare liegen
+    weiter auseinander, also sind es zwei Gruppen mit je zwei Kontakten.
+
+- id: m5-l4-x-vic-measures
+  type: choice
+  exam: true
+  vars:
+    d: { oneOf: [{ text: "12", spoken: twelve }, { text: "14", spoken: fourteen }, { text: "16", spoken: sixteen }, { text: "18", spoken: eighteen }] }
+    w: { oneOf: [{ text: "6", spoken: six }, { text: "8", spoken: eight }, { text: "10", spoken: ten }, { text: "20", spoken: twenty }] }
+  prompt: >-
+    Der AWACS sieht drei Gruppen: eine vorn und zwei dahinter. Die Tiefe (deep) beträgt **{d} Meilen**, die Breite (wide)
+    **{w} Meilen**. Wie sagt er Anzahl, Label und Maße an?
+  options:
+    - "three groups vic {d|spoken} deep, {w|spoken} wide"
+    - "three groups vic {w|spoken} wide, {d|spoken} deep"
+    - "three groups champagne {w|spoken} wide, {d|spoken} deep"
+    - "three groups wall {w|spoken} wide"
+  answer: 0
+  explain: >-
+    Eine Gruppe vorn und zwei dahinter ist ein vic – bei mehr als 5 Meilen Tiefe, sonst wäre es eine wall. Beim vic
+    kommt erst deep, dann wide; bei champagne (zwei Gruppen vorn) ist es umgekehrt (ATP 3-52.4).
+
+- id: m5-l4-x-negative-contact
+  type: choice
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    oth: { pool: callsigns.fighter }
+    onum: { int: [1, 4] }
+  prompt: >-
+    **{awacs}** bekommt von keinem Sensor mehr Daten zu einem **eigenen** Flugzeug, **{oth} {onum}**. Was meldet er ihm?
+  options:
+    - "„{oth} {onum|spoken}, {awacs}, negative contact.“"
+    - "„{oth} {onum|spoken}, {awacs}, faded.“"
+    - "„{oth} {onum|spoken}, {awacs}, vanished.“"
+    - "„{oth} {onum|spoken}, {awacs}, clean.“"
+  answer: 0
+  explain: >-
+    „Faded“ gilt nur für Gegner. Fehlen Sensordaten zu einem Freund, heißt es „negative contact“ (ATP 3-52.4, S. 64).
+    „Vanished“ passt nur zu einer Gegnergruppe, die nach einem erfolgreichen Schuss gestrichen wurde.
+
+# ------------------------------------------------------------ Lektion 5: Declare
+- id: m5-l5-x-call-declare
+  type: call
+  exam: true
+  call: m5-declare
+  prompt: >-
+    Auf deinem Radar steht eine Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}** – ob Freund oder Feind, weißt
+    du nicht. Klär das mit dem AWACS **{awacs}**.
+  hint: Adressat – Rufzeichen – Brevity-Wort für „Identität erfragen“ – Position im Bullseye-Format – Höhe (045/60 oder 045, 60 – beides geht)
+  explain: >-
+    Du nennst die Position im Bullseye-Format und die Höhe, damit der AWACS die richtige Gruppe findet; die Identität
+    sagt er dir. „Declare“ steht in der ATP 3-52.4 vorn.
+
+- id: m5-l5-x-answer-order
+  type: sequence
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 1, id: mixed }
+  prompt: >-
+    Du hast den AWACS **{awacs}** mit „declare“ nach der Identität einer Gruppe gefragt. Er antwortet mit diesen Teilen.
+    In welcher Reihenfolge?
+  items:
+    - "{awacs} (sein eigenes Rufzeichen)"
+    - "group bullseye {pic.g1.bulls|spoken}"
+    - "{pic.g1.alt|spoken}"
+    - "track {pic.g1.track}"
+    - "{pic.g1.id}"
+  explain: >-
+    Zuerst der Name der antwortenden Stelle, dann Bullseye, Höhe, Track und zuletzt die Declaration (hostile, bandit,
+    bogey …). Bullseye, Höhe, Track und Declaration stehen laut ATP 3-52.4 immer in der Antwort.
+
+- id: m5-l5-x-two-groups-roe
+  type: choice
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+  prompt: >-
+    Du hast beim AWACS **{awacs}** zwei Gruppen erfragt. Die eine erklärt er als „bandit“, die andere als „hostile“. Was
+    heißt das für die Einsatzregeln?
+  options:
+    - Die hostile-Gruppe ist nach den Einsatzregeln freigegeben; die bandit-Gruppe ist als Feind identifiziert, aber nicht automatisch freigegeben
+    - Beide Gruppen sind freigegeben, denn bandit und hostile bedeuten beide „Feind“
+    - Nur die bandit-Gruppe ist freigegeben, denn bandit ist die höhere Stufe
+  answer: 0
+  explain: >-
+    Bandit sagt nur, **wer** es ist; zur Freigabe nach den Einsatzregeln wird daraus erst hostile. Der Unterschied
+    entscheidet, ob du die Gruppe bekämpfen darfst.
+
+- id: m5-l5-x-iff-words
+  type: choice
+  exam: true
+  prompt: >-
+    Der AWACS hängt an „bogey“ einen Zusatz zur IFF-Lage. Welche dieser Wörter beschreiben **nur** diese IFF-Lage und
+    sind keine eigene Declaration? (Alles Zutreffende)
+  options: [paints, spades, squawking, bandit, hostile, furball]
+  answer: [0, 1, 2]
+  explain: >-
+    paints (alle geforderten IFF-Modes und -Codes stimmen), spades (die Modes fehlen ganz) und squawking (ein Mode oder
+    Code antwortet, ist aber falsch) sagen nur etwas über die IFF-Antwort – „bogey paints“ bleibt ein Bogey. bandit,
+    hostile und furball sind dagegen Declarations.
+
+# ------------------------------------------------------------ Lektion 6: Auf CAP-Station
+- id: m5-l6-x-plot-vic-trail
+  type: plot
+  exam: true
+  vars:
+    awacs: { pool: callsigns.awacs }
+    pic: { geo: true, groups: 3, label: vic }
+  geo: pic
+  mode: place
+  group: 2
+  rangeTolerance: 3.5
+  prompt: >-
+    Der AWACS meldet drei Gruppen im Label vic. Die **erste trail group** (die zweite genannte Gruppe) nennt er ohne
+    Bullseye. Setze sie anhand von Label und Maßen auf die Karte. Dein Flugzeug ist das blaue Dreieck.
+  context: "„{awacs}, {pic.call|spoken}.“"
+  explain: >-
+    Vic heißt: eine lead group vorn, zwei trail groups dahinter. Die trail groups stehen {pic.deep} Meilen hinter der lead
+    group und je die halbe Breite ({pic.wide} Meilen insgesamt) seitlich davon – die Himmelsrichtung im Namen sagt, auf
+    welcher Seite.
+
+- id: m5-l6-x-station-order
+  type: sequence
+  exam: true
+  layer: community
+  prompt: Eine Station beim AWACS vom Anfang bis zum Ende. Bring diese Schritte in die übliche Reihenfolge.
+  items:
+    - Mit Missionsnummer und „as fragged“ anmelden, dazu ein Alpha Check
+    - Vom AWACS auf die Station geschickt werden (CAP bzw. anchor)
+    - Das Lagebild anfragen (picture)
+    - Die Identität einer Gruppe erfragen (declare)
+    - Abmelden mit RTB und pigeons
+  explain: >-
+    Erst anmelden, dann die Station beziehen. Aus dem Picture hast du die Zahlen, die du beim Declare brauchst. Zum
+    Schluss meldest du dich ab und lässt dir den Weg nach Hause geben.
+
+- id: m5-l6-x-anchor-meaning
+  type: choice
+  exam: true
+  layer: community
+  vars:
+    awacs: { pool: callsigns.awacs }
+    ab: { number: bearing }
+    ar: { oneOf: [{ text: "20", spoken: twenty }, { text: "25", spoken: twenty-five }, { text: "30", spoken: thirty }, { text: "40", spoken: forty }] }
+  prompt: >-
+    Du bist beim AWACS **{awacs}** angemeldet. Er funkt: „{callsign|spoken}, {awacs}, anchor bullseye {ab|spoken},
+    {ar|spoken}.“ Was sollst du tun?
+  options:
+    - Über dem Punkt bullseye {ab}/{ar} kreisen – das ist deine Station
+    - Die Gruppe bei bullseye {ab}/{ar} sofort abfangen
+    - Dem AWACS melden, ob du den Punkt bullseye {ab}/{ar} auf deinem Radar siehst
+    - Zum Bullseye zurückfliegen
+  answer: 0
+  explain: >-
+    „Anchor“ heißt: um einen bestimmten Punkt kreisen (ATP 1-02.1). Der Punkt steht hier im Bullseye-Format, du hältst
+    also deine CAP-Station über bullseye {ab}/{ar}. Genauer wäre „CAP bullseye …“ (Combat Air Patrol an diesem Punkt
+    einrichten) – für die Station meint beides dasselbe. Bestätigt wird mit dem Rufzeichen.
+
+- id: m5-l6-x-priority-threat
+  type: choice
+  exam: true
+  prompt: >-
+    Auf der Frequenz steht gleich zweierlei an: Der AWACS will dir ein Picture geben und dich zugleich vor einer Gruppe
+    in deiner Bedrohungsreichweite warnen. Was hat laut ATP 3-52.4 Vorrang?
+  options:
+    - Die THREAT-Warnung
+    - Das Picture
+    - Beides gleich – es zählt, wer zuerst sendet
+  answer: 0
+  explain: >-
+    In der Rangfolge der ATP 3-52.4 stehen Warnungen wie THREAT (Rang 3) weit vor dem Picture (Rang 6). Nur
+    Flugsicherheit und Notfälle sowie die Prüfung von Abschüssen gehen noch davor.

@@ -1,0 +1,309 @@
+# Modul 5, Szenario S1 (Lektion m5-l6): eine ganze CAP-Station mit dem AWACS.
+# Ablauf: Check-in „as fragged“ mit Alpha Check (unterwegs) → CAP/Anchor auf der Station → Picture (Core
+# Information, vor dem Commit) → Bogey Dope → Declare (bogey wird hostile/bandit) → Threat Group → Bingo, Abmelden
+# mit Pigeons → push Approach → Check.
+# Wortlaut laut ATP 3-52.4 „Air Control Communication“ (2021): Check-in S. 8, Core Information S. 28–29,
+# Declare S. 50–51, Threat Group S. 46, Threat S. 61.
+# Gewürfelt: Heimatplatz, Comm Plan, AWACS, Flugzeugtyp, Missionsnummer, Lage (2 Gruppen, im Picture noch bogey),
+# Declaration, Pigeons. Alles hängt an einer Lage `pic`: Der Alpha Check nennt den Check-in-Punkt
+# (`pic.ingress`, 15–25 NM vor der Station), die Station ist die eigene Position (`pic.own`), von dort rechnen
+# Bogey Dope und Threat (`pic.threat`: neue Gruppe 20–35 NM, hot oder flank).
+id: m5-s1-cap-station
+title: Auf CAP-Station mit {awacs}
+summary: Anmelden, Station beziehen, Lagebild, Bogey Dope, Declare, eine Bedrohung – und mit Pigeons nach Hause.
+layer: community
+as: lead
+sources:
+  - title: "ATP 3-52.4 „Air Control Communication“ (2. Sept. 2021), S. 8–9 (Check-in), S. 28–29 (Core Information), S. 46 (Threat Group), S. 50–51 (Declare), S. 61 (Threat)"
+  - title: "ATP 1-02.1 Multi-Service Brevity Codes (2020/21) – CAP(ING), ANCHOR"
+  - title: "Falcon BMS 4.38 Comms & Nav Book, S. 48–49 – Declare (Furball), JUDY"
+  - title: "Hoggit-Wiki: Getting started with GCI/AWACS"
+    url: https://wiki.hoggitworld.com/view/Gci
+  - title: "Wikipedia: Multiservice tactical brevity code (ATP 1-02.1, Stand 25.04.2025)"
+    url: https://en.wikipedia.org/wiki/Multiservice_tactical_brevity_code
+  - title: "SkyEye Player Guide"
+    url: https://github.com/dharmab/skyeye/blob/main/docs/PLAYER.md
+vars:
+  af: { pool: airfields }
+  cp: { commplan: true, airfield: af }
+  awacs: { pool: callsigns.awacs }
+  ac: { pool: aircraft, where: { role: multirole, era: modern } }
+  mn: { int: [1000, 9999] }
+  pt: { number: playtime, range: [45, 90] }
+  pic: { geo: true, groups: 2, id: bogey, labelled: false }
+  stn: { oneOf: [CAP, anchor] }
+  decl: { oneOf: [hostile, hostile, bandit] }
+  pb: { number: bearing }
+  pr: { oneOf: [{ text: "45", spoken: forty-five }, { text: "60", spoken: sixty }, { text: "75", spoken: seventy-five }] }
+  bingo: { number: fuel, range: [2.5, 3.5] }
+kneeboard:
+  title: "Line-up-Card {flight} – CAP"
+  commplan: cp
+  stations: [departure, awacs, approach]
+  rows:
+    - { label: "AWACS", value: "{awacs}" }
+    - { label: "Missionsnummer", value: "{mn}" }
+    - { label: "Auftrag", value: "CAP, playtime {pt}" }
+    - { label: "Bingo", value: "{bingo}" }
+    - { label: "Home Plate", value: "{af.name}" }
+  airfield: af
+  where:
+    dcs: "Missionsbriefing bzw. Comm Card im Kneeboard. AWACS-Rufzeichen und -Frequenz legt der Missionsersteller fest – sie stehen im Briefing."
+    bms: "Comm Plan im Briefing bzw. Line-up-Card im Kneeboard. In BMS liegt Tactical (AWACS) auf UHF-Preset 6."
+    srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Werte kommen aus Briefing oder Comm Card. SkyEye hört auf der Frequenz, die der Server festlegt."
+steps:
+  - stage: Check-in
+    tune: { name: "{awacs} ({cp.awacs.name})", freq: "{cp.awacs.freq}", channel: "{cp.awacs.channel}" }
+    situation: >-
+      Dein Flight ({flightSize}× {ac.type}) ist unterwegs zur CAP und fliegt genau nach Einsatzbefehl. Die
+      Missionsnummer steht auf der Line-up-Card. Stell den AWACS ein und melde dich als Lead an – mit
+      Alpha Check vom Bullseye.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – mission number … – checking in as fragged – request alpha check bullseye
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: "mission number {mn|spoken}", role: info, critical: true }
+          - { text: checking in as fragged, role: intent, critical: true, alt: [as fragged] }
+          - { text: request alpha check bullseye, role: request, critical: true, alt: [request alpha check, alpha check, alpha check bullseye] }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: contact, role: info }
+          - { text: "alpha check bullseye {pic.ingress|spoken}", role: value, note: "Deine Position vom Bullseye aus: {pic.ingress}." }
+
+  - stage: Check-in
+    situation: Der AWACS hat dich auf dem Schirm und dir gleich deine Position genannt.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Nur dein Rufzeichen. Den Alpha Check ({pic.ingress}) vergleichst du still mit deinem
+      Bullseye-Cursor – zurücklesen musst du ihn nicht.
+
+  - stage: Station
+    situation: Der AWACS schickt dich auf deine Station.
+    hear:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: "{stn}", role: brevity, note: "CAP = „richte deine Combat Air Patrol an diesem Punkt ein“, ANCHOR = „kreise über diesem Punkt“ – für die Station dasselbe." }
+          - { text: "bullseye {pic.own.bulls|spoken}", role: value, note: "Deine Station: bullseye {pic.own.bulls}, ein paar Meilen weiter in Richtung Bedrohung." }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Flieg zu bullseye {pic.own.bulls} und kreise dort. Bestätigt wird – wie immer beim AWACS – mit dem Rufzeichen.
+      Ab jetzt rechnet der AWACS jedes BRAA von deiner Station aus.
+
+  - stage: Picture
+    situation: >-
+      Du kreist auf deiner Station. Dein Flight ist noch nicht „commit“ gegangen – der AWACS gibt dir das Lagebild als
+      Core Information, ohne Label. Frag danach.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: picture, role: request, critical: true }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{awacs}", role: callsign }
+          - { text: "{pic.label|spoken}", role: info, note: Gesamtzahl der Gruppen. }
+          - { text: "{pic.g1.call|spoken}", role: value, note: "Erste Gruppe: Position, Höhe, Track, Identität – {pic.g1.call}." }
+          - { text: "{pic.g2.call|spoken}", role: value, note: "Zweite Gruppe im selben Muster – {pic.g2.call}." }
+
+  - stage: Picture
+    situation: Das Picture ist durch. Was antwortest du?
+    you:
+      mode: choice
+      wrong:
+        - "{awacs}, {callsign|spoken}, copy two groups"
+        - "Roger, two groups, {callsign|spoken}"
+        - "{awacs}, {callsign|spoken}, say again"
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign }
+    explain: Kurz bestätigen und merken – zwei Gruppen. Ein Picture liest man nicht zurück.
+
+  - stage: Bogey Dope
+    situation: Welche der beiden Gruppen ist dir am nächsten – und wie steht sie zu dir? Frag nach.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: bogey dope, role: brevity, critical: true }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: "group BRAA {pic.near.braa|spoken}", role: value, note: "Von dir aus: {pic.near.braa}." }
+          - { text: "{pic.near.alt|spoken}", role: value }
+          - { text: "{pic.near.aspect}", role: brevity }
+          - { text: "{pic.near.id}", role: brevity }
+
+  - stage: Bogey Dope
+    situation: Der AWACS hat geantwortet.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Nächste Gruppe: BRAA {pic.near.braa}, {pic.near.alt}, {pic.near.aspect}. Das ist die Gruppe bei
+      bullseye {pic.near.bulls} aus dem Picture.
+
+  - stage: Declare
+    situation: >-
+      Ein paar Minuten später: Dein Radar zeigt die Gruppe bei **bullseye {pic.near.bulls}**, **{pic.near.alt}**. Im
+      Picture war sie noch „bogey“ – Identität unbekannt. Laut Missionsbriefing bekämpfst du nur, was der AWACS als
+      hostile meldet. Frag nach, ob er inzwischen mehr weiß.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – declare – bullseye … – Höhe (bullseye 045/60 oder 045, 60 – beides geht)
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: declare, role: brevity, critical: true, free: true }
+          - { text: "bullseye {pic.near.bulls|spoken}", role: position, critical: true, tolerance: 3, alt: ["group bullseye {pic.near.bulls|spoken}"] }
+          - { text: "{pic.near.alt|spoken}", role: value, tolerance: 2 }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{awacs}", role: callsign }
+          - { text: "group bullseye {pic.near.bulls|spoken}", role: position }
+          - { text: "{pic.near.alt|spoken}", role: value }
+          - { text: "track {pic.near.track}", role: info }
+          - { text: "{decl}", role: brevity, note: "Die neue Declaration – im Picture war die Gruppe noch bogey." }
+
+  - stage: Declare
+    situation: Die Antwort ist da.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      Aus „bogey“ ist „{decl}“ geworden – deshalb hat sich das Declare gelohnt. Nur hostile heißt hier: freigegeben.
+      Bei bandit bleibst du dran, bekämpfst aber nicht – was als Nächstes passiert, ist Stoff der später geplanten
+      Spur Luftkampf.
+
+  - stage: Threat
+    situation: Plötzlich ruft dich der AWACS – ungefragt. Eine Gruppe, die im Picture nicht vorkam, ist aufgetaucht.
+    hear:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: threat group, role: brevity, note: "Eine bisher unbekannte Gruppe, die schon die Threat-Kriterien erfüllt (Standard 35 NM)." }
+          - { text: "BRAA {pic.threat.braa|spoken}", role: value, note: "Von deiner Station aus: {pic.threat.braa} – innerhalb von 35 NM." }
+          - { text: "{pic.threat.alt|spoken}", role: value }
+          - { text: "{pic.threat.aspect}", role: brevity, note: "Sie kommt näher." }
+          - { text: "{pic.threat.id}", role: brevity }
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: >-
+      „Threat group“ kommt ungefragt und in BRAA – nur für dich gerechnet, von deiner Station aus. Läge die neue Gruppe
+      noch außerhalb der Threat-, aber innerhalb der Targeting-Reichweite, wäre sie eine „pop-up group“ im
+      Bullseye-Format. Du bestätigst mit dem Rufzeichen. Ob du abdrehst oder angreifst, lernst du in der
+      später geplanten Spur Luftkampf. In Falcon BMS quittierst du eine solche Warnung im AWACS-Menü mit JUDY (Ziel auf
+      dem Radar, du übernimmst) – sonst wiederholt der AWACS sie alle 10 NM.
+
+  - stage: Heimweg
+    situation: >-
+      Dein Treibstoff erreicht Bingo. Melde dich beim AWACS ab und lass dir den Weg nach Hause geben.
+    you:
+      mode: type
+      hint: Adressat – Rufzeichen – RTB – request pigeons
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{awacs}", role: addressee, critical: true }
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+          - { text: bingo, role: brevity, optional: true }
+          - { text: RTB, role: intent, critical: true }
+          - { text: request pigeons, role: request, alt: [pigeons, "say pigeons", "request pigeons home plate"] }
+    reply:
+      - speaker: "{awacs}"
+        segments:
+          - { text: "{callsign|spoken}", role: addressee }
+          - { text: "{awacs}", role: callsign }
+          - { text: pigeons home plate, role: brevity }
+          - { text: "{pb|spoken}", role: value }
+          - { text: "{pr|spoken}", role: value }
+
+  - stage: Heimweg
+    situation: Du drehst auf den Kurs nach Hause.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{callsign|spoken}", role: callsign, critical: true }
+    explain: Kurs {pb}, {pr} Meilen bis {af.name}.
+
+  - stage: Heimweg
+    situation: Kurz vor dem Heimatplatz. Schick deinen Flight zu Approach.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: push, role: brevity, critical: true }
+          - { text: "{cp.approach.name}", role: info, critical: true, alt: ["button {cp.approach.channel|spoken}", "channel {cp.approach.channel|spoken}", "{cp.approach.channel|spoken}"] }
+
+  - stage: Heimweg
+    tune: { name: "{af.name} {cp.approach.name}", freq: "{cp.approach.freq}", channel: "{cp.approach.channel}" }
+    situation: Stell Approach ein und prüf deinen Flight.
+    you:
+      mode: type
+      transmission:
+        speaker: "{callsign}"
+        segments:
+          - { text: "{flightName}", role: addressee, critical: true }
+          - { text: check, role: request, critical: true }
+    reply:
+      - speaker: "{two}"
+        station: two
+        segments:
+          - { text: Two, role: callsign }
+      - speaker: "{three}"
+        station: three
+        segments:
+          - { text: Three, role: callsign }
+      - speaker: "{four}"
+        station: four
+        segments:
+          - { text: Four, role: callsign }
+    explain: >-
+      Station abgearbeitet – vom Check-in bis zu Pigeons. Wie es mit Approach weitergeht, kommt in der
+      später geplanten Spur Air Force Ops.

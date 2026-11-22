@@ -1,0 +1,21 @@
+id: osan
+name: Osan
+map: kto
+icao: RKSO
+elevationFt: 42
+runways: ["09L/27R", "09R/27L"]
+atc: { uhf: 308.8, vhf: 122.1 }
+tacan: 116X
+ils: "ILS 09L/27R: 111.30"
+freqs: { atis: 132.125, ground: 253.7, departure: 306.3, approach: 306.3 }
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+charts:
+  - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_AGC.pdf" }
+  - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_LOC.pdf" }
+  - { sim: bms, name: "EOR-Karte (Arm-/De-Arm-Flächen)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_EOR.png" }
+verified: community
+notes:
+  - "Frequenzen laut BMS-Simdaten (Stations+Ils.dat, Stand BMS 4.38) und BMS-AGC: ATC nur auf UHF, ATIS nur auf VHF; Approach und Departure teilen sich eine Frequenz. Das VHF in `atc` ist der Tower auf VHF."
+  - "TACAN SOT 116X laut AGC. Zwei parallele Bahnen; ILS-Frequenz 111.30 laut Simdaten für das Bahnpaar 09L/27R (Zuordnung zu den Bahnenden nicht geprüft)."
+  - "Base Ops UHF 272.7 nur in den Simdaten."
+  - "Funkname ohne „AB“, wie ihn die BMS-ATC spricht („Osan Ground“, vgl. Comms & Nav Book 4.38.2: „Gunsan Approach, Falcon 1 …“). Die BMS-Karten führen den Platz als „Osan AB“."

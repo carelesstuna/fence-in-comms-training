@@ -1,0 +1,982 @@
+# Übungen für Modul 1 (Grundausbildung).
+# Typen: choice, match, build, anatomy, input, generated – siehe content/README.md
+
+# ------------------------------------------------------------ Lektion 1: Aufbau eines Funkspruchs
+- id: m1-l1-anatomy-addressee
+  type: anatomy
+  call: m1-radio-check
+  transmission: 0
+  target: addressee
+  prompt: Tippe auf den Teil, der sagt, **wen** der Pilot ruft.
+  explain: Der Adressat kommt immer zuerst. So horchen nur die Gemeinten auf – alle anderen können weghören.
+
+- id: m1-l1-anatomy-callsign
+  type: anatomy
+  exam: true
+  call: m1-startup-request
+  transmission: 0
+  target: callsign
+  prompt: Tippe auf den Teil, der sagt, **wer** hier funkt.
+  explain: Das eigene Rufzeichen folgt direkt auf den Adressaten.
+
+- id: m1-l1-anatomy-request
+  type: anatomy
+  call: m1-startup-request
+  transmission: 0
+  target: request
+  prompt: Tippe auf den Teil, der sagt, **was** der Pilot will.
+  explain: Das Anliegen kommt zum Schluss – nachdem klar ist, wer mit wem spricht.
+
+- id: m1-l1-order
+  type: choice
+  prompt: Du rufst eine Station zum ersten Mal. In welcher Reihenfolge baust du den Funkspruch auf?
+  options:
+    - Adressat → eigenes Rufzeichen → Nachricht
+    - Eigenes Rufzeichen → Adressat → Nachricht
+    - Nachricht → Adressat → eigenes Rufzeichen
+    - Adressat → Nachricht → eigenes Rufzeichen
+  answer: 0
+  explain: „Wen rufe ich? Wer bin ich? Was will ich?“ – diese Reihenfolge gilt im militärischen wie im zivilen Funk.
+
+- id: m1-l1-who-answers
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    {airfield.name} Tower antwortet dir: „{callsign|spoken}, {airfield.name} Tower, loud and clear.“
+    Warum steht **dein** Rufzeichen vorne?
+  options:
+    - Jetzt ruft der Tower dich – du bist der Adressat.
+    - Der Tower liest dein Rufzeichen zur Kontrolle zurück.
+    - Rufzeichen von Piloten werden immer zuerst genannt.
+    - Ein Fehler – der Tower müsste sich zuerst nennen.
+  answer: 0
+  explain: Die Regel dreht sich nicht um – sie gilt für beide Seiten. Wer antwortet, ruft jetzt dich.
+
+- id: m1-l1-think-press-talk
+  type: choice
+  exam: true
+  prompt: Was gehört in die richtige Reihenfolge, bevor du auf einer belebten Frequenz sprichst?
+  options:
+    - Hineinhören → formulieren → PTT drücken → kurz warten → sprechen
+    - PTT drücken → überlegen, was man sagen will → sprechen
+    - Formulieren → PTT drücken → sofort losreden, damit keiner dazwischenfunkt
+    - Hineinhören → PTT drücken → „ähm, Tower …“ → Funkspruch formulieren
+  answer: 0
+  explain: >-
+    Erst hören, dann denken, dann drücken. Nach dem Drücken eine halbe Sekunde warten – sonst
+    fehlt beim Empfänger die erste Silbe (oft genau der Adressat!).
+
+- id: m1-l1-ptt-order
+  type: sequence
+  prompt: >-
+    Du willst auf einer belebten Frequenz etwas sagen. Bring die Schritte in die richtige
+    Reihenfolge.
+  items:
+    - Hineinhören, ob die Frequenz frei ist
+    - Den ganzen Funkspruch im Kopf formulieren
+    - Sprechtaste (PTT) drücken
+    - Eine halbe Sekunde warten
+    - Ruhig und deutlich sprechen
+  explain: >-
+    Erst hören, dann denken, dann drücken. Nach dem Drücken kurz warten – sonst fehlt beim Empfänger
+    die erste Silbe, oft genau der Adressat.
+
+- id: m1-l1-build-radio-check
+  type: build
+  call: m1-radio-check
+  prompt: >-
+    Du bist **{callsign}** und willst beim Tower prüfen, ob dein Funkgerät richtig sendet. Bau den
+    Radio Check zusammen.
+  distractors: [over, please]
+  explain: >-
+    Adressat, Rufzeichen, Anliegen. Die Frequenz zum Schluss ist eine hilfreiche Ergänzung. „please“ und „over“ sind
+    überflüssig: Dass du fertig bist, hört der Tower, wenn du die Taste loslässt.
+
+- id: m1-l1-build-startup
+  type: build
+  call: m1-startup-request
+  prompt: >-
+    Du bist **{callsign}**, stehst kalt auf dem Vorfeld, hast die ATIS gehört und willst anlassen. Bau
+    deine Anfrage an Ground.
+  distractors: ["{wingman|spoken}", "request taxi"]
+  explain: >-
+    „request taxi“ wäre der nächste Schritt – erst kommt die Anlassfreigabe. Und das Rufzeichen deines
+    Wingman hat in deiner Anfrage nichts zu suchen.
+
+# ------------------------------------------------------------ Lektion 2: Buchstabieralphabet
+- id: m1-l2-why-alphabet
+  type: choice
+  exam: true
+  prompt: Warum buchstabiert man im Funk mit ganzen Wörtern statt mit Buchstaben?
+  options:
+    - Viele Buchstaben klingen im Rauschen fast gleich, etwa B, D und P.
+    - Englische Buchstabennamen sind für den Funk zu lang und zu umständlich.
+    - Das Alphabet ist geheim, ein mithörender Gegner versteht es nicht.
+    - Funkgeräte können einzelne Buchstaben technisch nicht übertragen.
+  answer: 0
+  explain: >-
+    „Bee“, „Dee“, „Ee“, „Gee“, „Pee“ … klingen über ein knisterndes Funkgerät fast gleich. Ein
+    ganzes Wort wie „Bravo“ oder „Delta“ ist auch dann noch eindeutig, wenn eine Silbe verloren geht.
+
+- id: m1-l2-letter-to-word
+  type: generated
+  generator: phonetic-letter-to-word
+
+- id: m1-l2-word-to-letter
+  type: generated
+  exam: true
+  generator: phonetic-word-to-letter
+
+- id: m1-l2-spell
+  type: generated
+  generator: phonetic-spell
+
+- id: m1-l2-spelling
+  type: choice
+  prompt: Welche Schreibweise ist im ICAO-Alphabet richtig?
+  options:
+    - Alfa und Juliett
+    - Alpha und Juliet
+    - Alfa und Juliet
+    - Alpha und Juliett
+  answer: 0
+  explain: >-
+    Absicht, kein Tippfehler: Mit „f“ sprechen auch Nicht-Englischsprachige das Wort richtig aus,
+    und das doppelte „tt“ verhindert, dass Französischsprachige das Ende verschlucken. Im Alltag
+    liest du oft „Alpha“ – gesprochen klingt beides gleich.
+
+- id: m1-l2-german
+  type: choice
+  prompt: Du sollst die Wegpunkt-Kennung „BK“ durchgeben. Was sagst du?
+  options:
+    - Bravo Kilo
+    - Berta Konrad
+    - Baker King
+    - Bee Kay
+  answer: 0
+  explain: >-
+    Im Flugfunk gilt nur das ICAO/NATO-Alphabet. „Berta, Konrad“ ist die frühere deutsche
+    Buchstabiertafel fürs Telefon, und „Baker, King“ stammt aus dem alten Alphabet von vor 1956.
+
+- id: m1-l2-taxi-letters
+  type: input
+  vars:
+    l1: { letter: true }
+    l2: { letter: true, distinctFrom: [l1] }
+  prompt: >-
+    Ground sagt: „… taxi via **{l1}, {l2}** …“ – Über welche Rollwege sollst du rollen? Tippe die
+    beiden Buchstaben, nicht die Wörter.
+  accept:
+    - "{l1.letter} {l2.letter}"
+    - "{l1.letter}{l2.letter}"
+  placeholder: z. B. A B
+  explain: >-
+    {l1} ist {l1.letter}, {l2} ist {l2.letter}. Rollwege sind nach Buchstaben benannt und werden im
+    Alphabet gesprochen. Die Reihenfolge ist der Weg.
+
+- id: m1-l2-build-taxi
+  type: build
+  call: m1-taxi-request
+  transmission: 0
+  prompt: >-
+    Du bist **{callsign}** und führst einen Flight aus **zwei** Flugzeugen. Ihr habt angelassen und
+    wollt zur Startbahn rollen. Bau deine Anfrage an Ground.
+  distractors: [request startup, "{wingman|spoken}", flight of four]
+  explain: >-
+    Adressat, Rufzeichen, dann die Zusatzinfos (Anzahl, ATIS-Buchstabe) und zum Schluss das Anliegen.
+    Als Lead sprichst du für beide – dein Wingman sagt hier nichts.
+
+- id: m1-l2-call-startup
+  type: call
+  call: m1-startup-request
+  prompt: >-
+    Du stehst kalt in **{airfield.name}** und hast die ATIS-Ausgabe **{atis.letter}** gehört. Bitte
+    Ground um die Anlassfreigabe. Den ATIS-Buchstaben sprichst du im Alphabet.
+  hint: Adressat – Rufzeichen – ATIS-Kennung – Anfrage
+  explain: >-
+    „{airfield.name} Ground, {callsign|spoken}, information {atis}, request startup.“ Statt
+    „information {atis}“ geht auch „with {atis}“, und die Kennung darf auch nach der Anfrage stehen.
+
+- id: m1-l2-match-where
+  type: match
+  vars:
+    atis: { letter: true }
+  prompt: Wo begegnen dir Alphabet-Wörter im Funk? Ordne zu.
+  pairs:
+    - ["information {atis}", ATIS-Kennung – welche Wetterausgabe du gehört hast]
+    - [taxi via Alfa, Rollweg auf dem Flugplatz]
+    - [Kilo Mike, Gitterquadrat einer Koordinate (z. B. vom JTAC)]
+
+# ------------------------------------------------------------ Lektion 3: Zahlen im Funk
+- id: m1-l3-niner
+  type: choice
+  exam: true
+  prompt: Welche Ziffer spricht man auch im US-Militär fast immer anders als im Alltags-Englisch?
+  options:
+    - 9 – „niner“
+    - 3 – „tree“
+    - 5 – „fife“
+    - 0 – „oh“
+  answer: 0
+  explain: >-
+    „niner“ hört man überall. „tree“ und „fife“ sind strenges ICAO/NATO und werden im US-Militär oft
+    weggelassen. „oh“ statt „zero“ ist Umgangssprache – im Funk heißt es „zero“.
+
+- id: m1-l3-heading-spoken
+  type: generated
+  generator: number-to-spoken
+  params: { kind: heading }
+
+- id: m1-l3-input-heading
+  type: input
+  vars:
+    hdg: { number: heading }
+  prompt: >-
+    Approach schickt dich auf den Steuerkurs **{hdg}°**. Wie klingt dieser Kurs im Funk? Tippe ihn mit dem passenden
+    Stichwort.
+  accept:
+    - "heading {hdg|spoken}"
+    - "fly heading {hdg|spoken}"
+    - "turn left heading {hdg|spoken}"
+    - "turn right heading {hdg|spoken}"
+    - "left heading {hdg|spoken}"
+    - "right heading {hdg|spoken}"
+  hint: Drei Ziffern, jede einzeln – auch die führende Null.
+  explain: >-
+    „heading {hdg|spoken}“: Kurse sind immer dreistellig und werden Ziffer für Ziffer gesprochen. Der Lotse sagt dazu
+    „fly heading …“ oder mit Drehrichtung „turn left heading …“. Beim Zurücklesen nennst du die Drehrichtung mit.
+
+- id: m1-l3-north
+  type: choice
+  exam: true
+  prompt: Du sollst genau nach Norden fliegen. Wie lautet die Anweisung?
+  options:
+    - heading three six zero
+    - heading zero zero zero
+    - heading north
+    - heading zero
+  answer: 0
+  explain: Norden ist im Funk immer 360, nie 000. Kurse sind dreistellig und laufen von 001 bis 360.
+
+- id: m1-l3-angels-meaning
+  type: choice
+  exam: true
+  vars:
+    ang: { number: angels }
+  prompt: Ein Flight meldet „angels {ang|spoken}“. Wie hoch fliegt er?
+  options:
+    - "{ang}.000 Fuß über dem Meer"
+    - "{ang}00 Fuß über Grund"
+    - "{ang}.000 Meter über dem Meer"
+    - "{ang}.000 Fuß über dem Platz"
+  answer: 0
+  explain: >-
+    „angels“ heißt Tausend Fuß über dem Meer, wie der Höhenmesser mit QNH. Danach kommen nur die Tausender, Ziffer für
+    Ziffer – kein „thousand“ mehr dahinter. Hundert Fuß über Grund wären „cherubs“.
+
+- id: m1-l3-input-angels
+  type: input
+  vars:
+    ang: { number: angels }
+  prompt: Du fliegst auf **{ang}.000 Fuß**. Melde deine Höhe im taktischen Format, mit dem passenden Stichwort.
+  accept: ["angels {ang|spoken}"]
+  explain: „angels“ plus die Tausender Ziffer für Ziffer.
+
+- id: m1-l3-input-frequency
+  type: input
+  vars:
+    f: { number: uhf }
+  prompt: Sprich die Frequenz **{f}** im Funkformat.
+  accept: ["{f|spoken}"]
+  hint: Ziffer für Ziffer. Der Punkt heißt „point“ (US-Militär) oder „decimal“ (ICAO).
+  explain: Beide Varianten für den Punkt sind richtig. Wichtig ist, dass jede Ziffer einzeln kommt.
+
+- id: m1-l3-number-to-spoken
+  type: generated
+  exam: true
+  generator: number-to-spoken
+
+- id: m1-l3-spoken-to-number
+  type: generated
+  generator: spoken-to-number
+
+- id: m1-l3-two-fifty
+  type: choice
+  exam: true
+  prompt: Warum sagt man im Funk „two five zero“ und nicht „two fifty“?
+  options:
+    - Einzelne Ziffern bleiben im Rauschen eindeutig.
+    - „fifty“ ist im Militärfunk ein Brevity-Code mit eigener Bedeutung.
+    - Zahlwörter über hundert sind im ICAO-Englisch nicht vorgesehen.
+    - Reine Tradition aus der Morsezeit, technisch egal.
+  answer: 0
+  explain: >-
+    Jede Ziffer einzeln ist langsamer, aber robust: Geht eine Silbe verloren, fehlt eine Ziffer –
+    und das fällt auf. Bei „fifty“ gegen „fifteen“ fällt es nicht auf. Eine Ausnahme lernst du später: Im Lagebild
+    spricht der AWACS Entfernungen und Höhen als ganze Zahl (Modul 5, Lektion 2).
+
+- id: m1-l3-match-kinds
+  type: match
+  vars:
+    ang: { number: angels }
+    fuel: { number: fuel }
+    # Luftdruck in der Form eines gewürfelten Platzes: mal „altimeter“ (inHg), mal „QNH“ (hPa)
+    af: { pool: airfields }
+    altim: { number: pressure, airfield: af }
+    hdg: { number: heading }
+    t: { number: time }
+    f: { number: uhf }
+  prompt: Ordne jede Funkzahl ihrer Bedeutung zu.
+  pairs:
+    - ["angels {ang|spoken}", "Höhe: {ang}.000 Fuß über dem Meer"]
+    - ["state {fuel|spoken}", "Treibstoff: {fuel} (Tausend Pfund)"]
+    - ["{altim.word} {altim|spoken}", "Luftdruck: {altim} {altim.unit}"]
+    - ["heading {hdg|spoken}", "Steuerkurs: {hdg}°"]
+    - ["{t|spoken} Zulu", "Uhrzeit: {t} UTC"]
+    - ["{f|spoken}", "Frequenz: {f} MHz"]
+
+- id: m1-l3-match-height-words
+  type: match
+  vars:
+    alt: { number: altitude, range: [2000, 9000], step: 500 }
+    fl: { int: [180, 390], step: 10 }
+    ang: { number: angels }
+    cher: { int: [1, 9] }
+  prompt: Wer spricht wie? Ordne jede Beschreibung der passenden Höhenangabe zu.
+  pairs:
+    - ["ATC, Höhe in Fuß (unter der Übergangshöhe)", "{alt|spoken}"]
+    - ["ATC, Höhe über der Übergangshöhe", "flight level {fl|spoken}"]
+    - ["Taktisch (AWACS, Flight): Tausend Fuß über dem Meer", "angels {ang|spoken}"]
+    - ["Taktisch (AWACS, Flight): Hundert Fuß über Grund", "cherubs {cher|spoken}"]
+  explain: >-
+    ATC nennt Fuß mit „thousand“ und „hundred“, darüber Flight Levels. „angels“ (Tausend Fuß über dem Meer) und
+    „cherubs“ (Hundert Fuß über Grund) sind Brevity-Wörter des taktischen Funks.
+
+- id: m1-l3-ops-check
+  type: choice
+  layer: community
+  vars:
+    fuel: { number: fuel }
+  prompt: Beim Ops Check meldet dein Wingman „Two, {fuel|spoken}“. Was heißt das?
+  options:
+    - "Er hat noch {fuel} Tausend Pfund Treibstoff."
+    - "Er kann mit seinem Sprit noch {fuel} Minuten fliegen."
+    - "Er ist {fuel} Meilen hinter dir."
+    - "Sein Funkgerät ist auf Kanal {fuel}."
+  answer: 0
+  explain: >-
+    Treibstoff wird in Tausend Pfund gemeldet, mit einer Nachkommastelle. Die Rechnung „reicht das
+    noch?“ macht jeder selbst – gemeldet wird nur die Zahl.
+
+- id: m1-l3-time
+  type: choice
+  exam: true
+  vars:
+    t: { number: time }
+  prompt: „{t|spoken} Zulu“ – was ist gemeint?
+  options:
+    - "{t} Uhr UTC (Weltzeit)"
+    - "{t} Uhr Ortszeit am Startplatz"
+    - "{t} Uhr Ortszeit am Zielplatz"
+    - "{t} Uhr deiner Ortszeit zu Hause am PC"
+  answer: 0
+  explain: >-
+    Zeiten sind vierstellig, und „Zulu“ ist der Buchstabe Z für die Weltzeit UTC. Sie gilt überall gleich, egal wo
+    du startest, landest oder vor dem Bildschirm sitzt. So gibt es keine Verwirrung über Zeitzonen.
+
+- id: m1-l3-anatomy-altimeter
+  type: anatomy
+  exam: true
+  call: m1-approach-numbers
+  transmission: 0
+  target: value
+  prompt: Tippe auf den Teil, der dir den Luftdruck für den Höhenmesser gibt.
+  explain: >-
+    „{altim.word}“ plus die Ziffern einzeln: {altim} {altim.unit} wird zu „{altim|spoken}“. In der US-Form (FAA) heißt
+    es „altimeter“ (inHg, vier Ziffern ohne den Punkt), nach ICAO „QNH“ (Hektopascal).
+
+- id: m1-l3-build-angels
+  type: build
+  call: m1-awacs-checkin-angels
+  prompt: >-
+    Du bist **{callsign}**, fliegst auf **{ang}.000 Fuß** und meldest dich beim AWACS **{awacs}** an.
+    Bau deine Anmeldung – mit der Höhe im taktischen Format.
+  distractors: ["angels {ang|spoken} thousand", over]
+  explain: >-
+    Adressat, Rufzeichen, Anmeldung, Höhe. „angels“ enthält das „thousand“ schon. Und „over“ hört man
+    im Flugfunk kaum – das Ende eines Funkspruchs merkt man auch so.
+
+# ------------------------------------------------------------ Lektion 4: Rufzeichen und Flights
+- id: m1-l4-position
+  type: generated
+  generator: flight-position
+
+- id: m1-l4-match-roles
+  type: match
+  exam: true
+  prompt: Wer ist wer in deinem Flight? Ordne zu.
+  pairs:
+    - ["{flightName} {flightNum}-1", Flight Lead – führt den ganzen Flight]
+    - ["{flightName} {flightNum}-2", Wingman des Flight Leads]
+    - ["{flightName} {flightNum}-3", Element Lead – führt das zweite Paar]
+    - ["{flightName} {flightNum}-4", Wingman des Element Leads]
+
+- id: m1-l4-check-answer
+  type: input
+  prompt: Du bist Nummer 2. Dein Lead ruft „{flightName}, check.“ Was antwortest du?
+  accept: [two]
+  placeholder: …
+  explain: >-
+    Nur deine Nummer: „Two“. Der Lead weiß, wer Two ist. Jedes weitere Wort blockiert die Frequenz.
+
+- id: m1-l4-check-wrong
+  type: choice
+  prompt: Der Lead ruft „{flightName}, check.“ Welche Antwort von Nummer 3 ist richtig?
+  options:
+    - Three
+    - "{flightName} {flightNum}-3, checking in, loud and clear"
+    - Roger
+    - Three, roger, wilco
+  answer: 0
+  explain: Kurz und in fester Reihenfolge 2-3-4. Ein „roger“ verrät nicht, WER sich gemeldet hat.
+
+- id: m1-l4-build-check
+  type: build
+  exam: true
+  call: m1-flight-check
+  prompt: Ihr habt die Frequenz gewechselt. Prüfe, ob dein Flight mitgekommen ist.
+  distractors: [radio check, over]
+  explain: Flight-Name, dann „check“. „Radio check“ wäre eine Frage nach der Lesbarkeit an eine Bodenstelle.
+
+- id: m1-l4-outside
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Du bist {wingman} und musst ausnahmsweise selbst {airfield.name} Tower rufen. Wie meldest du
+    dich?
+  options:
+    - "{airfield.name} Tower, {wingman|spoken} …"
+    - "{airfield.name} Tower, Two …"
+    - "{airfield.name} Tower, {flight|spoken}, Dash Two …"
+    - "{airfield.name} Tower, Two of {flight|spoken} …"
+  answer: 0
+  explain: >-
+    „Two“ funktioniert nur als Antwort auf den Ruf deines Leads. „Dash Two“ sagt man im Briefing oder im Funk, wenn
+    das genaue Rufzeichen unbekannt ist – dein eigenes kennst du. Jede selbst begonnene Meldung trägt das vollständige
+    Rufzeichen, an andere Stellen und auch an den eigenen Lead. Es besteht aus Flight-Name, Flight-Nummer und deiner
+    Nummer im Flight, also „{wingman|spoken}“. Quelle: Vorschrift der US Air Force für die F-16 (AFMAN 11-2F-16
+    Band 3, Abs. 3.30).
+
+- id: m1-l4-flight-of
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+  prompt: Du führst einen Flight aus vier Flugzeugen und rufst Ground zum Rollen. Was ist richtig?
+  options:
+    - "{airfield.name} Ground, {callsign|spoken}, flight of four, request taxi"
+    - "{airfield.name} Ground, {callsign|spoken}, {wingman|spoken}, {element|spoken}, {element2|spoken}, request taxi"
+    - "{callsign|spoken}, {airfield.name} Ground, flight of four, request taxi"
+    - "{airfield.name} Ground, {flightName}, request taxi"
+  answer: 0
+  explain: >-
+    Der Lead spricht für alle – mit seinem eigenen Rufzeichen und „flight of four“. Adressat zuerst,
+    und der Flight-Name allein ist für Ground zu ungenau.
+
+- id: m1-l4-dash
+  type: choice
+  exam: true
+  prompt: Im Briefing steht „#3 übernimmt den Tanker-Funk“. Wer ist gemeint?
+  options:
+    - "{flightName} {flightNum}-3"
+    - "{flightName} {flightNum}-1"
+    - Der dritte Flight im Paket
+    - Funkgerät Nummer 3
+  answer: 0
+  explain: >-
+    „#3“ ist die schriftliche Form für Position 3 im Flight, den Element Lead. Im Briefing heißt er „Dash 3“, im Funk
+    des eigenen Flights antwortet er mit „Three“.
+
+- id: m1-l4-modex
+  type: choice
+  prompt: >-
+    Du fliegst im Endanflug auf den Träger. Womit meldest du dich beim LSO (Landing Signal Officer, dem Landeoffizier
+    am Heck des Trägers)?
+  options:
+    - Mit der Side Number (Modex) deines Flugzeugs
+    - Mit deinem taktischen Rufzeichen, z. B. {callsign}
+    - Mit dem Namen deines Trägers
+    - Mit „Two“, wenn du Wingman bist
+  answer: 0
+  explain: >-
+    In der Landephase am Träger zählt das einzelne Flugzeug, nicht der Flight. Die Side Number steht
+    groß auf dem Flugzeug – der LSO kann sie sehen.
+
+# ------------------------------------------------------------ Lektion 5: Standardwörter
+- id: m1-l5-match-core
+  type: match
+  exam: true
+  prompt: Ordne die Standardwörter ihrer Bedeutung zu.
+  pairs:
+    - [roger, Empfangen – mehr nicht]
+    - [wilco, Verstanden und wird ausgeführt]
+    - [affirm, Ja]
+    - [negative, Nein]
+    - [say again, Bitte wiederholen]
+
+- id: m1-l5-match-more
+  type: match
+  exam: true
+  prompt: Ordne die Standardwörter ihrer Bedeutung zu.
+  pairs:
+    - [standby, Warte – ich melde mich gleich]
+    - [unable, Ich kann das nicht ausführen]
+    - [correction, Versprochen – richtig ist …]
+    - [disregard, Vergiss meine letzte Übertragung]
+    - [confirm, Stimmt das? Bitte bestätigen]
+
+- id: m1-l5-match-situations
+  type: match
+  prompt: Welches Standardwort passt zur Lage? Ordne zu.
+  pairs:
+    - [standby, "AWACS fragt nach deinem Treibstoff, du musst erst auf die Anzeige schauen."]
+    - [unable, "Approach will, dass du steigst – vor dir steht ein Gewitter."]
+    - [correction, Du hast gerade die falsche Höhe gesagt und willst sie sofort berichtigen.]
+    - [disregard, Deine letzte Meldung hat sich erledigt und soll nicht mehr gelten.]
+    - [affirm, "Ground fragt, ob du die aktuelle ATIS hast – du hast sie gehört."]
+  explain: >-
+    standby = gleich, ich melde mich. unable = geht nicht (mit kurzem Grund). correction = richtig
+    ist … disregard = vergiss das. affirm = ja.
+
+- id: m1-l5-roger-meaning
+  type: choice
+  exam: true
+  prompt: Du antwortest auf eine Anweisung nur mit „roger“. Was weiß der Lotse jetzt sicher?
+  options:
+    - Nur, dass du seine Übertragung empfangen hast.
+    - Dass du die Anweisung verstanden hast und sie ausführen wirst.
+    - Dass du die Anweisung gehört hast, sie aber ablehnst.
+    - Dass du alle Zahlen darin richtig verstanden hast.
+  answer: 0
+  explain: >-
+    roger = „angekommen“. Ob du es richtig verstanden hast, zeigt erst ein Readback. Ob du es tust,
+    sagt erst „wilco“.
+
+- id: m1-l5-roger-vs-wilco
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    rep: { oneOf: [report initial, report five mile final, report base] }
+  prompt: >-
+    {airfield.name} Tower: „{callsign|spoken}, {rep}.“ – Ein Auftrag für später: Melde dich, wenn du an diesem Punkt
+    des Anflugs bist. Was antwortest du jetzt?
+  options:
+    - "wilco, {callsign|spoken}"
+    - "roger wilco, {callsign|spoken}"
+    - "repeat, {callsign|spoken}"
+    - "negative, {callsign|spoken}"
+  answer: 0
+  explain: >-
+    Ein Auftrag für später – du sagst zu, ihn auszuführen: „wilco“. „roger wilco“ ist doppelt, weil
+    wilco das roger schon enthält.
+
+- id: m1-l5-repeat
+  type: choice
+  prompt: Der Lotse hat dir eine Höhe genannt, aber du hast sie nicht verstanden. Was sagst du?
+  options:
+    - say again altitude
+    - repeat altitude
+    - say altitude
+    - please repeat the altitude
+  answer: 0
+  explain: >-
+    „say again“, und dahinter, WAS du nicht verstanden hast. „repeat“ ist im Militärfunk tabu: In der
+    Feuerunterstützung heißt es „noch einmal feuern“. Und „say altitude“ ist etwas anderes – so fragt
+    ATC nach DEINER aktuellen Höhe.
+
+- id: m1-l5-standby
+  type: choice
+  exam: true
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    Du stehst in {airfield.name}. Ground hat die Freigabe für deinen Flug und fragt, ob du zum Mitschreiben bereit
+    bist. Du hast aber noch keinen Stift zur Hand. Was sagst du sofort?
+  options:
+    - "{callsign|spoken}, standby"
+    - "{callsign|spoken}, negative"
+    - "{callsign|spoken}, roger"
+    - "{callsign|spoken}, unable"
+  answer: 0
+  explain: >-
+    „standby“ heißt „Moment, ich melde mich“. Es ist weder ja noch nein – und du schuldest danach
+    eine Antwort. „negative“ und „unable“ klängen, als könntest du gar nicht mitschreiben. „roger“ sagt nur,
+    dass die Frage angekommen ist.
+
+- id: m1-l5-unable
+  type: choice
+  exam: true
+  prompt: >-
+    Du fliegst mit voller Bombenlast und Zusatztanks. Center weist dich an, auf Flight Level 350 zu steigen. So hoch
+    kommt dein Flugzeug mit dieser Last nicht. Welches Standardwort passt?
+  options:
+    - unable
+    - negative
+    - disregard
+    - standby
+  answer: 0
+  explain: >-
+    „unable“ heißt „kann ich nicht ausführen“. Gib danach kurz den Grund an, damit der Lotse dir eine andere Höhe
+    geben kann. „negative“ ist nur ein „nein“ und keine Antwort auf eine Anweisung.
+
+- id: m1-l5-affirm
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+    atis: { letter: true }
+  prompt: >-
+    {airfield.name} Ground fragt: „{callsign|spoken}, confirm you have information {atis}?“ Du hast
+    die ATIS gehört.
+  options:
+    - "affirm, {callsign|spoken}"
+    - "wilco, {callsign|spoken}"
+    - "roger, {callsign|spoken}"
+    - "copy, {callsign|spoken}"
+  answer: 0
+  explain: >-
+    Eine Ja/Nein-Frage beantwortest du mit „affirm“ oder „negative“. „roger“ und „copy“ heißen nur
+    „verstanden“, nicht „ja“. ICAO schreibt „affirm“ vor, im US-Militär hörst du meist „affirmative“ –
+    beides wird verstanden.
+
+- id: m1-l5-roger-wilco
+  type: choice
+  exam: true
+  prompt: Was ist an „roger wilco“ falsch?
+  options:
+    - Es ist doppelt – wilco schließt roger schon ein.
+    - Nichts – das ist die vollständige, korrekte Form der Antwort.
+    - roger und wilco widersprechen sich.
+    - Es fehlt „over“ am Ende.
+  answer: 0
+  explain: Kurz ist besser. „wilco“ allein heißt schon „empfangen, verstanden, wird gemacht“.
+
+- id: m1-l5-over-out
+  type: choice
+  exam: true
+  prompt: Warum ist „over and out“ ein Widerspruch?
+  options:
+    - „over“ will eine Antwort, „out“ beendet das Gespräch.
+    - „over“ heißt „verstanden“, „out“ heißt „ich verlasse die Frequenz“.
+    - „over“ gehört nur in den Seefunk, „out“ nur in den Flugfunk.
+    - Das ist kein Widerspruch, sondern die korrekte Schlussformel.
+  answer: 0
+  explain: >-
+    Beides sind echte Standardwörter mit gegensätzlicher Bedeutung. Im Flugfunk hört man sie ohnehin
+    selten – das Ende eines Funkspruchs ergibt sich aus dem Zusammenhang.
+
+- id: m1-l5-build-correction
+  type: build
+  call: m1-correction
+  prompt: >-
+    Du bist **{callsign}** und meldest dem AWACS **{awacs}** deine Höhe. Dabei sagst du aus Versehen
+    „angels {a1|spoken}“ – richtig sind **{a2}.000 Fuß**. Korrigiere dich im selben Funkspruch.
+  distractors: [sorry, disregard]
+  explain: >-
+    „correction“ und sofort der richtige Wert. „disregard“ würde den GANZEN Funkspruch zurücknehmen –
+    dann müsstest du komplett neu ansetzen.
+
+- id: m1-l5-anatomy-say-again
+  type: anatomy
+  exam: true
+  call: m1-say-again
+  transmission: 1
+  target: proword
+  prompt: Tippe auf das Standardwort, mit dem der Pilot um Wiederholung bittet.
+  explain: „say again“ – und dahinter genau das, was fehlt.
+
+- id: m1-l5-input-say-again
+  type: input
+  prompt: >-
+    Die Frequenz, die dir der Tower gibt, geht im Rauschen unter. Bitte nur um Wiederholung der
+    Frequenz – ohne Adressat und Rufzeichen.
+  accept: [say again frequency]
+  placeholder: …
+  explain: >-
+    „say again“ plus das fehlende Stück. So muss der Tower nicht alles wiederholen. Niemals „repeat“ –
+    das ist in der Feuerunterstützung das Kommando, noch einmal zu schießen.
+
+- id: m1-l5-break-break
+  type: choice
+  prompt: Was bedeutet „break break“ nach ICAO?
+  options:
+    - Ab jetzt spreche ich mit einer anderen Station.
+    - Ganzer Flight, sofort maximal eng kurven!
+    - Die Funkverbindung ist gerade abgebrochen.
+    - Ich mache Pause, ihr anderen dürft jetzt sprechen.
+  answer: 0
+  explain: >-
+    Ein einzelnes „break“ trennt Teile EINER Nachricht, „break break“ trennt Nachrichten an
+    VERSCHIEDENE Empfänger (ICAO Annex 10 Bd. II, 5.2.1.5.8). In Sim-Missionen wird „break break“ außerdem
+    oft benutzt, um mit einer dringenden Meldung dazwischenzugehen – das ist Praxis, keine ICAO-Regel. Vorsicht: BREAK mit Richtung („break right“) ist im
+    Luftkampf ein Kommando zur Maximalkurve.
+
+# ------------------------------------------------------------ Lektion 6: Readback und Radio Check
+- id: m1-l6-what-readback
+  type: choice
+  prompt: Was musst du von einer ATC-Anweisung zurücklesen? (Alles Zutreffende)
+  options:
+    - Runway-Freigaben und „hold short“
+    - Höhen und Flight Levels
+    - Kurse
+    - Frequenzen
+    - Höhenmesser-Einstellung
+    - Wind
+    - Verkehrshinweise
+    - Temperatur
+  answer: [0, 1, 2, 3, 4]
+  explain: >-
+    Zurückgelesen wird alles, was bei einem Missverständnis gefährlich wird: Bahnen, Höhen, Kurse,
+    Frequenzen, Luftdruck, Transpondercodes. Dazu dein Rufzeichen am Ende.
+
+- id: m1-l6-cloze-taxi
+  type: cloze
+  call: m1-taxi-request
+  transmission: 2
+  blanks: [0, 2]
+  prompt: Ground hat dir die Rollfreigabe gegeben. Ergänze die Lücken in deinem Readback.
+  explain: >-
+    Die Runway und das „hold short“ sind die beiden Teile, die nie fehlen dürfen. Ein vergessenes
+    „hold short“ heißt für Ground: Der rollt womöglich auf die Bahn.
+
+- id: m1-l6-no-readback
+  type: choice
+  exam: true
+  prompt: Was davon musst du NICHT zurücklesen?
+  options:
+    - Eine Verkehrsinformation („traffic, two o'clock“)
+    - Eine Haltanweisung („hold short of runway …“)
+    - Eine Höhenmesser-Einstellung („altimeter …“ bzw. „QNH …“)
+    - Einen Frequenzwechsel („contact departure …“ mit Frequenz)
+  answer: 0
+  explain: >-
+    Einen Verkehrshinweis bestätigst du nur („roger“, „looking“). Freigaben, Haltanweisungen, Frequenzen und Zahlen, nach
+    denen du fliegst, liest du zurück.
+
+- id: m1-l6-build-taxi-readback
+  type: build
+  call: m1-taxi-request
+  transmission: 2
+  prompt: Du bist **{callsign}**. Ground hat dir die Rollfreigabe gegeben. Lies sie zurück.
+  distractors: ["via {twB}, {twA}", roger, cleared for takeoff]
+  explain: >-
+    Runway, Rollweg in der richtigen Reihenfolge, „hold short“ wörtlich, Rufzeichen am Ende. Ein
+    „roger“ würde nicht zeigen, dass du richtig verstanden hast.
+
+- id: m1-l6-build-approach-readback
+  type: build
+  call: m1-approach-numbers
+  prompt: Du bist **{callsign}**. Approach gibt dir Luftdruck, Kurs und Höhe. Lies alles zurück.
+  distractors: ["right heading {hdg|spoken}", wilco]
+  explain: Alle drei Zahlen, die Drehrichtung beim Kurs und dein Rufzeichen. „wilco“ allein wäre hier zu wenig.
+
+- id: m1-l6-input-freq-readback
+  type: input
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    {airfield.name} Tower: „{callsign|spoken}, contact departure {airfield.dep|spoken}.“ – Lies zurück.
+  accept:
+    - "departure {airfield.dep|spoken} {callsign|spoken}"
+    - "{airfield.dep|spoken} {callsign|spoken}"
+    - "contact departure {airfield.dep|spoken} {callsign|spoken}"
+    # Rufzeichen vorn lässt jeder Lotse gelten (E3-07); üblich ist es am Ende
+    - "{callsign|spoken} departure {airfield.dep|spoken}"
+    - "{callsign|spoken} {airfield.dep|spoken}"
+  hint: Stelle und Frequenz, dann dein Rufzeichen.
+  explain: Die Frequenz Ziffer für Ziffer zurück und dein Rufzeichen dahinter. Dann erst umschalten.
+
+- id: m1-l6-anatomy-callsign-end
+  type: anatomy
+  exam: true
+  call: m1-taxi-request
+  transmission: 2
+  target: callsign
+  prompt: Wo steht in deinem Readback dein Rufzeichen?
+  explain: >-
+    Beim Readback kommt das Rufzeichen ans Ende. Der Inhalt ist wichtiger, und der Lotse weiß
+    ohnehin, wen er gerade angesprochen hat.
+
+- id: m1-l6-match-readability
+  type: match
+  exam: true
+  prompt: Ordne die Lesbarkeitsstufen (ICAO) zu.
+  pairs:
+    - [read you one, unlesbar]
+    - [read you two, zeitweise lesbar]
+    - [read you three, lesbar – aber nur mit Mühe]
+    - [read you four, gut lesbar]
+    - [read you five, einwandfrei lesbar]
+
+- id: m1-l6-five-by-five
+  type: choice
+  exam: true
+  prompt: Was meint „five by five“?
+  options:
+    - Lesbarkeit 5, Signalstärke 5.
+    - Fünf Flugzeuge in fünf Meilen Abstand.
+    - Kanal 5, Frequenz 5 – bitte dorthin wechseln.
+    - Du sollst in fünf Minuten erneut prüfen.
+  answer: 0
+  explain: >-
+    Zwei Skalen von 1 bis 5: wie gut man dich versteht und wie stark das Signal ist. „five by five“ ist Slang aus dem
+    Militär. Nach ICAO sagst du „read you five“, militärisch üblich ist „loud and clear“.
+
+- id: m1-l6-radio-check-answer
+  type: choice
+  vars:
+    airfield: { pool: airfields }
+  prompt: >-
+    {airfield.name} Approach macht einen Radio Check bei dir. Du verstehst ihn nur mit Mühe. Was
+    antwortest du?
+  options:
+    - "{airfield.name} Approach, {callsign|spoken}, read you three"
+    - "{airfield.name} Approach, {callsign|spoken}, read you five"
+    - "{airfield.name} Approach, {callsign|spoken}, five by five"
+    - "{airfield.name} Approach, {callsign|spoken}, roger, loud and clear"
+  answer: 0
+  explain: >-
+    Ehrlich melden: 3 heißt „lesbar, aber nur mit Mühe“. Ein geschöntes „five by five“ oder „loud and
+    clear“ hilft niemandem. Approach weiß dann nicht, dass er langsamer sprechen oder dich auf eine andere
+    Frequenz schicken sollte.
+
+- id: m1-l6-hearback
+  type: choice
+  exam: true
+  prompt: Du liest versehentlich eine falsche Höhe zurück. Was sollte passieren?
+  options:
+    - Der Lotse hört den Fehler und korrigiert dich.
+    - Nichts – der Readback ist nur eine Höflichkeit.
+    - Du musst die ganze Freigabe neu anfordern.
+    - Der Lotse bestätigt mit „roger“, dann gilt deine Höhe.
+  answer: 0
+  explain: >-
+    Readback und „Hearback“ gehören zusammen: Du liest zurück, der Lotse hört zu. Ein Fehler fällt
+    auf, bevor jemand danach fliegt.
+
+- id: m1-l6-takeoff-word
+  type: choice
+  prompt: Warum hört man heute „ready for departure“ statt „ready for takeoff“?
+  options:
+    - „takeoff“ soll nur noch in der Startfreigabe selbst fallen.
+    - „departure“ klingt im Rauschen viel deutlicher als „takeoff“.
+    - „takeoff“ ist heute ein Brevity-Code für den Start eines Pakets.
+    - Reine Geschmackssache – beide Wörter sind gleichwertig.
+  answer: 0
+  explain: >-
+    Eine Lehre aus dem Unglück von Teneriffa 1977: Wenn „takeoff“ nur in „cleared for takeoff“
+    vorkommt, kann kein halb verstandener Satz wie eine Startfreigabe klingen.
+
+# ------------------------------------------------------------ Lektion 7 (Position 5): Funk und Physik
+- id: m1-l7-match-propagation
+  type: match
+  prompt: Was passiert mit der Funkwelle? Ordne zu.
+  pairs:
+    - ["Kurzwelle (HF)", "Die Ionosphäre wirft sie zur Erde zurück – sie trägt weit über den Horizont"]
+    - ["VHF und UHF", "Breiten sich fast geradeaus aus – bis zum Funkhorizont"]
+    - ["Ein Berg zwischen Sender und Empfänger", "Funkschatten – meist kein Kontakt, bis einer höher steigt"]
+    - ["Rauschen im Empfänger", "Meist ist das Signal zu schwach – die Lesbarkeit sinkt"]
+    - ["Gleiche Frequenz, aber AM gegen FM", "Kein Kontakt – die Modulation muss passen"]
+
+- id: m1-l7-calc-one
+  type: choice
+  vars:
+    # text = Höhe, spoken = die Reichweite, 1,23 · √Höhe, gerundet (die Antwort)
+    alt:
+      oneOf:
+        - { text: "100", spoken: "12" }
+        - { text: "400", spoken: "25" }
+        - { text: "900", spoken: "37" }
+        - { text: "1.600", spoken: "49" }
+        - { text: "3.600", spoken: "74" }
+        - { text: "4.900", spoken: "86" }
+        - { text: "6.400", spoken: "98" }
+        - { text: "10.000", spoken: "123" }
+        - { text: "14.400", spoken: "148" }
+        - { text: "19.600", spoken: "172" }
+    # Falschantworten, die nie mit einer richtigen zusammenfallen
+    w1: { oneOf: ["60", "300", "5", "250", "500"] }
+    w2: { oneOf: ["60", "300", "5", "250", "500"], distinctFrom: [w1] }
+  prompt: >-
+    Du fliegst auf **{alt} ft**, die Antenne der Bodenstation steht auf Geländehöhe (rechne mit 0 ft). Wie weit reicht
+    der Funk nach der Faustformel 1,23 · √Höhe etwa?
+  options:
+    - "{alt|spoken} NM"
+    - "{w1} NM"
+    - "{w2} NM"
+    - "{alt} NM"
+  answer: 0
+  explain: >-
+    1,23 · √{alt} ≈ {alt|spoken} NM. Die Wurzel gehört dazu: Wer die Höhe in Fuß einfach als Seemeilen nimmt, kommt auf
+    absurde Werte.
+
+- id: m1-l7-calc-two
+  type: input
+  vars:
+    # text = Reichweite zwischen beiden Flugzeugen, 2 · 1,23 · √Höhe, gerundet (die Antwort);
+    # spoken = Höhe beider Flugzeuge in Fuß (nur Anzeige). lo/hi: ±1 NM, weil Zwischenrundungen bei einer
+    # Faustformel um eins danebenliegen dürfen (147 statt 148).
+    nm:
+      oneOf:
+        - { text: "25", spoken: "100" }
+        - { text: "49", spoken: "400" }
+        - { text: "74", spoken: "900" }
+        - { text: "98", spoken: "1.600" }
+        - { text: "123", spoken: "2.500" }
+        - { text: "148", spoken: "3.600" }
+        - { text: "172", spoken: "4.900" }
+        - { text: "197", spoken: "6.400" }
+        - { text: "221", spoken: "8.100" }
+        - { text: "246", spoken: "10.000" }
+    lo: { derive: offset, from: nm, add: -1 }
+    hi: { derive: offset, from: nm, add: 1 }
+  prompt: >-
+    Zwei Flugzeuge fliegen beide auf **{nm|spoken} ft**. Wie weit können sie sich nach der Faustformel
+    1,23 · (√Höhe₁ + √Höhe₂) höchstens hören? Antworte in Seemeilen, auf ganze NM gerundet.
+  accept: ["{nm}", "{nm} NM", "{lo}", "{lo} NM", "{hi}", "{hi} NM"]
+  placeholder: Zahl eintippen …
+  explain: >-
+    Beide Wurzeln sind gleich: 1,23 · 2 · √{nm|spoken} ≈ {nm} NM. Eine Seemeile mehr oder weniger zählt auch, das
+    kommt vom Runden. Zwei Antennen in der Luft hören sich deutlich weiter als eine in der Luft und eine am Boden.
+
+- id: m1-l7-mountain
+  type: choice
+  prompt: >-
+    Du fliegst tief in einem Tal. Der Tower liegt 15 NM entfernt hinter einem hohen Bergrücken. Frequenz, Gerät und
+    Modulation stimmen, aber er antwortet nicht. Was ist die wahrscheinlichste Ursache – und was hilft?
+  options:
+    - Funkschatten hinter dem Berg. Höher steigen, bis du wieder Sichtlinie hast.
+    - Das Funkgerät ist defekt. Lauter stellen und weiter rufen, bis die Antwort kommt.
+    - Die Frequenz ist falsch. Reihum alle Frequenzen durchprobieren, bis jemand antwortet.
+    - Der Tower hat dich überhört. Dieselbe Meldung sofort zweimal hintereinander senden.
+  answer: 0
+  explain: >-
+    VHF und UHF breiten sich fast geradeaus aus, ein Berg schattet sie weitgehend ab. Lauter sprechen oder öfter rufen
+    ändert daran nichts – nur eine andere Position (höher) oder ein Relais.
+
+- id: m1-l7-noise
+  type: choice
+  prompt: >-
+    Dein Wingman fliegt von dir weg. Je weiter er sich entfernt, desto stärker rauscht und knistert seine Stimme, bis
+    kaum noch Wörter zu verstehen sind. Warum?
+  options:
+    - Sein Signal wird mit der Entfernung schwächer, das Rauschen im Empfänger bleibt gleich.
+    - Seine Frequenz verschiebt sich mit der Entfernung langsam nach oben.
+    - Mit der Entfernung wechselt die Modulation von AM auf FM.
+    - Das Funkgerät sendet bei größerem Abstand mit weniger Leistung, um den Akku zu schonen.
+  answer: 0
+  explain: >-
+    Das Rauschen bleibt, das Signal wird schwächer. Beim Radio Check meldest du das ehrlich als „read you three“ oder
+    schlechter und nicht als „five by five“. Bleibt es auch aus der Nähe verrauscht, liegt es eher am Gerät, etwa an
+    Antenne oder Kabel.

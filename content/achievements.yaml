@@ -1,0 +1,127 @@
+# Abzeichen (Achievements). Jedes hat genau eine Bedingung (rule). Mögliche Bedingungen:
+#   lessons: n          n Lektionen abgeschlossen
+#   module: m1          Modul erledigt (auch per Einstufung)
+#   placement: true     einen Einstufungstest bestanden
+#   exams: n            n Modulprüfungen bestanden
+#   rank: wingman       Dienstgrad erreicht
+#   xp: n               n XP gesammelt
+#   streak: n           Funk-Drill n Tage in Folge (Rekord zählt)
+#   dailyDays: n        Funk-Drill an n Tagen erledigt (insgesamt)
+#   matureCards: n      n Übungen im Langzeitgedächtnis (Wiederholungsabstand ab 21 Tagen)
+#   hangar: n           n Hangar-Karten entdeckt
+#   correctCalls: n     n Funksprüche richtig getippt
+#   cleanCalls: n       n Funksprüche richtig und ohne ein überflüssiges Wort
+#   silences: n         n-mal richtig geschwiegen
+#   tunes: n            n-mal das Funkgerät auf Anhieb richtig eingestellt
+#   perfectScenarios: n n Szenarien ohne Fehler
+# hidden: true = geheim, bis es erreicht ist.
+
+# ------------------------------------------------------------------ Ausbildung
+- id: erste-lektion
+  title: Erster Sprechfunk
+  description: Die erste Lektion abgeschlossen.
+  icon: 📻
+  rule: { lessons: 1 }
+- id: grundausbildung
+  title: Grundausbildung bestanden
+  description: Modul 1 erledigt – Aufbau, Alphabet, Zahlen, Rufzeichen, Standardwörter.
+  icon: 🎓
+  rule: { module: m1 }
+- id: comm-plan
+  title: Herr der Kanäle
+  description: Modul 2 erledigt – Funkgeräte, Comm Plan, Guard und Sprechfunk in der Sim (SRS, IVC).
+  icon: 🎛️
+  rule: { module: m2 }
+- id: bodenpersonal
+  title: Freund der Bodencrew
+  description: Modul 3 erledigt – vom Crew Chief bis zum Departure.
+  icon: 🛫
+  rule: { module: m3 }
+- id: kenne-ich-schon
+  title: Kenne ich schon
+  description: Einen Einstufungstest bestanden.
+  icon: ⏩
+  rule: { placement: true }
+- id: geprueft
+  title: Geprüft
+  description: Eine Modulprüfung bestanden.
+  icon: 📝
+  rule: { exams: 1 }
+- id: alle-pruefungen
+  title: Alle Prüfungen bestanden
+  description: Die Modulprüfungen aller fünf Module bestanden.
+  icon: 🏅
+  rule: { exams: 5 }
+- id: hangar-stammgast
+  title: Hangar-Stammgast
+  description: Zehn Hangar-Karten entdeckt.
+  icon: 🔧
+  rule: { hangar: 10 }
+
+# ------------------------------------------------------------------ Funkpraxis
+- id: mikrofon-offen
+  title: Mikrofon offen
+  description: Den ersten Funkspruch richtig getippt.
+  icon: 🎙️
+  rule: { correctCalls: 1 }
+- id: clean-comms
+  title: Clean Comms
+  description: Zehn Funksprüche richtig – und ohne ein einziges überflüssiges Wort.
+  icon: ✨
+  rule: { cleanCalls: 10 }
+- id: funkdisziplin
+  title: Funkdisziplin
+  description: Zehnmal richtig geschwiegen, wo andere „roger“ gesagt hätten.
+  icon: 🤫
+  rule: { silences: 10 }
+- id: richtiger-kanal
+  title: Auf dem richtigen Kanal
+  description: Zehnmal das Funkgerät auf Anhieb richtig eingestellt.
+  icon: 📡
+  rule: { tunes: 10 }
+- id: fehlerfrei
+  title: Fehlerfrei
+  description: Ein Szenario ohne einen einzigen Fehler durchgespielt.
+  icon: 🎯
+  rule: { perfectScenarios: 1 }
+- id: hundert-funksprueche
+  title: Hundert Funksprüche
+  description: Hundert Funksprüche richtig getippt.
+  icon: 💯
+  rule: { correctCalls: 100 }
+  hidden: true
+
+# ------------------------------------------------------------------ Dranbleiben
+- id: drei-tage
+  title: Am Ball
+  description: Den Funk-Drill drei Tage in Folge erledigt.
+  icon: 🔥
+  rule: { streak: 3 }
+- id: eine-woche
+  title: Eine Woche am Funk
+  description: Den Funk-Drill sieben Tage in Folge erledigt.
+  icon: 📅
+  rule: { streak: 7 }
+- id: dreissig-tage
+  title: Dauersender
+  description: Den Funk-Drill dreißig Tage in Folge erledigt.
+  icon: 🏆
+  rule: { streak: 30 }
+  hidden: true
+- id: langzeitgedaechtnis
+  title: Langzeitgedächtnis
+  description: 25 Übungen sitzen so sicher, dass sie erst in drei Wochen oder später wiederkommen.
+  icon: 🧠
+  rule: { matureCards: 25 }
+
+# ------------------------------------------------------------------ Laufbahn
+- id: wingman
+  title: Wingman
+  description: Zum Wingman befördert.
+  icon: 🪽
+  rule: { rank: wingman }
+- id: tausend-xp
+  title: Tausend XP
+  description: 1.000 XP gesammelt.
+  icon: ⭐
+  rule: { xp: 1000 }

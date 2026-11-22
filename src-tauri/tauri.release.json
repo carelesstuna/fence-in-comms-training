@@ -1,0 +1,9 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "bundle": {
+    "resources": {
+      "../dist/LICENSES.txt": "LICENSES.txt",
+      "asr-bundle/whisper/*": "whisper/"
+    }
+  }
+}

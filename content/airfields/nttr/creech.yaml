@@ -1,0 +1,14 @@
+id: creech
+name: Creech
+map: nttr
+icao: KINS
+elevationFt: 3126
+runways: ["13/31", "08/26"]
+atc: { uhf: 360.6, vhf: 118.3 }
+tacan: 87X
+ils: "ILS 08: 108.70 (ICRR) – zweites ILS: RWY 13 auf 108.50 (ICRS)"
+verified: dcs-data
+notes:
+  - Real Heimat von Drohnen-Staffeln (RPA) – gemischter Verkehr.
+  - TACAN Kanal 87 (INS) und beide ILS laut DCS-Funkfeuerdaten (Mods/terrains/Nevada/Beacons.lua); die Bahn ergibt sich aus der Richtung des Localizers. Den TACAN-Modus nennen die Daten nicht.
+  - Platzhöhe aus Beacons.lua (Gleitpfadsender und TACAN auf 953 m = 3126 ft). DCS liefert für Creech keine Kneeboard-Karte mit.

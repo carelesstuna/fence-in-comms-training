@@ -1,0 +1,181 @@
+# Beispiele für die erweiterten Übungsformate. Sie hängen in keiner Lektion,
+# dienen als Vorlage und lassen sich in der App unter #/drill/<id> ansehen.
+
+- id: beispiel-mehrfachauswahl
+  type: choice
+  prompt: Ground gibt dir eine Rollfreigabe mit Haltepunkt. Was liest du **zurück**? (Alles Zutreffende)
+  options:
+    - Die zugewiesene Runway
+    - Die Haltepunkt-Anweisung („hold short …“)
+    - Die Rollroute
+    - Den Wind
+    - Die Temperatur
+  answer: [0, 1, 2]
+  explain: Runway, Rollroute und vor allem jedes „hold short“ werden zurückgelesen. Wetterwerte nicht.
+
+- id: beispiel-lueckentext
+  type: cloze
+  call: m1-startup-request
+  transmission: 0
+  blanks: [0, 2]
+  # Platzhalter aus dem Funkspruch (airfield, atis) sind auch in der Übung verfügbar
+  prompt: Du stehst in **{airfield.name}** und hast ATIS **{atis}** gehört. Ergänze deine Anfrage an Ground.
+  explain: Erst der Adressat, dann dein Rufzeichen – und die ATIS-Kennung zeigt, dass du das aktuelle Wetter kennst.
+
+- id: beispiel-reihenfolge
+  type: sequence
+  prompt: In welcher Reihenfolge sprichst du vor dem Start mit den Stellen am Platz?
+  items:
+    - ATIS hören
+    - "Ground: Anlassfreigabe"
+    - "Ground: Rollfreigabe"
+    - "Tower: Startfreigabe"
+    - Departure
+  explain: Erst informieren (ATIS), dann am Boden bleiben (Ground), dann auf die Bahn (Tower), dann in die Luft (Departure).
+
+- id: beispiel-atis-decoder
+  type: form
+  vars:
+    af: { pool: airfields }
+    wx: { weather: true, airfield: af }
+    info: { letter: true }
+  prompt: Du hörst die ATIS. Schreib die wichtigsten Werte mit.
+  context: >-
+    {af.name} information {info}. Wind {wx.wind|spoken}. {wx.visibility|spoken}.
+    {wx.clouds|spoken}. Temperature {wx.temp|spoken}, dew point {wx.dew|spoken}.
+    {wx.pressure.word} {wx.pressure|spoken}. Landing and departing runway {wx.runway|spoken}.
+    Advise on initial contact you have information {info}.
+  fields:
+    - { label: Kennung, accept: ["{info}", "{info.letter}"], placeholder: Buchstabe oder Wort }
+    - { label: Runway, accept: ["{wx.runway}"], placeholder: z. B. 31 }
+    # Luftdruck in der Form des Platzes: 29.92 (altimeter, inHg) oder 1013 (QNH, hPa)
+    - { label: "Luftdruck ({wx.pressure.unit})", accept: ["{wx.pressure}", "{wx.pressure|spoken}"], placeholder: Zahl eintippen … }
+  explain: >-
+    Kennung {info}, Runway {wx.runway}, {wx.pressure.word} {wx.pressure}. Die Runway passt zum Wind
+    ({wx.wind}) – gestartet und gelandet wird gegen den Wind.
+
+- id: beispiel-comm-plan
+  type: form
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+  prompt: Dein Lead funkt „{flight}, push {cp.strike.name}“. Auf welchen Kanal schaltest du – und mit welcher Frequenz?
+  context: |
+    **Comm Card {af.name}**
+
+    | Stelle | Kanal | Frequenz |
+    |---|---|---|
+    | {cp.ground.name} | {cp.ground.channel} | {cp.ground.freq} |
+    | {cp.tower.name} | {cp.tower.channel} | {cp.tower.freq} |
+    | {cp.departure.name} | {cp.departure.channel} | {cp.departure.freq} |
+    | {cp.strike.name} | {cp.strike.channel} | {cp.strike.freq} |
+    | {cp.awacs.name} | {cp.awacs.channel} | {cp.awacs.freq} |
+    | {cp.tanker.name} | {cp.tanker.channel} | {cp.tanker.freq} |
+  fields:
+    - { label: Kanal, accept: ["{cp.strike.channel}"] }
+    - { label: Frequenz, accept: ["{cp.strike.freq}"] }
+  explain: „Push Strike“ heißt – ohne Rückfrage – auf den Strike-Kanal {cp.strike.channel} ({cp.strike.freq}) wechseln und dort einchecken.
+
+# --------------------------------------------------------------- Funkspruch tippen und Schweigen
+
+- id: beispiel-checkin-tippen
+  type: call
+  call: beispiel-flight-checkin
+  prompt: Der Lead fragt nach dem Check-in. Was funkst du?
+  explain: Im Flight antwortet jeder nur mit seiner Nummer, in der richtigen Reihenfolge.
+
+- id: beispiel-push-schweigen
+  type: call
+  call: beispiel-push
+  as: two
+  expect: silence
+  prompt: Was antwortest du dem Lead?
+  explain: Auf „push“ antwortet niemand. Du wechselst die Frequenz und meldest dich dort beim Check-in.
+
+- id: beispiel-bogey-dope-tippen
+  type: call
+  call: beispiel-bogey-dope
+  prompt: Du willst von **{awacs}** wissen, wo die nächste Gruppe steht. Was funkst du?
+  explain: Adressat, Rufzeichen, Brevity-Wort – mehr braucht es nicht.
+
+# --------------------------------------------------------------- Lagebild-Decoder
+
+- id: beispiel-lagebild-setzen
+  type: plot
+  vars:
+    pic: { geo: true, groups: 1 }
+  geo: pic
+  mode: place
+  prompt: Der AWACS meldet eine Gruppe. Setze sie auf der Bullseye-Karte.
+  explain: Bullseye-Angaben sind immer Peilung und Entfernung VOM Bullseye zur Gruppe – egal, wo du gerade bist.
+
+- id: beispiel-lagebild-bullseye
+  type: plot
+  vars:
+    pic: { geo: true, groups: 2 }
+  geo: pic
+  mode: bullseye
+  group: 1
+  prompt: Lies Peilung und Entfernung der roten Gruppe vom Bullseye ab.
+
+- id: beispiel-lagebild-braa
+  type: plot
+  vars:
+    pic: { geo: true, groups: 1 }
+  geo: pic
+  mode: braa
+  prompt: Gib der Gruppe ein BRAA – Peilung und Entfernung von dir aus.
+  explain: BRAA ist relativ zu DIR, Bullseye relativ zum Bezugspunkt. Beides beschreibt dieselbe Gruppe.
+
+# --------------------------------------------------------------- Karten (::chart, chart-tap)
+
+- id: beispiel-karte-landefrequenz
+  type: chart-tap
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+    apc: { chart: approach, airfield: af, commplan: cp }
+  chart: apc
+  prompt: Du fliegst den Anflug auf **{af.name}**. Tippe auf die Frequenz, auf der du die Landefreigabe bekommst.
+  target: tower
+  explain: Die Landefreigabe kommt vom Tower – auf der Anflugkarte steht er im Kopf rechts, fett gedruckt.
+
+- id: beispiel-karte-startbahn
+  type: chart-tap
+  vars:
+    af: { pool: airfields }
+    wx: { weather: true, airfield: af }
+    cp: { commplan: true, airfield: af }
+    apd: { chart: airport, airfield: af, commplan: cp, weather: wx }
+  chart: apd
+  prompt: "Die ATIS meldet: wind {wx.wind}, departure runway {wx.runway}. Tippe auf der Platzkarte auf das Bahnende, von dem du startest."
+  target: rwy:active
+  explain: Die Bahnbezeichnung steht am Anfang der Bahn – dort rollst du auf. Die Nummer mal zehn ist ungefähr dein Startkurs.
+
+- id: beispiel-anflugkarte-lesen
+  type: form
+  vars:
+    af: { pool: airfields }
+    cp: { commplan: true, airfield: af }
+    apc: { chart: approach, airfield: af, commplan: cp }
+  chart: apc
+  prompt: Lies die Anflugkarte. In welcher Höhe überfliegst du den FAF, und was ist deine Mindesthöhe?
+  fields:
+    - { label: "FAF-Höhe (ft)", accept: ["{apc.faf.alt}", "{apc.faf.alt|spoken}"], placeholder: z. B. 2000 }
+    - { label: "DA / MDA (ft)", accept: ["{apc.da}", "{apc.da|spoken}"], placeholder: z. B. 230 }
+  explain: Die FAF-Höhe steht im Kopf links und im Profil über dem Kreuz, die Mindesthöhe im Kopf und in der Minima-Zeile.
+
+- id: beispiel-sim-oder-echt
+  type: choice
+  vars:
+    af: { pool: airfields, require: [realFreqs] }
+  prompt: >-
+    In DCS ist der Tower von **{af.name}** auf {af.uhf} (UHF) bzw. {af.vhf} (VHF). Laut echtem AIP
+    ist die Tower-Frequenz {af.real.tower}. Welche nimmst du in einer DCS-Mission?
+  options:
+    - Die Sim-Frequenz bzw. die aus dem Missionsbriefing – nur dort hört die KI bzw. der Mitspieler-Tower zu.
+    - Die echte Frequenz aus dem AIP – sie ist immer die richtige.
+    - Egal, beide funktionieren.
+    - Guard, weil der Tower dort immer mithört.
+  answer: 0
+  explain: "In der Sim gilt immer, was die Sim bzw. das Briefing sagt. Echte Karten sind gut zum Lernen, aber ihre Frequenzen stimmen in DCS oft nicht ({af.real.source})."
