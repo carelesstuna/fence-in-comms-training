@@ -80,11 +80,31 @@ export interface Finding {
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 /**
- * Spuren, die nie öffentlich werden dürfen: Benutzerordner, andere Laufwerke und die lokalen Ordner neben
- * dem Repo („<Repo> …“, z. B. für Aufnahmen). Name und Mailadresse kommen aus `git config`.
+ * Spuren, die nie öffentlich werden dürfen: Benutzerordner, andere Laufwerke, der Ordner, in dem das Repo
+ * liegt (sein übergeordneter Ordner), und die lokalen Ordner neben dem Repo („<Repo> …“, z. B. für Aufnahmen). Name
+ * und Mailadresse kommen aus `git config`.
  */
-export function genericPatterns(repoFolder: string): { re: RegExp; reason: string }[] {
+export function genericPatterns(
+  repoFolder: string,
+  parentDir?: string,
+): { re: RegExp; reason: string }[] {
+  const parent = parentDir
+    ? [
+        {
+          re: new RegExp(
+            `${parentDir
+              .split(/[\\/]+/)
+              .filter(Boolean)
+              .map(escape)
+              .join('[\\\\/]+')}[\\\\/]`,
+            'i',
+          ),
+          reason: 'lokaler Projektordner',
+        },
+      ]
+    : []
   return [
+    ...parent,
     { re: new RegExp(`${escape(repoFolder)} [A-ZÄÖÜ]`), reason: 'lokaler Ordner neben dem Repo' },
     { re: /[A-Za-z]:[\\/]Users[\\/]/i, reason: 'Benutzerordner' },
     { re: /\b[D-Z]:\\/, reason: 'Pfad auf einem lokalen Laufwerk' },
@@ -202,7 +222,7 @@ function main() {
   const name = git(['config', 'user.name']).toString().trim()
   const email = git(['config', 'user.email']).toString().trim()
   const leaks = scan(blobs, [
-    ...genericPatterns(basename(mainRepoRoot(root))),
+    ...genericPatterns(basename(mainRepoRoot(root)), dirname(mainRepoRoot(root))),
     ...personalPatterns(name, email),
   ])
   if (leaks.length) {

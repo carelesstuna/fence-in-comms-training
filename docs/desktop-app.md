@@ -158,7 +158,7 @@ npm run desktop:build   # Release: NSIS-Installer + SHA256SUMS.txt
 ## Geprüft am 21.11.2026: Spracherkennung (Phase 3)
 
 Release-Build mit Vulkan-whisper. Geprüft über das DevTools-Protokoll mit echten Aufnahmen der
-Messreihe (Radeon RX 9070 XT). Der erste Stand hatte small.en noch im Installer (181,5 MiB); seit dem
+Messreihe (aktuelle Grafikkarte). Der erste Stand hatte small.en noch im Installer (181,5 MiB); seit dem
 Nachladen ist der Installer ohne Modell 13,2 MiB groß.
 
 - **Erkennen:** whisper aus `whisper\` im Programmordner, Grafikkarte. Ein Funkspruch dauert rund 1 s
@@ -169,15 +169,15 @@ Nachladen ist der Installer ohne Modell 13,2 MiB groß.
 - **Installer:** legt `whisper\` (14 Dateien) ins Programmverzeichnis; die installierte App erkennt warm
   in 0,9 s. Ein Modell im eigenen Modell-Ordner (base.en) wird gefunden und genutzt.
   Deinstallieren entfernt das Programm; Fortschritt, WebView2-Profil und eigener Modell-Ordner bleiben.
-- **CPU:** mit „Grafikkarte nutzen“ aus rund 8 s pro Funkspruch (Ryzen 7 5800X).
+- **CPU:** mit „Grafikkarte nutzen“ aus rund 8 s pro Funkspruch (8-Kern-Desktop-CPU).
 - **Fehlerfälle:** unbekanntes Modell → „Modell „…“ fehlt.“; fehlende Dateien nennt der Status mit
   Namen (large-v3-turbo samt VAD-Modell).
 - **Mikrofon:** `getUserMedia` ohne Dialog von WebView2 (vorher „prompt“, danach „granted“).
 - **Lizenzen:** Seite und `LICENSES.txt` mit whisper.cpp, Whisper-Gewichten und Vulkan-Headern.
 - whisper.cpp hängt nur noch an Windows-DLLs (`kernel32`, `advapi32`, UCRT) und – nur für die
   Grafikkarte – an `vulkan-1.dll` vom Treiber (geprüft mit `dumpbin /dependents`).
-- Hinweis zum Test: Der Installer lief aus der Claude-App heraus; Windows hat die Installation dabei in
-  deren Paketordner umgeleitet (MSIX-Virtualisierung). Normal gestartet landet sie unter
+- Hinweis zum Test: Der Installer lief aus einer paketierten Windows-App (MSIX) heraus; Windows hat die
+  Installation dabei in deren Paketordner umgeleitet. Normal gestartet landet sie unter
   `%LOCALAPPDATA%\Fence In Comms Training`.
 - **Nachladen** (Installer ohne Modell, 13,2 MiB):
   - Ohne Modell zeigen Profil und Sprechfeld „Laden (190 MB von huggingface.co)“.

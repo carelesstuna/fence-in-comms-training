@@ -19,7 +19,7 @@ ohne sie bleibt alles Text, und alles bleibt ohne Ton lösbar.
 
 ## Messung und Entscheidung
 
-Ryzen 7 5800X (8 Kerne), Radeon RX 9070 XT. Zeiten pro Funkspruch, warm (Modell geladen).
+Desktop-PC mit 8-Kern-CPU und aktueller Grafikkarte. Zeiten pro Funkspruch, warm (Modell geladen).
 
 | Variante | Größe | kurzer Funkspruch (5 s) | BRAA (7 s) | ATIS (18–20 s) | Befund |
 |---|---|---|---|---|---|

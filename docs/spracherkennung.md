@@ -85,7 +85,7 @@ npm run asr-bench -- --rescore                       # letzte Ergebnisse mit der
 ## Messreihe vom 21.11.2026
 
 110 eigene Aufnahmen (deutscher Sprecher, englische Funksprüche): 58 richtige, 22 mit falscher Zahl,
-22 mit falschem Rufzeichen, 8 Stille. Rechner: Ryzen 7 5800X, 8 Threads, nur CPU. Alle Werte mit der
+22 mit falschem Rufzeichen, 8 Stille. Rechner: 8-Kern-Desktop-CPU, 8 Threads, nur CPU. Alle Werte mit der
 Bewertung nach den Änderungen unten (`--rescore`).
 
 | Engine | falsch angenommen | falsch abgelehnt | Stille erfunden | Ø Zeit |
@@ -139,7 +139,7 @@ whisper.cpp bietet für Windows keine fertige Vulkan-Version an (nur CPU, BLAS u
 Die Vulkan-Version ist deshalb selbst gebaut und läuft auf AMD-, NVIDIA- und Intel-Karten. Ohne
 passende Karte fällt sie von selbst auf die CPU zurück (`GGML_BACKEND_DL`, wie im offiziellen Release).
 
-### Ergebnis (Radeon RX 9070 XT, gleiche 110 Aufnahmen)
+### Ergebnis (aktuelle Grafikkarte, gleiche 110 Aufnahmen)
 
 | Engine | falsch angenommen | falsch abgelehnt | Stille erfunden | Ø Zeit |
 |---|---|---|---|---|
@@ -174,13 +174,14 @@ Werkzeuge liegen in `.asr\tools` (nicht in Git), nichts davon ist systemweit ins
 Fallstricke:
 
 - **Kein Leerzeichen im Pfad** (etwa im Ordnernamen des Repos) und **nicht im Temp-Ordner**: Sonst scheitern zufällig
-  einzelne Shader bzw. der Shader-Generator findet keinen Compiler. Gebaut wird in `C:\dev\rt-asr-build`
-  mit Verknüpfungen (Junctions) auf SDK und CMake.
+  einzelne Shader bzw. der Shader-Generator findet keinen Compiler. Gebaut wird deshalb in einem kurzen
+  Ordner ohne Leerzeichen (unten `C:\wb`) mit Verknüpfungen (Junctions) auf SDK und CMake. Auf GitHub baut
+  `.github/workflows/release.yml` genauso.
 - Die Build Tools 18 sind beim Visual-Studio-Installer nicht registriert; CMake braucht die Version:
   `-DCMAKE_GENERATOR_INSTANCE="C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools,version=18.12.12412.261"`
 
 ```
-set VULKAN_SDK=C:\dev\rt-asr-build\vksdk
+set VULKAN_SDK=C:\wb\vksdk
 cmake -S src -B build -G "Visual Studio 18 2026" -A x64 -DCMAKE_GENERATOR_INSTANCE=... ^
   -DBUILD_SHARED_LIBS=ON -DWHISPER_SDL2=OFF -DWHISPER_BUILD_TESTS=OFF -DGGML_NATIVE=OFF ^
   -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DGGML_VULKAN=ON

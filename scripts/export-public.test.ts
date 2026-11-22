@@ -40,7 +40,7 @@ describe('export-public', () => {
       [
         'a.md',
         Buffer.from(
-          `Handbuch unter ${'G'}:\\Falcon BMS 4.38\\Docs\nAuszug in C:\\dev\\Projekt X Quellen\\funde\n`,
+          `Handbuch unter ${'X'}:\\Beispiel\\Handbuch\nAuszug in C:\\Projekte\\Projekt X Quellen\\funde\n`,
         ),
       ],
       [
@@ -66,5 +66,19 @@ describe('export-public', () => {
       'LICENSE:1 Platzhalter nicht ausgefüllt',
     ])
     expect(scan(files, privateRefPatterns()).map((l) => `${l.file}:${l.line}`)).toEqual(['b.md:3'])
+  })
+
+  it('findet den Ordner, in dem das Repo liegt, in beiden Schreibweisen', () => {
+    const files = new Map([
+      [
+        'a.md',
+        Buffer.from('Build in C:\\Werkstatt\\tmp\nauch C:/werkstatt/x\nnicht C:\\Werkstatt2\\y\n'),
+      ],
+    ])
+    const leaks = scan(files, genericPatterns('Projekt Y', 'C:\\Werkstatt'))
+    expect(leaks.map((l) => `${l.line} ${l.reason}`)).toEqual([
+      '1 lokaler Projektordner',
+      '2 lokaler Projektordner',
+    ])
   })
 })
