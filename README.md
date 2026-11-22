@@ -51,9 +51,11 @@ belong there.
 
 ## Installation (Windows)
 
-1. Download `Fence In Comms Training_<version>_x64-setup.exe` from
+1. Download `Fence-In-Comms-Training_<version>_x64-setup.exe` from
    [Releases](https://github.com/carelesstuna/fence-in-comms-training/releases).
-2. Optional: compare the checksum with `SHA256SUMS.txt` (PowerShell: `Get-FileHash <file>`).
+2. Optional: compare the checksum with `SHA256SUMS.txt` (PowerShell: `Get-FileHash <file>`). Installers are
+   built by GitHub Actions from the public source; `gh attestation verify <file> --repo
+   carelesstuna/fence-in-comms-training` proves where a file came from.
 3. Run the installer. It installs for your user only and needs no admin rights. The installer is not
    code-signed, so Windows SmartScreen may warn you: *More info → Run anyway*.
 

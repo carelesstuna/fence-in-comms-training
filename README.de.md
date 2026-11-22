@@ -48,9 +48,11 @@ der Schritt davor – damit du auf einem Server voller echter Menschen klingst, 
 
 ## Installation (Windows)
 
-1. `Fence In Comms Training_<Version>_x64-setup.exe` von den
+1. `Fence-In-Comms-Training_<Version>_x64-setup.exe` von den
    [Releases](https://github.com/carelesstuna/fence-in-comms-training/releases) herunterladen.
-2. Optional: die Prüfsumme mit `SHA256SUMS.txt` vergleichen (PowerShell: `Get-FileHash <Datei>`).
+2. Optional: die Prüfsumme mit `SHA256SUMS.txt` vergleichen (PowerShell: `Get-FileHash <Datei>`). Die
+   Installer baut GitHub Actions aus dem öffentlichen Code; `gh attestation verify <Datei> --repo
+   carelesstuna/fence-in-comms-training` weist nach, woher eine Datei stammt.
 3. Installer starten. Er installiert nur für deinen Benutzer und braucht keine Administratorrechte. Der Installer
    ist nicht signiert; warnt Windows SmartScreen, „Weitere Informationen → Trotzdem ausführen“.
 

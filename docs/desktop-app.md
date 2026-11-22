@@ -35,6 +35,24 @@ npm run desktop:build   # Release: NSIS-Installer + SHA256SUMS.txt
   `desktop:dev`. Beim Entwickeln (`desktop:dev`) findet die App whisper.cpp und die Modelle direkt in
   `.asr`.
 
+## Release über GitHub Actions
+
+- `.github/workflows/checks.yml`: bei jedem Push auf `main` und jedem Pull Request Typprüfung, Lint,
+  Inhaltsprüfung und Unit-Tests (Ubuntu).
+- `.github/workflows/release.yml` (Windows):
+  - Jeder Push auf `main` baut den Installer zur Probe; er liegt 30 Tage als Artefakt am Workflow-Lauf.
+  - Ein Versions-Tag `v<Version>` (muss zu `version` in `tauri.conf.json` und `package.json` passen) baut
+    ebenso, benennt den Installer ohne Leerzeichen (`Fence-In-Comms-Training_<Version>_x64-setup.exe`),
+    schreibt `SHA256SUMS.txt`, hängt eine Herkunftsbescheinigung an (`gh attestation verify`) und legt
+    einen **Release-Entwurf** an. Veröffentlicht wird von Hand auf GitHub; Text aus
+    `.github/release-notes.md`.
+  - whisper.cpp v1.9.5 baut der Workflow selbst mit Vulkan (Vulkan SDK per Prüfsumme geprüft, statische
+    C-Laufzeit, ohne OpenMP) und hebt das Ergebnis im Cache auf; ein Schritt bricht ab, wenn die Dateien
+    doch die Visual-C++-Laufzeit brauchen.
+- Ablauf für eine neue Version: `version` in `tauri.conf.json` und `package.json` erhöhen, committen,
+  `npm run export-public -- <öffentliches Repo>`, dort committen, pushen, dann `git tag v<Version>` und
+  `git push origin v<Version>`.
+
 ## Festlegungen, die sich nicht mehr ändern dürfen
 
 - **App-Kennung `io.github.carelesstuna.fence-in-comms-training`.** Sie bestimmt den Datenordner von WebView2 (localStorage)

@@ -18,6 +18,7 @@ import { mainRepoRoot } from './local-dirs'
 
 /** Wird veröffentlicht. Ein Eintrag gilt für die Datei bzw. den Ordner mit allem darunter. */
 export const PUBLIC: readonly string[] = [
+  '.github',
   '.gitattributes',
   '.gitignore',
   '.prettierignore',
