@@ -1,8 +1,9 @@
 /**
  * Einstellungen fürs Sprechen: Eingabe, Sprechtaste (halten/umschalten), Mikrofon, Modell und ein
  * Mikrofontest mit Pegel und Transkript. Alles bleibt auf diesem Rechner; nichts wird gespeichert.
+ * Mikrofon, Modell und Test nutzt auch das Onboarding (`VoiceStep`).
  */
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useApp, type SpeechSettings as Settings } from '../../state/store'
 import { content } from '../../ui/run'
 import { buildHints } from '../../core/speech/hints'
@@ -10,45 +11,28 @@ import { initialSpeech, keyLabel, speechReducer } from '../../core/speech/flow'
 import { checkRecording, DISCARD_TEXT } from '../../core/speech/transcript'
 import { dbfs } from '../../core/speech/pcm'
 import { micLabel } from '../../core/speech/mics'
-import { acquireMicrophone, listMicrophones, onMicrophonesChanged, revealMicrophones, type AudioCapture, type MicList } from '../../platform/audio-capture'
+import { acquireMicrophone, type AudioCapture } from '../../platform/audio-capture'
 import { isTauri, useSpeech } from '../../platform/speech-context'
 import { usePushToTalk } from '../../platform/usePushToTalk'
 import { squelch } from '../../platform/squelch'
 import { TRANSFORMERS_MODELS } from '../../platform/transformers-config'
 import { WHISPER_MODELS, whisperModel } from '../../platform/whisper-config'
 import { asrStatus, openModelDir, type AsrStatus } from '../../platform/whisper-recognizer'
+import { useAsrDownload } from '../../platform/asr-download'
 import { LevelMeter, PttButton } from '../../components/speech/SpeechParts'
 import { ModelDownload, ModelLoaded } from '../../components/speech/ModelDownload'
+import { setSpeech, useMicList, type MicListState } from './speech-settings'
 
 /** Diese Tasten taugen nicht als Sprechtaste. */
 const RESERVED = new Set(['Escape', 'Enter', 'NumpadEnter', 'Tab', 'Backspace'])
 
 export function SpeechSettings() {
   const s = useApp((st) => st.profile.speech)
-  const set = (patch: Partial<Settings>) => useApp.getState().setProfile({ speech: { ...useApp.getState().profile.speech, ...patch } })
+  const set = setSpeech
   const speech = useSpeech()
-  const [mics, setMics] = useState<MicList | null>(null)
-  const [revealing, setRevealing] = useState(false)
-  const [micError, setMicError] = useState<string | null>(null)
+  const micList = useMicList()
   const [pickKey, setPickKey] = useState(false)
   const [testing, setTesting] = useState(false)
-
-  // Liste neu holen: beim Öffnen, wenn Geräte dazukommen oder wegfallen und sobald das Mikrofon offen
-  // ist (vor der ersten Freigabe verrät WebView2 bzw. der Browser keine Namen)
-  const refreshMics = useCallback(() => void listMicrophones().then(setMics).catch(() => undefined), [])
-  useEffect(() => {
-    refreshMics()
-    return onMicrophonesChanged(refreshMics)
-  }, [refreshMics])
-  const reveal = () => {
-    setRevealing(true)
-    setMicError(null)
-    revealMicrophones()
-      .then(setMics)
-      .catch((e: unknown) => setMicError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setRevealing(false))
-  }
-  const savedMissing = !!s.micId && !!mics && !mics.devices.some((d) => d.deviceId === s.micId)
 
   // Nächste Taste als Sprechtaste übernehmen (Escape bricht ab)
   useEffect(() => {
@@ -56,7 +40,7 @@ export function SpeechSettings() {
     const onKey = (e: KeyboardEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      if (e.code !== 'Escape' && !RESERVED.has(e.code)) set({ pttKey: e.code })
+      if (e.code !== 'Escape' && !RESERVED.has(e.code)) setSpeech({ pttKey: e.code })
       setPickKey(false)
     }
     window.addEventListener('keydown', onKey, true)
@@ -110,32 +94,7 @@ export function SpeechSettings() {
         </div>
 
         <span className="text-muted">Mikrofon</span>
-        <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-3">
-            <select value={s.micId} onChange={(e) => set({ micId: e.target.value })} className="max-w-full rounded-md border border-line bg-black/30 px-2 py-1">
-              <option value="">{mics?.defaultLabel ? `Standardmikrofon (${mics.defaultLabel})` : 'Standardmikrofon'}</option>
-              {savedMissing && <option value={s.micId}>{mics?.named ? 'Gewähltes Mikrofon fehlt – es nimmt das Standardmikrofon' : 'Gewähltes Mikrofon'}</option>}
-              {mics?.devices.map((d) => (
-                <option key={d.deviceId} value={d.deviceId}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-            {mics && !mics.named && (
-              <button className="rounded-md border border-line px-2.5 py-1 hover:border-phosphor disabled:opacity-50" disabled={revealing} onClick={reveal}>
-                {revealing ? 'Suche Mikrofone …' : 'Alle Mikrofone anzeigen'}
-              </button>
-            )}
-            <label className="flex items-center gap-2" title="Echo- und Rauschunterdrückung sowie automatische Lautstärke des Browsers. Für die Erkennung meist besser aus.">
-              <input type="checkbox" checked={s.micFilters} onChange={(e) => set({ micFilters: e.target.checked })} />
-              Browser-Filter
-            </label>
-          </div>
-          {mics && !mics.named && !micError && (
-            <p className="text-xs text-muted">Die Namen der Mikrofone gibt es erst nach der Freigabe. Dafür geht das Mikrofon einmal kurz an.</p>
-          )}
-          {micError && !mics?.named && <p className="text-red-300">{micError}</p>}
-        </div>
+        <MicField settings={s} list={micList} />
 
         <span className="text-muted">Modell</span>
         {isTauri() ? (
@@ -184,18 +143,69 @@ export function SpeechSettings() {
           🎙 Mikrofontest
         </button>
       ) : (
-        <MicTest settings={s} onOpened={refreshMics} onClose={() => setTesting(false)} />
+        <MicTest settings={s} onOpened={micList.refresh} onClose={() => setTesting(false)} />
       )}
     </section>
   )
 }
 
-/** Desktop-App: whisper.cpp-Modelle (vorhanden oder nicht), Grafikkarte und der eigene Modell-Ordner. */
-function DesktopModel({ settings, set }: { settings: Settings; set: (patch: Partial<Settings>) => void }) {
+/** Mikrofon wählen (samt „Alle Mikrofone anzeigen“ vor der ersten Freigabe) und die Browser-Filter. */
+export function MicField({ settings: s, list }: { settings: Settings; list: MicListState }) {
+  const { mics, revealing, error: micError, reveal } = list
+  const set = setSpeech
+  const savedMissing = !!s.micId && !!mics && !mics.devices.some((d) => d.deviceId === s.micId)
+  return (
+    <div className="space-y-1">
+      <div className="flex flex-wrap items-center gap-3">
+        <select value={s.micId} onChange={(e) => set({ micId: e.target.value })} className="max-w-full rounded-md border border-line bg-black/30 px-2 py-1">
+          <option value="">{mics?.defaultLabel ? `Standardmikrofon (${mics.defaultLabel})` : 'Standardmikrofon'}</option>
+          {savedMissing && <option value={s.micId}>{mics?.named ? 'Gewähltes Mikrofon fehlt – es nimmt das Standardmikrofon' : 'Gewähltes Mikrofon'}</option>}
+          {mics?.devices.map((d) => (
+            <option key={d.deviceId} value={d.deviceId}>
+              {d.label}
+            </option>
+          ))}
+        </select>
+        {mics && !mics.named && (
+          <button className="rounded-md border border-line px-2.5 py-1 hover:border-phosphor disabled:opacity-50" disabled={revealing} onClick={reveal}>
+            {revealing ? 'Suche Mikrofone …' : 'Alle Mikrofone anzeigen'}
+          </button>
+        )}
+        <label className="flex items-center gap-2" title="Echo- und Rauschunterdrückung sowie automatische Lautstärke des Browsers. Für die Erkennung meist besser aus.">
+          <input type="checkbox" checked={s.micFilters} onChange={(e) => set({ micFilters: e.target.checked })} />
+          Browser-Filter
+        </label>
+      </div>
+      {mics && !mics.named && !micError && (
+        <p className="text-xs text-muted">Die Namen der Mikrofone gibt es erst nach der Freigabe. Dafür geht das Mikrofon einmal kurz an.</p>
+      )}
+      {micError && !mics?.named && <p className="text-red-300">{micError}</p>}
+    </div>
+  )
+}
+
+/**
+ * Desktop-App: whisper.cpp-Modelle (vorhanden oder nicht), Grafikkarte und der eigene Modell-Ordner.
+ * `compact` (Onboarding): ohne Zeile zum Modell-Ordner. `blocked`: siehe `ModelDownload`.
+ */
+export function DesktopModel({
+  settings,
+  set,
+  compact = false,
+  blocked,
+}: {
+  settings: Settings
+  set: (patch: Partial<Settings>) => void
+  compact?: boolean
+  blocked?: string
+}) {
   const [status, setStatus] = useState<AsrStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [checks, recheck] = useReducer((n: number) => n + 1, 0)
   const speech = useSpeech()
+  // Ein fertiger Download (auch einer, der auf einer anderen Seite begann) ändert, was fehlt
+  const { finished, lastFinished } = useAsrDownload()
+  const [finishedAtMount] = useState(finished)
 
   useEffect(() => {
     let cancelled = false
@@ -211,7 +221,7 @@ function DesktopModel({ settings, set }: { settings: Settings; set: (patch: Part
     return () => {
       cancelled = true
     }
-  }, [checks])
+  }, [checks, finished])
 
   const found = (id: string) => status?.models.find((m) => m.id === id)
   const selected = found(settings.desktopModel)
@@ -220,10 +230,10 @@ function DesktopModel({ settings, set }: { settings: Settings; set: (patch: Part
     // Ein eben abgelegtes Modell gleich laden (ein Fehler vorher wird damit neu versucht)
     if (speech.status === 'error') void speech.ensureLoaded().catch(() => undefined)
   }
-  // Eben geladen: Bestätigung stehen lassen und die Erkennung gleich vorbereiten
-  const [loaded, setLoaded] = useState<string | null>(null)
+  // Eben geladen (solange diese Ansicht offen ist, auch wenn der Download vorher anderswo begann):
+  // Bestätigung stehen lassen und die Erkennung gleich vorbereiten
+  const justLoaded = finished > finishedAtMount && lastFinished === settings.desktopModel
   const downloaded = () => {
-    setLoaded(settings.desktopModel)
     recheck()
     void speech.ensureLoaded().catch(() => undefined)
   }
@@ -250,9 +260,9 @@ function DesktopModel({ settings, set }: { settings: Settings; set: (patch: Part
       </div>
       {error && <p className="text-red-300">{error}</p>}
       {status && !status.available && <p className="text-red-300">Die Spracherkennung ist in dieser Version nicht enthalten.</p>}
-      {selected && !selected.path && <ModelDownload key={settings.desktopModel} modelId={settings.desktopModel} onDone={downloaded} />}
-      {loaded === settings.desktopModel && selected?.path && <ModelLoaded label={loadedLabel} next={next} />}
-      {status && (
+      {selected && !selected.path && <ModelDownload key={settings.desktopModel} modelId={settings.desktopModel} onDone={downloaded} blocked={blocked} />}
+      {justLoaded && selected?.path && <ModelLoaded label={loadedLabel} next={next} />}
+      {status && !compact && (
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
           <span>
             Modell-Ordner: <span className="font-mono">{status.modelDir}</span>
@@ -270,7 +280,7 @@ function DesktopModel({ settings, set }: { settings: Settings; set: (patch: Part
 }
 
 /** Sprechtaste ausprobieren: Pegel, Länge und was erkannt wurde. */
-function MicTest({ settings, onOpened, onClose }: { settings: Settings; onOpened: () => void; onClose: () => void }) {
+export function MicTest({ settings, onOpened, onClose }: { settings: Settings; onOpened: () => void; onClose: () => void }) {
   const speech = useSpeech()
   const [state, dispatch] = useReducer(speechReducer, initialSpeech)
   const [capture, setCapture] = useState<AudioCapture | null>(null)

@@ -1,6 +1,6 @@
 [package]
 name = "fence-in-comms-training"
-version = "0.1.0"
+version = "0.2.0"
 description = "Lern-App für militärischen Flugfunk für Flugsim-Piloten"
 license = "MIT"
 edition = "2021"

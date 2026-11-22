@@ -15,31 +15,31 @@ describe('Mikrofonliste', () => {
   })
 
   it('nach der Freigabe: alle Mikrofone, Standardgerät erkannt, Sammel-Einträge weg', () => {
-    // Gemessen in der installierten Desktop-App (WebView2 157) mit drei Mikrofonen
+    // Aufbau wie in der installierten Desktop-App (WebView2 157) mit drei Mikrofonen; Gerätenamen verallgemeinert
     const list = micList([
       mic(
         'default',
-        'Default - Kopfhörermikrofon (CORSAIR HS80 MAX WIRELESS Gaming Headset) (1b1c:0a97)',
+        'Default - Kopfhörermikrofon (Wireless Gaming Headset) (1a2b:3c4d)',
       ),
       mic(
         'communications',
-        'Communications - Kopfhörermikrofon (CORSAIR HS80 MAX WIRELESS Gaming Headset) (1b1c:0a97)',
+        'Communications - Kopfhörermikrofon (Wireless Gaming Headset) (1a2b:3c4d)',
       ),
-      mic('748432b0', 'Mikrofon (Steam Streaming Microphone)'),
-      mic('d46ab3dd', 'Mikrofon (Logi 4K Stream Edition) (046d:086b)'),
-      mic('4b956504', 'Kopfhörermikrofon (CORSAIR HS80 MAX WIRELESS Gaming Headset) (1b1c:0a97)'),
+      mic('a1b2c3d4', 'Mikrofon (Virtual Streaming Microphone)'),
+      mic('e5f6a7b8', 'Mikrofon (USB Webcam) (5e6f:7a8b)'),
+      mic('c9d0e1f2', 'Kopfhörermikrofon (Wireless Gaming Headset) (1a2b:3c4d)'),
       { deviceId: 'out1', label: 'Lautsprecher', kind: 'audiooutput' },
     ])
     expect(list.named).toBe(true)
     expect(list.devices).toEqual([
-      { deviceId: '748432b0', label: 'Mikrofon (Steam Streaming Microphone)' },
-      { deviceId: 'd46ab3dd', label: 'Mikrofon (Logi 4K Stream Edition)' },
+      { deviceId: 'a1b2c3d4', label: 'Mikrofon (Virtual Streaming Microphone)' },
+      { deviceId: 'e5f6a7b8', label: 'Mikrofon (USB Webcam)' },
       {
-        deviceId: '4b956504',
-        label: 'Kopfhörermikrofon (CORSAIR HS80 MAX WIRELESS Gaming Headset)',
+        deviceId: 'c9d0e1f2',
+        label: 'Kopfhörermikrofon (Wireless Gaming Headset)',
       },
     ])
-    expect(list.defaultLabel).toBe('Kopfhörermikrofon (CORSAIR HS80 MAX WIRELESS Gaming Headset)')
+    expect(list.defaultLabel).toBe('Kopfhörermikrofon (Wireless Gaming Headset)')
   })
 
   it('Standardgerät: der längste passende Name gewinnt, auch bei anderer Sprache', () => {
@@ -61,11 +61,11 @@ describe('Mikrofonliste', () => {
   })
 
   it('Gerätenamen ohne angehängte USB-Nummer', () => {
-    expect(micLabel('Mikrofon (Logi 4K Stream Edition) (046d:086b)')).toBe(
-      'Mikrofon (Logi 4K Stream Edition)',
+    expect(micLabel('Mikrofon (USB Webcam) (5e6f:7a8b)')).toBe(
+      'Mikrofon (USB Webcam)',
     )
-    expect(micLabel('Mikrofon (Steam Streaming Microphone)')).toBe(
-      'Mikrofon (Steam Streaming Microphone)',
+    expect(micLabel('Mikrofon (Virtual Streaming Microphone)')).toBe(
+      'Mikrofon (Virtual Streaming Microphone)',
     )
   })
 })

@@ -23,7 +23,7 @@ export interface MicList {
 /** Was von `MediaDeviceInfo` gebraucht wird. */
 export type DeviceInfo = Pick<MediaDeviceInfo, 'deviceId' | 'kind' | 'label'>
 
-/** Chromium hängt bei USB-Geräten Hersteller- und Produktnummer an: „Headset (1b1c:0a97)“. */
+/** Chromium hängt bei USB-Geräten Hersteller- und Produktnummer an: „Headset (1a2b:3c4d)“. */
 export function micLabel(label: string): string {
   return label.replace(/\s*\([0-9a-f]{4}:[0-9a-f]{4}\)\s*$/i, '').trim()
 }

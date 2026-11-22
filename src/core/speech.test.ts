@@ -321,6 +321,19 @@ describe('Bewertung: gesprochen', () => {
     expect(heard('departure, three, six, nine, a point, two, six, rage, two, one,', freq).correct).toBe(false)
   })
 
+  it('Rufzeichen mit Punkt („Enfield 1.1“) – die Erkennung setzt den Punkt, gesprochen wurde „one one“', () => {
+    const startup = [seg('Batumi Ground', 'addressee'), seg('Enfield one one', 'callsign'), seg('request startup', 'request')]
+    expect(heard('Batumi Ground, Enfield 1.1, request startup.', startup).correct).toBe(true)
+    expect(heard('Batumi Ground, Enfield 1.1. Request startup.', startup).correct).toBe(true)
+    expect(heard('Batumi Ground, Enfield 1.2, request startup.', startup).correct).toBe(false)
+    // Mit Frequenz: die echte Dezimalzahl bleibt eine, der Punkt im Rufzeichen trennt
+    const tune = [seg('Enfield one one', 'callsign'), seg('switching to two six one point eight', 'value')]
+    expect(heard('Enfield 1.1, switching to 261.8.', tune).correct).toBe(true)
+    expect(heard('Enfield 1.1, switching to 261.9.', tune).correct).toBe(false)
+    // Getippt bleibt „1.1“ eine Dezimalzahl
+    expect(scoreCall('Batumi Ground, Enfield 1.1, request startup', startup).correct).toBe(false)
+  })
+
   it('„of“ darf fehlen, Buchstabierwörter dürfen etwas daneben liegen', () => {
     const taxi = [seg('Chevy five one', 'callsign'), seg('flight of four', 'info'), seg('information Golf', 'info')]
     expect(heard('Chevy 5-1, flight 04, information gulf', taxi).correct).toBe(true)

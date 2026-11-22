@@ -4,31 +4,36 @@
  * Datei im eigenen Modell-Ordner. Ohne Klick geht die App nie ins Internet.
  */
 import { useEffect, useState } from 'react'
+import { startAsrDownload, useAsrDownload } from '../../platform/asr-download'
 import { whisperModel } from '../../platform/whisper-config'
 import {
   asrStatus,
   cancelDownload,
-  downloadModel,
   openModelDir,
   type AsrModelStatus,
 } from '../../platform/whisper-recognizer'
 
 const mb = (bytes: number) => `${Math.round(bytes / 1e6)} MB`
 
-type Phase =
-  | { kind: 'idle' }
-  | { kind: 'loading'; done: number; total: number; retry?: string }
-  | { kind: 'done' }
-  | { kind: 'error'; message: string }
-
 /**
  * `onDone`: Das Modell liegt geprüft im Ordner. Die Bestätigung zeigt der Aufrufer weiter an – dieser
- * Kasten verschwindet, sobald das Modell als vorhanden gilt.
+ * Kasten verschwindet, sobald das Modell als vorhanden gilt. Der Download läuft weiter, wenn der Kasten
+ * verschwindet (`asr-download.ts`). `blocked`: Warum gerade nicht geladen werden kann (z. B. weil die
+ * Sprachausgabe lädt – es lädt immer nur eins).
  */
-export function ModelDownload({ modelId, onDone }: { modelId: string; onDone: () => void }) {
+export function ModelDownload({
+  modelId,
+  onDone,
+  blocked,
+}: {
+  modelId: string
+  onDone: () => void
+  blocked?: string
+}) {
   const [status, setStatus] = useState<{ model: AsrModelStatus; dir: string } | null>(null)
-  const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
+  const dl = useAsrDownload()
 
+  // Neu prüfen, sobald ein Download fertig ist (auch einer, der vor dem Öffnen dieses Kastens begann)
   useEffect(() => {
     let cancelled = false
     asrStatus()
@@ -40,68 +45,50 @@ export function ModelDownload({ modelId, onDone }: { modelId: string; onDone: ()
     return () => {
       cancelled = true
     }
-  }, [modelId])
+  }, [modelId, dl.finished])
 
   if (!status || status.model.path) return null
   const label = whisperModel(modelId)?.label ?? modelId
   const { model, dir } = status
+  const running = dl.running
+  const mine = running?.modelId === modelId
+  const other = running && !mine ? (whisperModel(running.modelId)?.label ?? running.modelId) : null
+  const error = dl.error?.modelId === modelId ? dl.error.message : null
+  const waitFor = blocked ?? (other ? `Es lädt gerade ${other} – es lädt immer nur eins.` : undefined)
 
-  const start = () => {
-    // Fortschritt über alle Dateien (large-v3-turbo bringt das VAD-Modell mit)
-    const doneByFile = new Map<string, number>()
-    setPhase({ kind: 'loading', done: 0, total: model.download })
-    const done = () => [...doneByFile.values()].reduce((a, b) => a + b, 0)
-    downloadModel(modelId, (e) => {
-      if (e.kind === 'progress') {
-        doneByFile.set(e.file, e.done)
-        setPhase({ kind: 'loading', done: done(), total: model.download })
-      } else if (e.kind === 'retry') {
-        setPhase({
-          kind: 'loading',
-          done: done(),
-          total: model.download,
-          retry: `Verbindung abgerissen – geht an derselben Stelle weiter (${e.attempt}/${e.max}) …`,
-        })
-      }
+  const start = () =>
+    void startAsrDownload(modelId, model.download).then((ok) => {
+      if (ok) onDone()
     })
-      .then(() => {
-        setPhase({ kind: 'done' })
-        onDone()
-      })
-      .catch((e: unknown) =>
-        setPhase({ kind: 'error', message: e instanceof Error ? e.message : String(e) }),
-      )
-  }
-
-  if (phase.kind === 'done') return <ModelLoaded label={label} />
 
   return (
     <div className="space-y-1.5 rounded-lg border border-line bg-black/20 p-3 text-sm">
       <p>
         Das Modell <b>{label}</b> fehlt noch ({model.missing.join(', ')}).
       </p>
-      {phase.kind === 'loading' ? (
+      {mine ? (
         <div className="space-y-1">
           <div className="h-2 overflow-hidden rounded bg-black/40">
             <div
               className="h-full bg-phosphor transition-[width]"
-              style={{ width: `${Math.round((phase.done / Math.max(1, phase.total)) * 100)}%` }}
+              style={{ width: `${Math.round((running.done / Math.max(1, running.total)) * 100)}%` }}
             />
           </div>
           <div className="flex items-center gap-3 text-xs text-muted">
             <span>
-              {mb(phase.done)} von {mb(phase.total)} von huggingface.co
+              {mb(running.done)} von {mb(running.total)} von huggingface.co
             </span>
             <button className="underline hover:text-text" onClick={() => void cancelDownload()}>
               Abbrechen
             </button>
           </div>
-          {phase.retry && <p className="text-xs text-amber-hud">{phase.retry}</p>}
+          {running.retry && <p className="text-xs text-amber-hud">{running.retry}</p>}
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
           <button
-            className="rounded-md border border-phosphor px-2.5 py-1 hover:bg-phosphor/10"
+            className="rounded-md border border-phosphor px-2.5 py-1 hover:bg-phosphor/10 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!!waitFor}
             onClick={start}
           >
             Laden ({mb(model.download)} von huggingface.co)
@@ -115,7 +102,8 @@ export function ModelDownload({ modelId, onDone }: { modelId: string; onDone: ()
           </span>
         </div>
       )}
-      {phase.kind === 'error' && <p className="text-red-300">{phase.message}</p>}
+      {waitFor && !mine && <p className="text-xs text-amber-hud">{waitFor}</p>}
+      {error && <p className="text-red-300">{error}</p>}
       <p className="text-xs text-muted">
         Quelle: die whisper.cpp-Modelle auf Hugging Face (fester Stand). Die App prüft Größe und
         Prüfsumme; sonst geht sie nicht ins Internet.

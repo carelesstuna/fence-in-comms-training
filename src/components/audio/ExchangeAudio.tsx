@@ -3,6 +3,7 @@
  *
  * - `ExchangeAudio` umschließt einen Funkspruch (RadioPanel, Funk-Log im Szenario). Seine Zeilen bekommen
  *   ▶, im Hörmodus erscheint ihr Text erst nach dem Hören, im Szenario spielen neue Funksprüche von selbst.
+ *   Die Stimmen werden gerechnet, sobald die Zeilen zu sehen sind – nicht erst beim Klick auf ▶.
  * - `PlayAllButton` spielt alle sichtbaren Zeilen nacheinander.
  * - `AudioSetup` bietet den einmaligen Download der Sprachausgabe an.
  *
@@ -133,25 +134,34 @@ export function ExchangeAudio({
     void runQueue()
   }, [autoplay, audio.autoplay, registered, transmissions, runQueue])
 
-  // Vorab rechnen: was noch nicht gehört wurde und was gleich kommt
-  const warmKey = `${[...registered].join(',')}|${upcoming?.length ?? 0}`
+  // Vorab rechnen, sobald die Zeilen zu sehen sind: von oben nach unten, die Gegenstellen vor den eigenen
+  // Funksprüchen (im Szenario spielen nur die Gegenstellen), danach was gleich kommt
+  const warmKey = `${[...registered].sort((a, b) => a - b).join(',')}|${upcoming?.length ?? 0}`
   useEffect(() => {
     const a = audioRef.current
-    if (!a.available || (!listen && !autoplay)) return
-    const lines = [...registered].filter((i) => !transmissions[i]?.you).map((i) => request(i))
+    if (!a.available) return
+    const shown = [...registered].sort((x, y) => x - y)
+    const others = shown.filter((i) => !transmissions[i]?.you)
+    const own = autoplay ? [] : shown.filter((i) => transmissions[i]?.you)
     const next = (upcoming ?? []).map((_, i) => ({
       key: `${id}:u${i}`,
       transmissions: upcoming!,
       index: i,
       cast: castKey,
     }))
-    a.prefetch([...lines, ...next])
+    a.prefetch([...[...others, ...own].map((i) => request(i)), ...next], id)
     // warmKey fasst registered und upcoming zusammen
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [warmKey, audio.available, listen, autoplay])
+  }, [warmKey, audio.available, autoplay])
 
-  // Beim Verlassen nichts weiterspielen
-  useEffect(() => () => audioRef.current.stop(), [])
+  // Beim Verlassen nichts weiterspielen und nicht mehr für diese Seite rechnen
+  useEffect(
+    () => () => {
+      audioRef.current.stop()
+      audioRef.current.release(id)
+    },
+    [id],
+  )
 
   const value = useMemo<ExchangeAudioValue>(
     () => ({
@@ -197,13 +207,16 @@ export function PrefetchAudio({
   transmissions: readonly ResolvedTransmission[]
   cast: string
 }) {
-  const { available, prefetch } = useRadioAudio()
+  const { available, prefetch, release } = useRadioAudio()
+  const [owner] = useState(() => `vorab${nextPanel++}`)
   useEffect(() => {
     if (available && transmissions.length)
       prefetch(
         transmissions.map((_, index) => ({ key: `vorab:${index}`, transmissions, index, cast })),
+        owner,
       )
-  }, [available, prefetch, transmissions, cast])
+  }, [available, prefetch, transmissions, cast, owner])
+  useEffect(() => () => release(owner), [release, owner])
   return null
 }
 
@@ -297,13 +310,18 @@ export function PlayAllButton({ className = '' }: { className?: string }) {
   )
 }
 
-/** Einmaliger Download der Sprachausgabe – im Profil und dort, wo man zum ersten Mal ▶ drückt. */
+/**
+ * Einmaliger Download der Sprachausgabe – im Onboarding, im Profil und dort, wo man zum ersten Mal ▶ drückt.
+ * `blocked`: Warum gerade nicht geladen werden kann (z. B. weil ein Sprachmodell lädt – es lädt immer nur eins).
+ */
 export function AudioSetup({
   onClose,
   compact = false,
+  blocked,
 }: {
   onClose?: () => void
   compact?: boolean
+  blocked?: string
 }) {
   const audio = useRadioAudio()
   const d = audio.download
@@ -352,7 +370,8 @@ export function AudioSetup({
           <button
             type="button"
             onClick={() => void audio.startDownload()}
-            className="rounded-md bg-phosphor px-3 py-1 font-semibold text-ink"
+            disabled={!!blocked}
+            className="rounded-md bg-phosphor px-3 py-1 font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-50"
           >
             Laden ({TTS_DOWNLOAD_MB} MB)
           </button>
@@ -367,6 +386,7 @@ export function AudioSetup({
           )}
         </div>
       )}
+      {blocked && !d && <p className="mt-1 text-xs text-amber-hud">{blocked}</p>}
       {d?.retry && <p className="mt-1 text-xs text-amber-hud">{d.retry}</p>}
       {audio.error && !d && <p className="mt-1 text-xs text-red-300">{audio.error}</p>}
     </div>

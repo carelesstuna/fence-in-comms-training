@@ -60,9 +60,9 @@ belong there.
    code-signed, so Windows SmartScreen may warn you: *More info → Run anyway*.
 
 **Requirements:** Windows 10 or 11, 64-bit. WebView2 is installed automatically if it is missing. Optional
-downloads inside the app: a speech recognition model (small.en, about 190 MB; other sizes available) and the
-radio voices (about 340 MB). A Vulkan-capable graphics card makes speech recognition fast (about one second per
-call); on the CPU it takes a few seconds.
+downloads inside the app, offered on first start and later under Profil: a speech recognition model (small.en,
+about 190 MB; other sizes available) and the radio voices (about 340 MB). A Vulkan-capable graphics card makes
+speech recognition fast (about one second per call); on the CPU it takes a few seconds.
 
 **Privacy:** no account, no telemetry, no ads. The app only goes online when you click to download a model
 (huggingface.co, raw.githubusercontent.com). Your progress stays on your PC; you can export and import it.
@@ -87,7 +87,7 @@ please open an issue. The AI will apologise profusely (it is really good at that
 
 ## Status and feedback
 
-Version 0.1 – the first public release. Bugs, wrong phraseology, ideas: please open an
+Version 0.2 – early public release. Bugs, wrong phraseology, ideas: please open an
 [issue](https://github.com/carelesstuna/fence-in-comms-training/issues). Corrections from real-world pilots,
 controllers, JTACs and veteran simmers are especially welcome. How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 

@@ -125,18 +125,22 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   )
 
   const prefetch = useCallback(
-    (list: readonly PlayRequest[]) => {
+    (list: readonly PlayRequest[], owner?: string) => {
       const s = settingsRef.current
       if (!s.enabled || files !== 'present' || !list.length) return
       void ensureLoaded()
         .then(() => {
           for (const r of list)
-            prepareVoice(engine.current!, voiceRequest(r, s), 'later').catch(() => undefined)
+            prepareVoice(engine.current!, voiceRequest(r, s), 'later', owner).catch(
+              () => undefined,
+            )
         })
         .catch(() => undefined)
     },
     [files, ensureLoaded],
   )
+
+  const release = useCallback((owner: string) => engine.current?.dropLater(owner), [])
 
   const startDownload = useCallback(async () => {
     if (!store) return
@@ -195,6 +199,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       ensureLoaded,
       play,
       prefetch,
+      release,
       stop,
       current: settings.enabled ? current : null,
     }
@@ -213,6 +218,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     ensureLoaded,
     play,
     prefetch,
+    release,
     stop,
     current,
   ])

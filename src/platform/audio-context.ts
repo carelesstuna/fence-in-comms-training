@@ -45,8 +45,14 @@ export interface RadioAudioValue {
   ensureLoaded: () => Promise<void>
   /** Spielt ab; `true`, wenn bis zum Ende gehört, `false` bei Stopp, Abbruch oder ohne Ton. */
   play: (r: PlayRequest) => Promise<boolean>
-  /** Stimmen vorab rechnen (Szenario: der nächste Schritt). */
-  prefetch: (r: readonly PlayRequest[]) => void
+  /**
+   * Stimmen vorab rechnen, in dieser Reihenfolge: alles, was eine Seite zum Abspielen anbietet, im Szenario
+   * auch der nächste Schritt. `owner` (z. B. der Funkspruch auf der Seite) gibt die Aufträge mit `release`
+   * wieder frei.
+   */
+  prefetch: (r: readonly PlayRequest[], owner?: string) => void
+  /** Noch wartende Vorab-Aufträge eines Auftraggebers verwerfen (z. B. beim Verlassen der Seite). */
+  release: (owner: string) => void
   stop: () => void
   /** Läuft gerade (oder wird gerechnet): Schlüssel und Phase. */
   current: { key: string; phase: 'preparing' | 'playing' } | null
@@ -73,6 +79,7 @@ const SILENT: RadioAudioValue = {
   ensureLoaded: () => Promise.resolve(),
   play: () => Promise.resolve(false),
   prefetch: () => undefined,
+  release: () => undefined,
   stop: () => undefined,
   current: null,
 }

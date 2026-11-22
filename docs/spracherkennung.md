@@ -121,7 +121,8 @@ wegen der Erkennung:
 - **Zahlen in Whisper-Schreibweise** (`spokenNumbers` in `transcript.ts`): „06R“, „Raven61“, „4.7.1“,
   „Chevy II“, „3000 for 6000“ (lief vorher zu einer Zahl zusammen).
 - **Verhörer bei Zahlen** (`prepareSpoken` in `score.ts`): „Rage for one“, „Raven forward“, „Ghost 901“
-  und „9R1“ (niner), „nine a thousand“, „for 0.8“, „411“ für „Ford one one“. Jede Umschreibung gilt nur,
+  und „9R1“ (niner), „nine a thousand“, „for 0.8“, „411“ für „Ford one one“, „Enfield 1.1“ für „Enfield one
+  one“ (Spieltest 22.11.2026: Der Punkt kam aus der Erkennung, gesprochen war „one one“). Jede Umschreibung gilt nur,
   wenn dabei die erwartete Zahl herauskommt – ein falsch gesprochener Wert wird so nie richtig.
 - **Namen** (Rufzeichen, Stationen) und Buchstabierwörter dürfen ab 4 Buchstaben einen Fehler haben
   („cold“ für Colt, „gulf“ für Golf). Unter den Rufzeichen-Namen der Inhalte liegen keine zwei so nah

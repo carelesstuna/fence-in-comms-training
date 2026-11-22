@@ -1,7 +1,8 @@
 /**
  * Sprachausgabe im Hauptthread: startet den Worker, reicht ihm Modell, Lexika und Stimmen und ordnet
- * die Aufträge. Was gleich gespielt werden soll, geht vor; Vorab-Rechnen (nächster Schritt im Szenario)
- * läuft, wenn nichts anderes ansteht. Fertige Stimmen bleiben eine Weile im Speicher.
+ * die Aufträge. Was gleich gespielt werden soll, geht vor; Vorab-Rechnen (alles, was eine Seite zum Abspielen
+ * anbietet, und der nächste Schritt im Szenario) läuft, wenn nichts anderes ansteht. Fertige Stimmen bleiben
+ * eine Weile im Arbeitsspeicher – nie auf der Platte; nach dem Beenden der App sind sie weg.
  */
 import { lexiconFiles, MODEL_FILE, TTS_RATE, VOICES, voiceFile } from './tts-config'
 import type { TtsStore } from './tts-files'
@@ -15,10 +16,12 @@ interface Job {
   voice: string
   speed: number
   priority: Priority
+  /** Wer das Vorab-Rechnen angefordert hat (z. B. ein Funkspruch auf der Seite); leer bei „jetzt“. */
+  owners: Set<string>
   waiters: { resolve: (s: Float32Array) => void; reject: (e: Error) => void }[]
 }
 
-/** Obergrenze des Zwischenspeichers: rund 8 Minuten Sprache (32 MB). */
+/** Obergrenze des Zwischenspeichers im Arbeitsspeicher: rund 8 Minuten Sprache (Float32, etwa 46 MB). */
 const CACHE_SAMPLES = 8 * 60 * TTS_RATE
 
 export class TtsEngine {
@@ -113,6 +116,7 @@ export class TtsEngine {
       voice: VOICES[0].id,
       speed: 1,
       priority: 'now',
+      owners: new Set(),
       waiters: [],
     })
     onProgress?.(1)
@@ -174,12 +178,16 @@ export class TtsEngine {
     } satisfies TtsRequest)
   }
 
-  /** Trockene Stimme (24 kHz) für einen Text. */
+  /**
+   * Trockene Stimme (24 kHz) für einen Text. `owner`: wer vorab rechnen lässt – `dropLater(owner)` verwirft
+   * dessen Aufträge wieder, solange niemand sonst sie braucht.
+   */
   async synth(
     text: string,
     voice: string,
     speed: number,
     priority: Priority = 'now',
+    owner?: string,
   ): Promise<Float32Array> {
     const key = `${voice}|${speed.toFixed(2)}|${text}`
     const hit = this.cache.get(key)
@@ -193,10 +201,12 @@ export class TtsEngine {
     const pending = this.busy?.key === key ? this.busy : this.queue.find((j) => j.key === key)
     if (pending) {
       if (priority === 'now') pending.priority = 'now'
+      else if (owner) pending.owners.add(owner)
       return new Promise((resolve, reject) => pending.waiters.push({ resolve, reject }))
     }
     return new Promise((resolve, reject) => {
-      this.queue.push({ key, text, voice, speed, priority, waiters: [{ resolve, reject }] })
+      const owners = new Set<string>(priority === 'later' && owner ? [owner] : [])
+      this.queue.push({ key, text, voice, speed, priority, owners, waiters: [{ resolve, reject }] })
       this.pump()
     })
   }
@@ -206,14 +216,19 @@ export class TtsEngine {
     return this.cache.has(`${voice}|${speed.toFixed(2)}|${text}`)
   }
 
-  /** Vorab-Aufträge verwerfen (z. B. beim Verlassen eines Szenarios). */
-  dropLater(): void {
+  /**
+   * Vorab-Aufträge verwerfen, die noch warten: alle – oder nur die eines Auftraggebers (z. B. beim Verlassen
+   * einer Seite), sofern sie kein anderer mehr braucht. Was gerade rechnet, läuft zu Ende.
+   */
+  dropLater(owner?: string): void {
     for (let i = this.queue.length - 1; i >= 0; i--) {
       const j = this.queue[i]
-      if (j.priority === 'later') {
-        this.queue.splice(i, 1)
-        for (const w of j.waiters) w.reject(new Error('verworfen'))
+      if (j.priority !== 'later') continue
+      if (owner !== undefined) {
+        if (!j.owners.delete(owner) || j.owners.size) continue
       }
+      this.queue.splice(i, 1)
+      for (const w of j.waiters) w.reject(new Error('verworfen'))
     }
   }
 

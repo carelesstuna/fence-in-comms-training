@@ -39,13 +39,14 @@ export function textsOf(r: VoiceRequest): { text: string; voice: string }[] {
   return []
 }
 
-/** Nur die Stimmen rechnen lassen, ohne abzuspielen. */
+/** Nur die Stimmen rechnen lassen, ohne abzuspielen (`owner`: siehe `TtsEngine.synth`). */
 export async function prepareVoice(
   engine: TtsEngine,
   r: VoiceRequest,
   priority: Priority = 'later',
+  owner?: string,
 ): Promise<void> {
-  await Promise.all(textsOf(r).map((t) => engine.synth(t.text, t.voice, r.speed, priority)))
+  await Promise.all(textsOf(r).map((t) => engine.synth(t.text, t.voice, r.speed, priority, owner)))
 }
 
 /** Fertige Übertragung als Puffer – oder null, wenn es nichts zu hören gibt. */

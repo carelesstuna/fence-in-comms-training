@@ -39,7 +39,7 @@ export interface LineAudio {
   play: () => void
   stop: () => void
   reveal: () => void
-  /** Vorab rechnen, z. B. beim Zeigen auf ▶. */
+  /** Vorab rechnen (geschieht ohnehin, sobald die Zeile zu sehen ist); beim Zeigen auf ▶ noch einmal. */
   warm: () => void
   /** Ton grundsätzlich möglich (sonst führt ▶ zum Laden). */
   available: boolean
@@ -65,7 +65,7 @@ export function useLineAudio(t: ResolvedTransmission): LineAudio | null {
     play,
     stop: audio.stop,
     reveal: () => ctx.reveal(index),
-    warm: () => audio.prefetch([ctx.request(index)]),
+    warm: () => audio.prefetch([ctx.request(index)], ctx.id),
     available: audio.available,
     speaker: t.you ? 'dich' : t.speaker,
   }

@@ -57,9 +57,9 @@ der Schritt davor – damit du auf einem Server voller echter Menschen klingst, 
    ist nicht signiert; warnt Windows SmartScreen, „Weitere Informationen → Trotzdem ausführen“.
 
 **Voraussetzungen:** Windows 10 oder 11, 64 Bit. Fehlt WebView2, installiert der Installer es nach. Optional lädt
-die App auf Klick nach: ein Spracherkennungsmodell (small.en, rund 190 MB; andere Größen wählbar) und die
-Funkstimmen (rund 340 MB). Mit einer Vulkan-fähigen Grafikkarte erkennt die App einen Funkspruch in etwa einer
-Sekunde, auf der CPU dauert es einige Sekunden.
+die App auf Klick nach (angeboten beim ersten Start, später im Profil): ein Spracherkennungsmodell (small.en,
+rund 190 MB; andere Größen wählbar) und die Funkstimmen (rund 340 MB). Mit einer Vulkan-fähigen Grafikkarte
+erkennt die App einen Funkspruch in etwa einer Sekunde, auf der CPU dauert es einige Sekunden.
 
 **Datenschutz:** kein Konto, keine Telemetrie, keine Werbung. Ins Internet geht die App nur, wenn du ein Modell
 herunterladen willst (huggingface.co, raw.githubusercontent.com). Dein Fortschritt bleibt auf deinem Rechner; du
@@ -86,7 +86,7 @@ sich dann ausführlich (das kann sie wirklich gut) und korrigiert es.
 
 ## Stand und Rückmeldung
 
-Version 0.1 – die erste öffentliche Fassung. Fehler, falsche Phraseologie, Ideen: bitte ein
+Version 0.2 – eine frühe öffentliche Fassung. Fehler, falsche Phraseologie, Ideen: bitte ein
 [Issue](https://github.com/carelesstuna/fence-in-comms-training/issues) aufmachen. Korrekturen von echten
 Pilotinnen und Piloten, Lotsen, JTACs und erfahrenen Simmern sind besonders willkommen. Wie du beitragen kannst:
 [CONTRIBUTING.md](CONTRIBUTING.md) (auf Englisch).

@@ -46,6 +46,8 @@ Desktop-PC mit 8-Kern-CPU und aktueller Grafikkarte. Zeiten pro Funkspruch, warm
 
 ## Bedienung
 
+- **Onboarding → Hören & Sprechen:** beim ersten Start an/aus, Laden mit Fortschritt und zwei Hörproben (AM,
+  Intercom). Ein laufender Download geht weiter, wenn man weiterklickt.
 - **Profil → Hören:** an/aus, Lautstärke, Tempo (0,8–1,3), Empfang (gut/mittel/schwach), „Funksprüche im Szenario
   sofort abspielen“, „Text immer gleich zeigen“, Hörproben (AM, FM, Intercom, blocked, eigener Funkspruch), Laden mit
   Fortschritt und Abbrechen; im Browser „Aus dem Browser entfernen“.
@@ -55,6 +57,11 @@ Desktop-PC mit 8-Kern-CPU und aktueller Grafikkarte. Zeiten pro Funkspruch, warm
   erst nach dem Hören. „Text zeigen“ gibt ihn jederzeit frei; ohne Sprachausgabe oder mit „Text immer gleich zeigen“
   steht er sofort da.
 - **Szenario:** Neue Funksprüche spielen von selbst nacheinander, der Text folgt nach dem Hören.
+- **Vorab rechnen:** Sobald eine Seite Funksprüche mit ▶ zeigt, rechnet die Sprachausgabe sie im Hintergrund – von
+  oben nach unten, Gegenstellen vor den eigenen Funksprüchen; im Szenario dazu der nächste Schritt. Ein Klick auf ▶
+  geht vor. Verlässt man die Seite, wird verworfen, was noch nicht angefangen hat (`TtsEngine.dropLater(owner)`).
+  Gemessen am 22.11.2026 in der Desktop-App: Die zweite Zeile der Hörprobe bzw. die letzte Zeile einer Lektion
+  spielte rund 50 ms nach dem Klick (ohne Vorab-Rechnen 1,5–2,5 s).
 - **9-Line-Decoder (Spur C):** „▶ Weiter hören“ spielt den nächsten Teil, dann erscheint sein Text; mit Ton beginnt
   auch der erste Teil verdeckt. Zwei Tempi: „Tempo: langsam“ (0,8 × Profil) zum Mitschreiben, „normal“ wie im Einsatz.
 - **Tastatur:** Alle Knöpfe sind normale Buttons (Tab, Enter/Leertaste). Während der Wiedergabe wird ▶ zu ■ (Stopp).
@@ -109,6 +116,9 @@ Desktop-App findet sie beim Entwickeln ebenfalls dort.
   wie die Whisper-Modelle (Prüfsumme, Fortsetzen nach Abbruch, ein Download zur Zeit) und reicht die Dateien über
   `read_tts_file` an die Seite. Erlaubt sind nur Namen aus der festen Liste, keine Pfade.
 - **Browser:** Cache Storage `fence-in-comms-training-tts`.
+- **Gerechnete Stimmen** liegen nur im Arbeitsspeicher, nie auf der Platte: höchstens rund 8 Minuten Sprache (etwa
+  46 MB, `CACHE_SAMPLES` in `tts-engine.ts`); darüber fliegt das am längsten nicht Gebrauchte raus. Nach dem Beenden
+  der App ist alles weg. Auf der Platte liegen nur die geladenen Modelldateien.
 
 ## Dateien
 

@@ -5,8 +5,9 @@ import { useApp } from '../../state/store'
 import { LEGAL_SHORT } from '../../ui/legal'
 import { content } from '../../ui/run'
 import { CallsignFields, CompactField, SimFields } from '../profile/ProfileFields'
+import { VoiceStep } from './VoiceStep'
 
-const STEPS = ['Willkommen', 'Sims & Flugzeuge', 'Rufzeichen', 'Einstufung'] as const
+const STEPS = ['Willkommen', 'Sims & Flugzeuge', 'Rufzeichen', 'Hören & Sprechen', 'Einstufung'] as const
 
 export function Onboarding() {
   const [step, setStep] = useState(0)
@@ -73,7 +74,8 @@ export function Onboarding() {
             <CallsignFields />
           </div>
         )}
-        {step === 3 && (
+        {step === 3 && <VoiceStep />}
+        {step === 4 && (
           <div>
             <h2 className="mb-1 text-xl font-semibold text-white">Was kannst du schon?</h2>
             <p className="mb-4 text-sm text-muted">

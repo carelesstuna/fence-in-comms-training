@@ -537,7 +537,7 @@ const DIGIT_WORD = /^(\d+([.,]\d+)?|zero|one|two|three|four|five|six|seven|eight
  *   zwischen Ziffern bleiben sie („6,000“); zusammengelaufene Zahlen trennt `splitMergedNumbers`.
  * - Typische Verhörer bei Zahlen werden versuchsweise umgeschrieben: ein Wort, das wie eine Ziffer
  *   klingt („Rage for one“, „Raven forward“), „niner“ als „90“ oder „9 R“ („Ghost 901“),
- *   „nine a thousand“, „for 0.8“ (four point eight), „411“ für „Ford one one“.
+ *   „nine a thousand“, „for 0.8“ (four point eight), „411“ für „Ford one one“, „1.1“ für „one one“.
  *   Eine Umschreibung gilt nur, wenn danach mehr Zahlen zu den erwarteten passen. Ein falsch
  *   gesprochener Wert wird so nie richtig – die erwartete Zahl muss dabei herauskommen.
  */
@@ -577,11 +577,15 @@ function prepareSpoken(input: string, expected: Set<number>, expectedNums: Num[]
       // „411“ für „Ford one one“
       for (const [name, d] of Object.entries(NAME_DIGITS)) if (expectedWords.has(name) && b.length > 1 && b.startsWith(d) && attempt(replaced(`${name} ${b.slice(1)}`))) break
     }
-    // „point eight“ schreibt die Erkennung als „0.8“ – „Two, for 0.8“ ist „Two, four point eight“
-    else if (/^0\.\d+$/.test(b)) {
-      const tail = `point ${b.slice(2)}`
-      const prev = DIGIT_HOMOPHONES[bare(words[k - 1])]
-      if (!attempt(replaced(tail)) && prev) attempt(words.map((x, i) => (i === k ? tail + w.slice(b.length) : i === k - 1 ? prev : x)))
+    else if (/^\d+\.\d+$/.test(b)) {
+      // „point eight“ schreibt die Erkennung als „0.8“ – „Two, for 0.8“ ist „Two, four point eight“
+      if (/^0\./.test(b)) {
+        const tail = `point ${b.slice(2)}`
+        const prev = DIGIT_HOMOPHONES[bare(words[k - 1])]
+        if (attempt(replaced(tail)) || (prev && attempt(words.map((x, i) => (i === k ? tail + w.slice(b.length) : i === k - 1 ? prev : x))))) return
+      }
+      // „Enfield one one“ schreibt die Erkennung gern als „Enfield 1.1“: der Punkt trennt nur die Ziffern
+      attempt(replaced(b.replace('.', ' ')))
     }
   }
   // Mehrere Durchgänge: Eine Umschreibung kann die nächste erst möglich machen
