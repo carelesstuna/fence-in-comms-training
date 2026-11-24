@@ -17,7 +17,10 @@
 - id: m3-l7-build-taxi
   type: build
   call: m3-traffic-taxi
-  prompt: Kein Tower heute. Bau deine Selbstansage, bevor du losrollst.
+  situation: >-
+    Heute ist kein Tower besetzt: Alle Piloten sprechen auf derselben Frequenz und sagen selbst an, was sie tun. Du
+    stehst angelassen auf dem Vorfeld und willst zur Bahn **{wx.runway}** rollen.
+  prompt: Bau deine Selbstansage, bevor du losrollst.
   distractors: ["{af.name} Tower", request taxi, please advise]
   explain: >-
     Ohne Tower bittest du um nichts – du sagst an. Deshalb „taxiing“ statt „request taxi“, und der
@@ -26,7 +29,10 @@
 - id: m3-l7-call-departure
   type: call
   call: m3-traffic-departure
-  prompt: Du stehst am Rollhalt von Runway **{wx.runway}** in **{af.name}** und willst Richtung „{dir}“ abfliegen. Sag dich an.
+  situation: >-
+    Heute ist kein Tower besetzt, jeder sagt selbst an, was er tut. Du stehst am Rollhalt von Bahn **{wx.runway}**
+    und willst nach dem Start Richtung „{dir}“ abfliegen.
+  prompt: Sag deinen Start an, bevor du auf die Bahn rollst.
   hint: Platz Traffic – Rufzeichen – departing runway … – Platzname
   explain: Kurz, mit Platzname am Anfang und am Ende. Eine Antwort erwartest du nicht.
 
@@ -34,7 +40,8 @@
   type: call
   call: m3-traffic-inbound
   expect: silence
-  prompt: Kein Tower heute. Du stehst noch auf dem Vorfeld, als sich ein anderer Flight auf der Platzfrequenz ansagt. Was antwortest du?
+  situation: Heute ist kein Tower besetzt. Du stehst noch auf dem Vorfeld, als sich ein anderer Flight ansagt.
+  prompt: Was antwortest du?
   explain: >-
     Nichts. Selbstansagen sind keine Fragen. Du merkst dir: Da kommt ein Flight zur Bahn {wx.runway}
     herein – also schaust du beim Auffahren auf die Bahn besonders genau in den Anflug.

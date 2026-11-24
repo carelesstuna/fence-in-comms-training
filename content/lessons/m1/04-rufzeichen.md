@@ -101,7 +101,7 @@ Wingmen hören mit und schweigen – außer jemand spricht sie direkt an.
 
 Ein Flugzeug kann mehrere „Namen“ haben – je nachdem, mit wem es gerade spricht:
 
-- **Taktisches Rufzeichen:** kommt aus dem Einsatzbefehl (Frag), z. B. {flight}. Damit sprichst du mit
+- **Taktisches Rufzeichen:** kommt aus dem Einsatzbefehl (:term[Frag]), z. B. {flight}. Damit sprichst du mit
   Flight, AWACS und Tanker.
 - **ATC-Rufzeichen:** steht im Flugplan. Oft ist es dasselbe wie das taktische. Wenn nicht, wechselt
   der Flight beim Übergang zwischen ATC und taktischer Phase das Rufzeichen.

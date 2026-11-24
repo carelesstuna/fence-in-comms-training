@@ -5,7 +5,7 @@
  * Im Sprechmodus bleibt Tippen daneben möglich; das Textfeld bekommt dann aber nicht automatisch
  * den Fokus, damit die Leertaste als Sprechtaste frei ist.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { ResolvedTransmission } from '../core/drills/types'
 import type { CallScore } from '../core/scoring/score'
 import type { HintContext } from '../core/speech/hints'
@@ -15,8 +15,12 @@ import { useApp } from '../state/store'
 import { InlineMarkdown } from './Markdown'
 import { RoleLegend, SegmentDetail, TransmissionLine, type Verdict } from './CallAnatomy'
 import { SpeakPanel } from './speech/SpeakPanel'
-import { isTextField } from '../platform/usePushToTalk'
+import { SpeakToggle } from './speech/SpeakToggle'
+import { SpokenNumbersNote, TypedNumbersNote } from './TypedNumbersNote'
+import { issueInWords, numberInWords, transcriptInWords } from '../core/speech/display'
+import { useSpeakMode, useTypeToFocus } from './speech/speak-mode'
 import { MODEL_LABEL } from '../ui/scenarioLog'
+import { ExchangeAudio } from './audio/ExchangeAudio'
 
 export interface CallResult {
   correct: boolean
@@ -26,6 +30,8 @@ export interface CallResult {
   detail?: CallScore
   /** Gesprochen: `text` ist das Transkript der Spracherkennung. */
   spoken?: boolean
+  /** Gesprochen, zum Anzeigen: das Transkript mit Zahlen in Worten (`transcriptInWords`) – nicht im Checkride-Flug zeigen. */
+  shown?: string
   /** Versuche, die vorher als „nicht richtig erkannt“ verworfen wurden. */
   rejected?: number
 }
@@ -39,6 +45,7 @@ export function CallInput({
   explain,
   blind = false,
   hintContext,
+  typedDigits = false,
   onDone,
 }: {
   expected?: ResolvedTransmission
@@ -49,18 +56,22 @@ export function CallInput({
   blind?: boolean
   /** Für die Spracherkennung: Modul und Stationen (nie die Lösung). */
   hintContext?: HintContext
+  /** Getippt dürfen Zahlen auch Ziffern sein (Spur C, `typedDigitsFor`); sonst nur in Worten. */
+  typedDigits?: boolean
   onDone: (r: CallResult) => void
 }) {
-  const speech = useApp((s) => s.profile.speech)
-  const speak = speech.input === 'speak'
+  const speak = useSpeakMode()
   const [text, setText] = useState('')
   const [result, setResult] = useState<CallResult | null>(null)
   const [showHint, setShowHint] = useState(false)
+  // Wortlaut der Musterlösung für die Anzeige erkannter Zahlen
+  const expectedTexts = expected?.segments.flatMap((s) => [s.text, ...(s.alt ?? []), ...(s.weak ?? [])]) ?? []
 
   const evaluate = (input: string, spoken: boolean, rejected = 0): CallResult => {
-    const extra = spoken ? { spoken, rejected } : {}
+    const extra = spoken ? { spoken, rejected, shown: transcriptInWords(input, expectedTexts) } : {}
     if (expectSilence || !expected) return { correct: false, score: 0, silent: false, text: input, ...extra }
-    const detail = scoreTransmission(input, expected, { source: spoken ? 'spoken' : 'typed' })
+    // Getippt zählen Zahlen nur in Worten (außer in Spur C), gesprochen schreibt die Erkennung ohnehin Ziffern
+    const detail = scoreTransmission(input, expected, spoken ? { source: 'spoken' } : { source: 'typed', numbersInWords: !typedDigits })
     return { correct: detail.correct, score: detail.score, silent: false, text: input, detail, ...extra }
   }
 
@@ -78,23 +89,8 @@ export function CallInput({
     if (text.trim()) commit(evaluate(text, false))
   }
 
-  const setSpeak = (on: boolean) => {
-    // Steht der Cursor noch im Textfeld, würde die Leertaste dort tippen statt zu senden
-    if (on && document.activeElement instanceof HTMLInputElement) document.activeElement.blur()
-    useApp.getState().setProfile({ speech: { ...speech, input: on ? 'speak' : 'type' } })
-  }
-
-  // Im Sprechmodus: Wer einfach lostippt, landet im Textfeld (die Sprechtaste selbst ausgenommen)
   const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => {
-    if (!speak || result) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key.length !== 1 || e.code === speech.pttKey || e.ctrlKey || e.altKey || e.metaKey || isTextField(e.target)) return
-      inputRef.current?.focus()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [speak, result, speech.pttKey])
+  useTypeToFocus(inputRef, speak && !result)
 
   const skeleton = expected?.segments.filter((s) => !s.optional).map((s) => roleInfo(s.role).label).join(' – ')
 
@@ -102,29 +98,13 @@ export function CallInput({
     <div>
       {!result && (
         <>
-          <div className="mb-2 flex items-center gap-1 text-xs" role="group" aria-label="Eingabe">
-            <button
-              type="button"
-              aria-pressed={!speak}
-              onClick={() => setSpeak(false)}
-              className={`rounded-md px-2.5 py-1 ${!speak ? 'bg-white/10 text-text' : 'text-muted hover:text-text'}`}
-            >
-              ⌨ Tippen
-            </button>
-            <button
-              type="button"
-              aria-pressed={speak}
-              onClick={() => setSpeak(true)}
-              className={`rounded-md px-2.5 py-1 ${speak ? 'bg-white/10 text-text' : 'text-muted hover:text-text'}`}
-            >
-              🎙 Sprechen
-            </button>
-          </div>
+          <SpeakToggle className="mb-2" />
           {speak && (
             <div className="mb-2">
               <SpeakPanel
                 blind={blind}
                 hintContext={hintContext}
+                display={blind ? undefined : (t) => transcriptInWords(t, expectedTexts)}
                 judge={(t) => evaluate(t, true).correct}
                 onCommit={(t, rejected) => commit(evaluate(t, true, rejected))}
               />
@@ -158,6 +138,7 @@ export function CallInput({
               Funken
             </button>
           </form>
+          <TypedNumbersNote digits={typedDigits} className="mt-1.5" />
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
             <button onClick={() => submit(true)} className="rounded-md border border-line px-2.5 py-1 text-muted hover:text-text" title="Bewusst nicht funken">
               🔇 Nichts sagen
@@ -201,6 +182,11 @@ const HEARD_CLASS: Record<string, string> = {
  * (gelb), nicht stimmte (rot) oder übrig blieb (durchgestrichen). Der Tooltip nennt das Segment.
  */
 function HeardLine({ detail, expected }: { detail: CallScore; expected?: ResolvedTransmission }) {
+  const segTexts = (k: number | undefined) => {
+    const s = k !== undefined ? expected?.segments[k] : undefined
+    return s ? [s.text, ...(s.alt ?? []), ...(s.weak ?? [])] : []
+  }
+  const all = expected?.segments.flatMap((_, k) => segTexts(k)) ?? []
   return (
     <span lang="en" className="font-mono">
       „
@@ -214,7 +200,8 @@ function HeardLine({ detail, expected }: { detail: CallScore; expected?: Resolve
               className={slot ? (slot.weak ? HEARD_CLASS.misplaced : (HEARD_CLASS[slot.status] ?? '')) : 'text-muted line-through'}
               title={seg ? `${roleInfo(seg.role).label}: ${seg.text}` : 'passt zu keinem Teil'}
             >
-              {w.text}
+              {/* Zahlen schreibt die Erkennung als Ziffern – hier so, wie man sie spricht */}
+              {/^\d+(\.\d+)?$/.test(w.text) ? numberInWords(w.text, [...segTexts(w.slot), ...all], w.slot !== undefined ? segTexts(w.slot) : all) : w.text}
             </span>
           </span>
         )
@@ -237,6 +224,9 @@ export function CallFeedback({
   explain?: string
 }) {
   const [sel, setSel] = useState<number | null>(null)
+  // Fester Funkspruch für die Musterlösung (gleiche Liste = gleiche Stimme und vorab gerechneter Ton)
+  const modelLine = useMemo(() => (expected ? [expected] : []), [expected])
+  const expectedTexts = expected?.segments.flatMap((s) => [s.text, ...(s.alt ?? []), ...(s.weak ?? [])]) ?? []
   const verdicts: Record<number, Verdict> = {}
   // Geduldete Form (weak): gilt, aber nicht nach Vorschrift – gelb wie „andere Reihenfolge“
   result.detail?.slots.forEach((s) => (verdicts[s.index] = s.weak ? 'warn' : STATUS_VERDICT[s.status]))
@@ -266,19 +256,20 @@ export function CallFeedback({
             <span className="text-muted">Erkannt: </span>
             <HeardLine detail={result.detail} expected={expected} />
             {!!result.rejected && <span className="ml-2 text-xs text-muted">({result.rejected}× neu gesprochen)</span>}
+            {result.detail.heard.some((w) => /\d/.test(w.text)) && <SpokenNumbersNote className="mt-0.5" />}
           </div>
         ) : (
           <div className="mt-1 text-sm">
             <span className="text-muted">{result.spoken ? 'Erkannt: ' : 'Du: '}</span>
             <span lang="en" className="font-mono">
-              „{result.text}“
+              „{result.spoken ? (result.shown ?? result.text) : result.text}“
             </span>
           </div>
         ))}
       {result.detail && result.detail.issues.length > 0 && (
         <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm">
           {result.detail.issues.map((i, k) => (
-            <li key={k}>{i}</li>
+            <li key={k}>{result.spoken ? issueInWords(i, expectedTexts) : i}</li>
           ))}
         </ul>
       )}
@@ -288,7 +279,10 @@ export function CallFeedback({
           <div className="mb-1.5 text-xs text-muted">
             {result.correct ? 'Musterlösung, aufgeschlüsselt – grün umrandet, was du gesagt hast:' : 'So wäre es richtig (Musterlösung):'}
           </div>
-          <TransmissionLine t={expected} label={MODEL_LABEL} verdicts={verdicts} selectedIndex={sel} onSelect={setSel} />
+          {/* Eigener Ton-Rahmen: So lässt sich die Musterlösung anhören, egal wo die Eingabe steht */}
+          <ExchangeAudio transmissions={modelLine}>
+            <TransmissionLine t={expected} label={MODEL_LABEL} verdicts={verdicts} selectedIndex={sel} onSelect={setSel} />
+          </ExchangeAudio>
           {skipped.length > 0 && (
             <p className="mt-1.5 text-xs text-muted">
               Optional, von dir weggelassen:{' '}

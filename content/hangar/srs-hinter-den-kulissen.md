@@ -29,5 +29,3 @@ Weil der Server die Positionen aller Spieler kennt, kann er auch **Entfernung** 
 prüfen. Er kann simulieren, dass du während des Sendens nichts hörst, und dass sich FM-Sendungen
 gegenseitig verdrängen. Und er kennt Sonderfälle: das **Intercom** für Besatzungen, Verschlüsselung
 oder einen **externen AWACS-Modus**, mit dem ein Controller ohne Flugzeug mitfunkt.
-
-Die aktuelle Version **2.4.1.0** erschien im September 2026.

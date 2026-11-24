@@ -4,7 +4,7 @@ title: So baust du deine Comm Card
 category: praxis
 teaser: Eine Seite auf dem Knie, und du suchst nie wieder eine Frequenz. So sieht eine brauchbare Comm Card aus.
 sources:
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 9, 31 – fester Comm Plan"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 9, 31 – fester Comm Plan"
   - title: "DCS Kneeboard-Seiten der mitgelieferten Kampagnen"
 ---
 

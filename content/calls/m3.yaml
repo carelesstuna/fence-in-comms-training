@@ -9,7 +9,8 @@
     was du über Wetter und Betrieb am Platz wissen musst. {airfield.name} liegt auf der Karte {airfield.map}, dort
     gilt die {airfield.phraseology.here}: Sicht und Luftdruck hörst du in dieser Form. Wolken und die Bitte am Schluss
     spricht die App überall in der US-Form.
-  freq: "ATIS → Ground {airfield.gnd} {airfield.gnd.band}"
+  freq: "ATIS → Ground · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     atis: { letter: true }
@@ -76,7 +77,7 @@
   context: >-
     Das Wetter ändert sich, und die ATIS bekommt einen neuen Buchstaben. Ground sagt es dir – und
     erwartet, dass du die neuen Werte übernimmst.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
   vars:
     airfield: { pool: airfields }
     atis2: { letter: true }
@@ -113,6 +114,8 @@
     Der Crew Chief steht vorn links am Flugzeug und ist per Kabel mit deinem Intercom verbunden. Der
     Ablauf (Bereich frei, Brandwache, Bremsklötze, Startfreigabe) ist überall gleich, der genaue
     Wortlaut unterscheidet sich je nach Einheit.
+  freq: Crew Chief · Intercom
+  place: Parkposition
   transmissions:
     - speaker: Pilot
       you: true
@@ -300,7 +303,8 @@
     Bevor der Flight rollt, holt der Lead die Streckenfreigabe für einen Flug nach Instrumentenflugregeln.
     An großen Plätzen ist dafür Clearance Delivery zuständig, an kleineren Ground. Die Freigabe selbst übt die App
     an jedem Platz in der US-Form (FAA).
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Clearance · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     dest: { pool: airfields, sameMap: airfield, distinctFrom: [airfield] }
@@ -397,7 +401,8 @@
   context: >-
     Du bist zum ersten Mal auf diesem Platz und kennst die Rollwege nicht. Statt zu raten, bittest
     du Ground, dich Schritt für Schritt zu führen.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     atis: { letter: true }
@@ -444,7 +449,7 @@
 - id: m3-hold-position
   title: Sofort anhalten – hold position
   context: Während du rollst, muss Ground dich stoppen – vielleicht kreuzt gleich ein anderes Flugzeug vor dir.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
   vars:
     airfield: { pool: airfields }
   transmissions:
@@ -467,7 +472,8 @@
 - id: m3-give-way
   title: Vorfahrt lassen – give way
   context: An einer Kreuzung kommt ein anderes Flugzeug. Ground regelt, wer zuerst fährt.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     other: { oneOf: [tanker, C-130, two-ship of Eagles, Hornet] }
@@ -495,7 +501,8 @@
   context: >-
     Dein Flight steht am Rollhalt vor der Bahn, alle Checks sind durch. Jetzt wechselst du zum Tower
     und meldest dich abflugbereit.
-  freq: "{airfield.twr} {airfield.twr.band}"
+  freq: "Tower · {airfield.twr} {airfield.twr.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
   transmissions:
@@ -545,7 +552,8 @@
 - id: m3-takeoff-clearance
   title: Die Startfreigabe
   context: Du stehst ausgerichtet auf der Bahn. Jetzt kommt das eine Wort, auf das du gewartet hast.
-  freq: "{airfield.twr} {airfield.twr.band}"
+  freq: "Tower · {airfield.twr} {airfield.twr.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     wx: { weather: true, airfield: airfield }
@@ -581,7 +589,8 @@
   context: >-
     Der Tower hat dich zu Departure geschickt. Du bist im Steigflug und meldest dich mit deiner
     aktuellen und deiner freigegebenen Höhe.
-  freq: "{airfield.dep} {airfield.dep.band}"
+  freq: "Departure · {airfield.dep} {airfield.dep.band}"
+  place: "Im Abflug von {airfield.name}"
   vars:
     airfield: { pool: airfields }
     # Höhen in Tausend Fuß über dem Platz (E3-01): leaving mindestens 1.000 ft, freigegeben mindestens
@@ -601,7 +610,7 @@
           role: callsign
         - text: "leaving {altA|spoken} thousand"
           role: value
-          alt: ["passing {altA|spoken} thousand", "leaving {altA}000", "passing {altA}000"]
+          alt: ["passing {altA|spoken} thousand"]
           note: >-
             Die Höhe, die du gerade verlässt, auf hundert Fuß genau. Damit prüft der Lotse, ob sein Radar
             deine Höhe richtig anzeigt. „Leaving“ ist die FAA-Form, in Europa hörst du „passing“.
@@ -610,9 +619,6 @@
           alt:
             - "climbing {altB|spoken} thousand"
             - "for {altB|spoken} thousand"
-            - "climbing to {altB}000"
-            - "climbing {altB}000"
-            - "for {altB}000"
           note: >-
             Die Höhe, die du freigegeben bekommen hast. So weiß er, wohin du steigst. In Sim-Staffeln hört
             man oft kurz „passing … for …“ – verständlich, aber in den Vorschriften steht „climbing to“.
@@ -636,21 +642,11 @@
           role: instruction
           critical: true
           alt:
-            - "{airfield.climb} FL{fl}0"
-            - "{airfield.climb} FL {fl}0"
             - "{airfield.climb.ing} flight level {fl|spoken} zero"
-            - "{airfield.climb.ing} FL{fl}0"
-            - "{airfield.climb.ing} FL {fl}0"
             - "climbing flight level {fl|spoken} zero"
-            - "climbing FL{fl}0"
-            - "climbing FL {fl}0"
             - "flight level {fl|spoken} zero"
-            - "FL{fl}0"
-            - "FL {fl}0"
           weak:
             - "{airfield.climb.other} flight level {fl|spoken} zero"
-            - "{airfield.climb.other} FL{fl}0"
-            - "{airfield.climb.other} FL {fl}0"
             - "{airfield.climb.otherIng} flight level {fl|spoken} zero"
           weakNote: "In der {airfield.phraseology.form} heißt es „{airfield.climb}“"
           note: Die neue Höhe wird wörtlich zurückgelesen – „flight level“ oder kurz „FL“.

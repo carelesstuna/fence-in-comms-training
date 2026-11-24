@@ -19,7 +19,8 @@
   transmission: 0
   blanks: [0, 2]
   # Platzhalter aus dem Funkspruch (airfield, atis) sind auch in der Übung verfügbar
-  prompt: Du stehst in **{airfield.name}** und hast ATIS **{atis}** gehört. Ergänze deine Anfrage an Ground.
+  situation: Du stehst kalt auf dem Vorfeld und hast ATIS **{atis}** gehört.
+  prompt: Ergänze deine Anfrage an Ground.
   explain: Erst der Adressat, dann dein Rufzeichen – und die ATIS-Kennung zeigt, dass du das aktuelle Wetter kennst.
 
 - id: beispiel-reihenfolge
@@ -81,7 +82,8 @@
 - id: beispiel-checkin-tippen
   type: call
   call: beispiel-flight-checkin
-  prompt: Der Lead fragt nach dem Check-in. Was funkst du?
+  situation: Ihr seid gerade auf eine neue Frequenz gewechselt. Der Lead fragt nach dem Check-in.
+  prompt: Melde dich im Check-in.
   explain: Im Flight antwortet jeder nur mit seiner Nummer, in der richtigen Reihenfolge.
 
 - id: beispiel-push-schweigen
@@ -89,13 +91,15 @@
   call: beispiel-push
   as: two
   expect: silence
+  situation: Ihr fliegt im Verband auf der Flight-Frequenz.
   prompt: Was antwortest du dem Lead?
   explain: Auf „push“ antwortet niemand. Du wechselst die Frequenz und meldest dich dort beim Check-in.
 
 - id: beispiel-bogey-dope-tippen
   type: call
   call: beispiel-bogey-dope
-  prompt: Du willst von **{awacs}** wissen, wo die nächste Gruppe steht. Was funkst du?
+  situation: Du bist auf Station, auf deinem Radar ist noch nichts zu sehen.
+  prompt: Frag den AWACS, wo die nächste Gruppe steht.
   explain: Adressat, Rufzeichen, Brevity-Wort – mehr braucht es nicht.
 
 # --------------------------------------------------------------- Lagebild-Decoder

@@ -12,9 +12,10 @@ import type { CasArea } from '../core/random/cas'
 import { bearing, distance, NM, norm360 } from '../core/random/cas'
 import { checkNineLine, extraReadback, type FieldCheck, type NineLineField, type NineLineResult } from '../core/scoring/nineline'
 import { RadioPanel, SegmentDetail, TransmissionLine } from './CallAnatomy'
+import { ExchangeAudio } from './audio/ExchangeAudio'
 import { CallInput, type CallResult } from './CallInput'
 import { InlineMarkdown } from './Markdown'
-import { hintContextForExchange } from '../ui/speech'
+import { hintContextForExchange, typedDigitsFor } from '../ui/speech'
 import { useExchangePlay } from './audio/exchange-audio'
 
 // ---------------------------------------------------------------------------
@@ -383,13 +384,15 @@ export function NineLineDrillView({ drill, onAnswered }: { drill: NineLineDrill;
             niemand.
           </p>
           {before.length > 0 && (
-            <div className="mb-3 space-y-2 rounded-lg border border-line bg-black/20 px-3 py-2">
-              {before.map((t, i) => (
-                <TransmissionLine key={i} t={t} />
-              ))}
-            </div>
+            <ExchangeAudio transmissions={drill.readback.exchange.transmissions}>
+              <div className="mb-3 space-y-2 rounded-lg border border-line bg-black/20 px-3 py-2">
+                {before.map((t, i) => (
+                  <TransmissionLine key={i} t={t} />
+                ))}
+              </div>
+            </ExchangeAudio>
           )}
-          <CallInput expected={readbackT} expectSilence={false} hintContext={hintContextForExchange(drill.readback.exchange)} onDone={(r) => {
+          <CallInput expected={readbackT} expectSilence={false} hintContext={hintContextForExchange(drill.readback.exchange)} typedDigits={typedDigitsFor({ drillId: drill.id })} onDone={(r) => {
             setRb(r)
             onAnswered(!!form.correct && r.correct)
           }} />
@@ -399,11 +402,13 @@ export function NineLineDrillView({ drill, onAnswered }: { drill: NineLineDrill;
             </p>
           )}
           {rb && after.length > 0 && (
-            <div className="mt-3 space-y-2 rounded-lg border border-line bg-black/20 px-3 py-2">
-              {after.map((t, i) => (
-                <TransmissionLine key={i} t={t} />
-              ))}
-            </div>
+            <ExchangeAudio transmissions={drill.readback.exchange.transmissions}>
+              <div className="mt-3 space-y-2 rounded-lg border border-line bg-black/20 px-3 py-2">
+                {after.map((t, i) => (
+                  <TransmissionLine key={i} t={t} />
+                ))}
+              </div>
+            </ExchangeAudio>
           )}
         </div>
       )}

@@ -147,7 +147,7 @@ Standarddruck 1013 hPa ein und fliegst Flight Levels. Mehr zu Höhenwörtern und
 
 **Welche Form gilt?** Standardmäßig spricht der Lotse in der App überall die US-Form (FAA): „altimeter two niner
 niner two“ und „descend and maintain …“. So funkt man in den meisten Sim-Staffeln, auch auf Karten außerhalb der USA.
-Mit der Einstellung „Kartenabhängig“ im [Profil](/profile) richtet sich die App nach dem gewürfelten Platz: In Nevada,
+Mit der Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) richtet sich die App nach dem gewürfelten Platz: In Nevada,
 auf Guam und in Korea bleibt es bei der US-Form, in Georgien und am Golf gilt die ICAO-Form: „QNH one zero one three“
 und „descend to …“. Liest du die andere Form zurück, zählt das noch, aber nicht voll. Welche Form gerade gilt, sagt
 die Beschreibung des Funkspruchs unten.

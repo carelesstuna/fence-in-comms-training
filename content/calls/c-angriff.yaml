@@ -8,7 +8,8 @@
   context: >-
     Der JTAC führt deine Augen zum Ziel: erst etwas Großes, das man sicher findet, dann Schritt für Schritt kleiner.
     Du meldest jedes Mal, was du siehst.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Über dem Zielgebiet
   layer: core
   callsignPool: attack
   vars:
@@ -61,7 +62,8 @@
   title: Markierung mit Rauch
   context: >-
     Der JTAC markiert das Ziel mit Rauch. Die Markierung liegt fast nie genau auf dem Ziel – die Korrektur kommt von dort aus.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Über dem Zielgebiet
   layer: sim
   callsignPool: attack
   vars:
@@ -104,7 +106,7 @@
 - id: track-c-lead-hits
   title: Talk-on von den Einschlägen des Leads
   context: Der Lead hat getroffen. Jetzt führt der JTAC Two von den Einschlägen aus auf das nächste Ziel.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
   layer: community
   callsignPool: attack
   vars:
@@ -133,7 +135,8 @@
   title: Laser-Markierung durch den JTAC
   context: >-
     Line 7 war „laser“. Du stellst den Code ein und sagst dem JTAC, wann er lasern soll. Den Laser startest du, nicht er.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Zielanflug
   layer: core
   callsignPool: attack
   vars:
@@ -186,7 +189,7 @@
 - id: track-c-ir
   title: IR-Pointer bei Nacht
   context: Bei Nacht markiert der JTAC mit einem Infrarot-Pointer. Den Strahl siehst du nur durch die Nachtsichtbrille.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
   layer: core
   callsignPool: attack
   vars:
@@ -222,7 +225,8 @@
   context: >-
     Der eigentliche Angriff. Du sagst, wann du losfliegst und aus welcher Richtung du kommst. Erst nach „cleared hot“ wird
     ausgelöst.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Zielanflug
   layer: core
   callsignPool: attack
   vars:
@@ -279,7 +283,8 @@
 - id: track-c-abort
   title: Abbruch
   context: Der JTAC sieht etwas, das du nicht siehst – und bricht deinen Angriff ab.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Zielanflug
   layer: core
   callsignPool: attack
   vars:
@@ -312,7 +317,8 @@
 - id: track-c-type3
   title: Type 3 – Cleared to Engage
   context: Bei geringem Risiko für die eigenen Leute gibt der JTAC nicht jeden Angriff einzeln frei, sondern einen Rahmen.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Über dem Zielgebiet
   layer: core
   callsignPool: attack
   vars:
@@ -345,7 +351,8 @@
 - id: track-c-bda
   title: BDA und Check-out
   context: Der JTAC meldet das Ergebnis. Ohne Munition meldest du dich ab.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Über dem Zielgebiet
   layer: community
   callsignPool: attack
   vars:
@@ -380,7 +387,7 @@
   context: >-
     Hubschrauber greifen tief und nah an. Ihr Brief ist kürzer und beginnt bei den eigenen Leuten. Aufbau laut einem
     Community-Leitfaden (1st RRF); die Vorlage der Heeresvorschrift ist nicht geprüft ⚠.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
   layer: community
   callsignPool: helo
   vars:
@@ -388,6 +395,7 @@
     cas: { casArea: true, aircraft: ah64, dangerClose: any }
   transmissions:
     - speaker: "{jtac}"
+      pace: lines
       radio: fm
       segments:
         - { text: "{callsign|spoken}", role: addressee }
@@ -425,7 +433,7 @@
   context: >-
     Auf dem Package-Netz meldet ein F-16-Flight, der gegen die Flugabwehr fliegt, einen Schuss. Für dich in der A-10 heißt
     das: Das Radar dort soll gleich schweigen.
-  freq: UHF (Package)
+  freq: Package · UHF
   layer: core
   vars:
     sead: { pool: callsigns.fighter }
@@ -443,7 +451,8 @@
 - id: track-c-singer
   title: Singer – SAM-Start auf dem RWR
   context: Dein Radarwarngerät zeigt einen Start. Das muss dein Flight sofort wissen.
-  freq: UHF (Flight)
+  freq: Flight · UHF
+  place: Im Einsatzgebiet
   layer: core
   callsignPool: attack
   vars:

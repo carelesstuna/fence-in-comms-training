@@ -28,9 +28,10 @@
   exam: true
   call: m5-awacs-checkin-exceptions
   transmission: 2
-  prompt: >-
-    Du hast dich beim AWACS **{awacs}** „with exceptions“ angemeldet (Missionsnummer **{mn}**). Er hat dir den Alpha
-    Check gegeben und sagt „continue with check in“. Deine Abweichung vom Plan: **{exc}**. Was funkst du jetzt?
+  situation: >-
+    Du hast dich beim AWACS „with exceptions“ angemeldet (Missionsnummer **{mn}**). Deine Abweichung vom Plan:
+    **{exc}**.
+  prompt: Melde dem AWACS jetzt deine Abweichung.
   explain: >-
     Jetzt kommt die Abweichung: dein Rufzeichen, dann die Meldung – ohne „roger“ und ohne den Alpha Check zurückzulesen.
     So zeigt es auch das Beispiel der ATP 3-52.4.
@@ -39,9 +40,8 @@
   type: call
   exam: true
   call: m5-relay
-  prompt: >-
-    **{oth} {onum}** kommt bei AWACS **{awacs}** nicht durch. Du hörst seine Meldung „{rmsg}“ aber klar. Gib sie an den
-    AWACS weiter.
+  situation: "**{oth} {onum}** kommt beim AWACS nicht durch. Du hörst seine Meldung „{rmsg}“ aber klar."
+  prompt: Gib seine Meldung an den AWACS weiter.
   explain: >-
     Adressat, „relay“, Rufzeichen des **ursprünglichen** Senders, dann die Meldung. Dein eigenes Rufzeichen lässt du
     weg – sonst hielte der AWACS die Meldung für deine (ATP 3-52.4, S. 6).
@@ -52,7 +52,7 @@
   vars:
     ang: { number: angels, range: [10, 35] }
   prompt: Du fliegst auf **{ang}.000 Fuß** und meldest dem AWACS deine eigene Höhe. Welche Höhenangabe funkst du?
-  accept: ["angels {ang}", "angels {ang|spoken}"]
+  accept: ["angels {ang|spoken}"]
   hint: Das Stichwort gilt für die Höhe von Freunden. Danach kommen die Ziffern einzeln.
   explain: >-
     Die Höhe eines Freundes – hier deine eigene – heißt „angels“, danach Ziffer für Ziffer: angels {ang|spoken}. „Thousand“
@@ -176,9 +176,8 @@
   type: call
   exam: true
   call: m5-bogey-dope-group
-  prompt: >-
-    Der AWACS **{awacs}** hat dir ein Picture mit benannten Gruppen gegeben ({pic.label}). Du willst wissen, wo die
-    **{pic.g1.name}** von dir aus liegt – nicht die nächste Gruppe. Was funkst du?
+  situation: Der AWACS hat dir ein Picture mit benannten Gruppen gegeben ({pic.label}).
+  prompt: Frag den AWACS, wo die **{pic.g1.name}** von dir aus liegt – nicht die nächste Gruppe.
   explain: >-
     Adressat, dein Rufzeichen, „bogey dope“ und der Gruppenname. Ohne Namen bekommst du das BRAA zur nächsten Gruppe;
     mit Namen zu genau dieser (ATP 3-52.4, S. 22).
@@ -260,9 +259,10 @@
   type: call
   exam: true
   call: m5-declare
-  prompt: >-
+  situation: >-
     Auf deinem Radar steht eine Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}** – ob Freund oder Feind, weißt
-    du nicht. Klär das mit dem AWACS **{awacs}**.
+    du nicht.
+  prompt: Klär mit dem AWACS, wer das ist.
   hint: Adressat – Rufzeichen – Brevity-Wort für „Identität erfragen“ – Position im Bullseye-Format – Höhe (045/60 oder 045, 60 – beides geht)
   explain: >-
     Du nennst die Position im Bullseye-Format und die Höhe, damit der AWACS die richtige Gruppe findet; die Identität

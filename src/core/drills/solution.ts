@@ -33,6 +33,9 @@ export function drillSolution(d: ResolvedDrill): string[] | null {
       return d.accept.length ? [d.accept[0]] : null
     case 'cloze':
       return [spoken(d.exchange.transmissions[d.transmission])]
+    case 'memory':
+      // Die Stufe wählt man erst in der Übung; gezeigt wird der Readback mit wenig Angaben
+      return d.few.answer >= 0 ? [spoken(d.few.answerExchange.transmissions[d.few.answer])] : null
     case 'sequence':
       return [d.solution.map((k) => d.items.find((i) => i.key === k)?.label ?? k).join(' → ')]
     case 'form':

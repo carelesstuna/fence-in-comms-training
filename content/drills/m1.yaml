@@ -85,9 +85,8 @@
 - id: m1-l1-build-radio-check
   type: build
   call: m1-radio-check
-  prompt: >-
-    Du bist **{callsign}** und willst beim Tower prüfen, ob dein Funkgerät richtig sendet. Bau den
-    Radio Check zusammen.
+  situation: Du sitzt startbereit im Cockpit und willst wissen, ob dein Funkgerät richtig sendet.
+  prompt: Bau den Radio Check an den Tower zusammen.
   distractors: [over, please]
   explain: >-
     Adressat, Rufzeichen, Anliegen. Die Frequenz zum Schluss ist eine hilfreiche Ergänzung. „please“ und „over“ sind
@@ -96,9 +95,8 @@
 - id: m1-l1-build-startup
   type: build
   call: m1-startup-request
-  prompt: >-
-    Du bist **{callsign}**, stehst kalt auf dem Vorfeld, hast die ATIS gehört und willst anlassen. Bau
-    deine Anfrage an Ground.
+  situation: Du stehst kalt auf dem Vorfeld und hast die ATIS gehört.
+  prompt: Bau deine Bitte an Ground um die Anlassfreigabe.
   distractors: ["{wingman|spoken}", "request taxi"]
   explain: >-
     „request taxi“ wäre der nächste Schritt – erst kommt die Anlassfreigabe. Und das Rufzeichen deines
@@ -179,9 +177,8 @@
   type: build
   call: m1-taxi-request
   transmission: 0
-  prompt: >-
-    Du bist **{callsign}** und führst einen Flight aus **zwei** Flugzeugen. Ihr habt angelassen und
-    wollt zur Startbahn rollen. Bau deine Anfrage an Ground.
+  situation: Dein Flight hat **zwei** Flugzeuge. Ihr habt angelassen und steht auf dem Vorfeld.
+  prompt: Bau deine Anfrage an Ground, um zur Startbahn zu rollen.
   distractors: [request startup, "{wingman|spoken}", flight of four]
   explain: >-
     Adressat, Rufzeichen, dann die Zusatzinfos (Anzahl, ATIS-Buchstabe) und zum Schluss das Anliegen.
@@ -190,10 +187,9 @@
 - id: m1-l2-call-startup
   type: call
   call: m1-startup-request
-  prompt: >-
-    Du stehst kalt in **{airfield.name}** und hast die ATIS-Ausgabe **{atis.letter}** gehört. Bitte
-    Ground um die Anlassfreigabe. Den ATIS-Buchstaben sprichst du im Alphabet.
-  hint: Adressat – Rufzeichen – ATIS-Kennung – Anfrage
+  situation: Du stehst kalt auf dem Vorfeld, die Checks sind durch. Die ATIS-Ausgabe **{atis.letter}** hast du gehört.
+  prompt: Bitte Ground um die Anlassfreigabe.
+  hint: Adressat – Rufzeichen – ATIS-Kennung (im Alphabet) – Anfrage
   explain: >-
     „{airfield.name} Ground, {callsign|spoken}, information {atis}, request startup.“ Statt
     „information {atis}“ geht auch „with {atis}“, und die Kennung darf auch nach der Anfrage stehen.
@@ -347,11 +343,11 @@
   pairs:
     - ["ATC, Höhe in Fuß (unter der Übergangshöhe)", "{alt|spoken}"]
     - ["ATC, Höhe über der Übergangshöhe", "flight level {fl|spoken}"]
-    - ["Taktisch (AWACS, Flight): Tausend Fuß über dem Meer", "angels {ang|spoken}"]
-    - ["Taktisch (AWACS, Flight): Hundert Fuß über Grund", "cherubs {cher|spoken}"]
+    - ["Taktisch (AWACS, Flight): in Tausend Fuß über dem Meer", "angels {ang|spoken}"]
+    - ["Taktisch (AWACS, Flight): in Hundert Fuß über Grund", "cherubs {cher|spoken}"]
   explain: >-
-    ATC nennt Fuß mit „thousand“ und „hundred“, darüber Flight Levels. „angels“ (Tausend Fuß über dem Meer) und
-    „cherubs“ (Hundert Fuß über Grund) sind Brevity-Wörter des taktischen Funks.
+    ATC nennt Fuß mit „thousand“ und „hundred“, darüber Flight Levels. „angels“ (in Tausend Fuß über dem Meer) und
+    „cherubs“ (in Hundert Fuß über Grund) sind Brevity-Wörter des taktischen Funks.
 
 - id: m1-l3-ops-check
   type: choice
@@ -399,9 +395,8 @@
 - id: m1-l3-build-angels
   type: build
   call: m1-awacs-checkin-angels
-  prompt: >-
-    Du bist **{callsign}**, fliegst auf **{ang}.000 Fuß** und meldest dich beim AWACS **{awacs}** an.
-    Bau deine Anmeldung – mit der Höhe im taktischen Format.
+  situation: Du fliegst auf **{ang}.000 Fuß** und kommst in das Gebiet des AWACS.
+  prompt: Bau deine Anmeldung beim AWACS – mit der Höhe im taktischen Format.
   distractors: ["angels {ang|spoken} thousand", over]
   explain: >-
     Adressat, Rufzeichen, Anmeldung, Höhe. „angels“ enthält das „thousand“ schon. Und „over“ hört man
@@ -445,7 +440,8 @@
   type: build
   exam: true
   call: m1-flight-check
-  prompt: Ihr habt die Frequenz gewechselt. Prüfe, ob dein Flight mitgekommen ist.
+  situation: Ihr habt gerade die Frequenz gewechselt.
+  prompt: Prüfe, ob dein Flight mitgekommen ist.
   distractors: [radio check, over]
   explain: Flight-Name, dann „check“. „Radio check“ wäre eine Frage nach der Lesbarkeit an eine Bodenstelle.
 
@@ -679,9 +675,10 @@
 - id: m1-l5-build-correction
   type: build
   call: m1-correction
-  prompt: >-
-    Du bist **{callsign}** und meldest dem AWACS **{awacs}** deine Höhe. Dabei sagst du aus Versehen
-    „angels {a1|spoken}“ – richtig sind **{a2}.000 Fuß**. Korrigiere dich im selben Funkspruch.
+  situation: >-
+    Du fliegst auf **{a2}.000 Fuß** und meldest dem AWACS deine Höhe. Dabei sagst du aus Versehen
+    „angels {a1|spoken}“.
+  prompt: Korrigiere dich im selben Funkspruch.
   distractors: [sorry, disregard]
   explain: >-
     „correction“ und sofort der richtige Wert. „disregard“ würde den GANZEN Funkspruch zurücknehmen –
@@ -740,15 +737,23 @@
     Zurückgelesen wird alles, was bei einem Missverständnis gefährlich wird: Bahnen, Höhen, Kurse,
     Frequenzen, Luftdruck, Transpondercodes. Dazu dein Rufzeichen am Ende.
 
-- id: m1-l6-cloze-taxi
-  type: cloze
-  call: m1-taxi-request
-  transmission: 2
-  blanks: [0, 2]
-  prompt: Ground hat dir die Rollfreigabe gegeben. Ergänze die Lücken in deinem Readback.
+- id: m1-l6-memory-readback
+  type: memory
+  prompt: >-
+    Hör zu, merk dir die Anweisung – im Kopf oder als Stichworte auf dem Kneeboard – und lies sie dann zurück. Fang mit
+    Stufe 1 an; mit jeder geschafften Stufe bleibt der Text kürzer stehen.
+  few:
+    call: m1-taxi-request
+    heard: 1
+    situation: Du stehst angelassen auf dem Vorfeld und hast Ground ums Rollen gebeten.
+  many:
+    call: m1-approach-numbers
+    heard: 0
+    situation: Du kommst zurück zum Platz und hast dich eben bei Approach gemeldet.
   explain: >-
-    Die Runway und das „hold short“ sind die beiden Teile, die nie fehlen dürfen. Ein vergessenes
-    „hold short“ heißt für Ground: Der rollt womöglich auf die Bahn.
+    Zurückgelesen wird alles, was bei einem Missverständnis gefährlich wird: Bahn, Rollweg in der richtigen Reihenfolge,
+    „hold short“, Zahlen mit Drehrichtung. Wer mitschreibt, schreibt Stichworte, keine Sätze – etwa „RWY 27 · A B · HS“
+    oder „ALT 2992 · L 270 · 4000“.
 
 - id: m1-l6-no-readback
   type: choice
@@ -761,14 +766,16 @@
     - Einen Frequenzwechsel („contact departure …“ mit Frequenz)
   answer: 0
   explain: >-
-    Einen Verkehrshinweis bestätigst du nur („roger“, „looking“). Freigaben, Haltanweisungen, Frequenzen und Zahlen, nach
-    denen du fliegst, liest du zurück.
+    Eine Verkehrsinformation liest du nicht zurück. Du sagst, ob du den Verkehr siehst („traffic in sight“, „negative
+    contact“, „looking“). Freigaben, Haltanweisungen, Frequenzen und Zahlen, nach denen du fliegst, liest du zurück –
+    auch den Luftdruck.
 
 - id: m1-l6-build-taxi-readback
   type: build
   call: m1-taxi-request
   transmission: 2
-  prompt: Du bist **{callsign}**. Ground hat dir die Rollfreigabe gegeben. Lies sie zurück.
+  situation: Du stehst angelassen auf dem Vorfeld. Ground hat dir eben die Rollfreigabe gegeben.
+  prompt: Lies die Rollfreigabe zurück.
   distractors: ["via {twB}, {twA}", roger, cleared for takeoff]
   explain: >-
     Runway, Rollweg in der richtigen Reihenfolge, „hold short“ wörtlich, Rufzeichen am Ende. Ein
@@ -777,7 +784,8 @@
 - id: m1-l6-build-approach-readback
   type: build
   call: m1-approach-numbers
-  prompt: Du bist **{callsign}**. Approach gibt dir Luftdruck, Kurs und Höhe. Lies alles zurück.
+  situation: Du kommst zurück zum Platz. Approach gibt dir Luftdruck, Kurs und Höhe.
+  prompt: Lies alles zurück.
   distractors: ["right heading {hdg|spoken}", wilco]
   explain: Alle drei Zahlen, die Drehrichtung beim Kurs und dein Rufzeichen. „wilco“ allein wäre hier zu wenig.
 
@@ -835,6 +843,9 @@
 
 - id: m1-l6-radio-check-answer
   type: choice
+  # Hörprobe: Approach klingt so, wie die Aufgabe sagt (Lesbarkeit 3 aus dem Funkspruch)
+  call: m1-radio-check-incoming
+  noAudio: Du verstehst ihn nur mit Mühe.
   vars:
     airfield: { pool: airfields }
   prompt: >-
@@ -850,6 +861,34 @@
     Ehrlich melden: 3 heißt „lesbar, aber nur mit Mühe“. Ein geschöntes „five by five“ oder „loud and
     clear“ hilft niemandem. Approach weiß dann nicht, dass er langsamer sprechen oder dich auf eine andere
     Frequenz schicken sollte.
+
+- id: m1-l6-listen-readability
+  type: choice
+  call: m1-radio-check-incoming
+  vars:
+    airfield: { pool: airfields }
+    # text = Beschreibung (Ersatztext ohne Ton, Erklärung), spoken = Stufe als Funkwort
+    rd:
+      oneOf: &levels
+        - { text: nur zeitweise, spoken: two }
+        - { text: nur mit Mühe, spoken: three }
+        - { text: gut, spoken: four }
+        - { text: einwandfrei, spoken: five }
+    w1: { oneOf: *levels, distinctFrom: [rd] }
+    w2: { oneOf: *levels, distinctFrom: [rd, w1] }
+  noAudio: "Du verstehst ihn {rd}."
+  prompt: >-
+    {airfield.name} Approach prüft sein Funkgerät mit dir. Hör dir den Ruf an: Wie gut verstehst du ihn? Antworte mit
+    der Stufe der Lesbarkeitsskala.
+  options:
+    - "{airfield.name} Approach, {callsign|spoken}, read you {rd|spoken}"
+    - "{airfield.name} Approach, {callsign|spoken}, read you {w1|spoken}"
+    - "{airfield.name} Approach, {callsign|spoken}, read you {w2|spoken}"
+  answer: 0
+  explain: >-
+    Gesendet war Stufe {rd|spoken}: Du verstehst ihn {rd}. Hör auf zwei Dinge: Wie laut ist das Rauschen gegen die
+    Stimme, und gehen Wörter verloren? Gehen ganze Wörter verloren, ist es höchstens eine 2. Alle Stufen zum Vergleich
+    stehen auf der Seite „Lesbarkeit 1 bis 5 zum Anhören“.
 
 - id: m1-l6-hearback
   type: choice
@@ -889,66 +928,32 @@
     - ["Rauschen im Empfänger", "Meist ist das Signal zu schwach – die Lesbarkeit sinkt"]
     - ["Gleiche Frequenz, aber AM gegen FM", "Kein Kontakt – die Modulation muss passen"]
 
-- id: m1-l7-calc-one
-  type: choice
-  vars:
-    # text = Höhe, spoken = die Reichweite, 1,23 · √Höhe, gerundet (die Antwort)
-    alt:
-      oneOf:
-        - { text: "100", spoken: "12" }
-        - { text: "400", spoken: "25" }
-        - { text: "900", spoken: "37" }
-        - { text: "1.600", spoken: "49" }
-        - { text: "3.600", spoken: "74" }
-        - { text: "4.900", spoken: "86" }
-        - { text: "6.400", spoken: "98" }
-        - { text: "10.000", spoken: "123" }
-        - { text: "14.400", spoken: "148" }
-        - { text: "19.600", spoken: "172" }
-    # Falschantworten, die nie mit einer richtigen zusammenfallen
-    w1: { oneOf: ["60", "300", "5", "250", "500"] }
-    w2: { oneOf: ["60", "300", "5", "250", "500"], distinctFrom: [w1] }
-  prompt: >-
-    Du fliegst auf **{alt} ft**, die Antenne der Bodenstation steht auf Geländehöhe (rechne mit 0 ft). Wie weit reicht
-    der Funk nach der Faustformel 1,23 · √Höhe etwa?
-  options:
-    - "{alt|spoken} NM"
-    - "{w1} NM"
-    - "{w2} NM"
-    - "{alt} NM"
-  answer: 0
+- id: m1-l7-horizon-match
+  type: match
+  prompt: Ein Flugzeug funkt eine Antenne am Boden an. Wie weit reicht der Funk etwa? Ordne zu.
+  pairs:
+    - ["100 ft (Tiefflug)", "gut 10 NM"]
+    - ["1.000 ft", "40 NM"]
+    - ["5.000 ft", "90 NM"]
+    - ["10.000 ft", "120 NM"]
+    - ["30.000 ft", "210 NM"]
   explain: >-
-    1,23 · √{alt} ≈ {alt|spoken} NM. Die Wurzel gehört dazu: Wer die Höhe in Fuß einfach als Seemeilen nimmt, kommt auf
-    absurde Werte.
+    Das sind die fünf Merkwerte. Höhe zahlt sich nur langsam aus: Die vierfache Höhe bringt die doppelte Reichweite.
+    Genauer muss es nicht sein – es geht um die Größenordnung.
 
-- id: m1-l7-calc-two
-  type: input
-  vars:
-    # text = Reichweite zwischen beiden Flugzeugen, 2 · 1,23 · √Höhe, gerundet (die Antwort);
-    # spoken = Höhe beider Flugzeuge in Fuß (nur Anzeige). lo/hi: ±1 NM, weil Zwischenrundungen bei einer
-    # Faustformel um eins danebenliegen dürfen (147 statt 148).
-    nm:
-      oneOf:
-        - { text: "25", spoken: "100" }
-        - { text: "49", spoken: "400" }
-        - { text: "74", spoken: "900" }
-        - { text: "98", spoken: "1.600" }
-        - { text: "123", spoken: "2.500" }
-        - { text: "148", spoken: "3.600" }
-        - { text: "172", spoken: "4.900" }
-        - { text: "197", spoken: "6.400" }
-        - { text: "221", spoken: "8.100" }
-        - { text: "246", spoken: "10.000" }
-    lo: { derive: offset, from: nm, add: -1 }
-    hi: { derive: offset, from: nm, add: 1 }
-  prompt: >-
-    Zwei Flugzeuge fliegen beide auf **{nm|spoken} ft**. Wie weit können sie sich nach der Faustformel
-    1,23 · (√Höhe₁ + √Höhe₂) höchstens hören? Antworte in Seemeilen, auf ganze NM gerundet.
-  accept: ["{nm}", "{nm} NM", "{lo}", "{lo} NM", "{hi}", "{hi} NM"]
-  placeholder: Zahl eintippen …
+- id: m1-l7-horizon-order
+  type: sequence
+  prompt: Wer kann wen am weitesten hören? Sortiere von der größten zur kleinsten Reichweite.
+  items:
+    - Zwei Jets auf je 10.000 ft, untereinander
+    - Ein Airliner auf 30.000 ft und der Tower
+    - Ein Jet auf 10.000 ft und der Tower
+    - Ein Jet auf 10.000 ft über einem 5.000 ft hohen Hochplateau und der Tower auf dem Plateau
+    - Ein Hubschrauber auf 1.000 ft und der Tower
   explain: >-
-    Beide Wurzeln sind gleich: 1,23 · 2 · √{nm|spoken} ≈ {nm} NM. Eine Seemeile mehr oder weniger zählt auch, das
-    kommt vom Runden. Zwei Antennen in der Luft hören sich deutlich weiter als eine in der Luft und eine am Boden.
+    Zwei Jets addieren ihre Reichweiten (120 + 120, rund 240 NM) und schlagen damit sogar den Airliner (rund 210 NM).
+    Über dem Plateau zählen nur die 5.000 ft über dem Gelände, also rund 90 statt 120 NM. Der Hubschrauber auf
+    1.000 ft kommt auf rund 40 NM.
 
 - id: m1-l7-mountain
   type: choice

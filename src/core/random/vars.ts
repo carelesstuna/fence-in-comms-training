@@ -137,6 +137,7 @@ const NUMBER_DEFAULTS: Record<NumberKind, { range: [number, number]; step: numbe
   elevation: { range: [0, 9000], step: 5 },
   lasercode: { range: [1111, 1788], step: 1 },
   nm: { range: [5, 15], step: 0.1 },
+  distance: { range: [5, 80], step: 1 },
   meters: { range: [300, 3000], step: 100 },
   cardinal: { range: [0, 315], step: 45 },
   mgrs: { range: [0, 0], step: 1 },
@@ -217,6 +218,10 @@ export function formatNumber(kind: NumberKind, n: number): Value {
         return value(n.toFixed(1), spellDigits(n.toFixed(1)))
       case 'meters':
         return value(String(Math.round(n)), spokenWholeNumber(Math.round(n)))
+      case 'distance': {
+        const d = String(Math.max(0, Math.round(n)))
+        return value(d, spokenWholeNumber(Number(d)), { digits: value(d, spellDigits(d)) })
+      }
       case 'cardinal': {
         const dir = cardinal(n)
         return value(dir, dir, { opposite: value(cardinal(n + 180)) })
@@ -352,7 +357,8 @@ function airfieldFields(
     name: value(a.name),
     /** Zweiter gebräuchlicher Name (Kunsan zu Gunsan), sonst der Funkname. */
     alias: value(a.aliases[0] ?? a.name),
-    icao: value(a.icao ?? '—', a.icao ? a.icao.split('').join(' ') : '—'),
+    // ICAO-Kennung („UGKO“). Nicht „icao“: Das Feld ist der Phraseologie-Schalter für `when: af.icao` (siehe unten).
+    code: value(a.icao ?? '—', a.icao ? a.icao.split('').join(' ') : '—'),
     map: value(map?.name ?? a.map),
     uhf: optFreq(a.atc.uhf),
     vhf: optFreq(a.atc.vhf),

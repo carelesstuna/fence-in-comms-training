@@ -1,15 +1,15 @@
 ---
 id: m2-l9
 module: m2
-order: 9
+order: 10
 title: Platzinfos und Verfahren in deiner Sim
 summary: Woher in DCS, BMS und IL-2 die Frequenzen und Platzverfahren kommen – und welcher Quelle du trauen kannst.
 minutes: 8
 xp: 80
 sources:
   - title: "DCS World: User Manual (liegt DCS bei) S. 39–40, 63, 103–104, 113; terrains\\<Karte>\\radio.lua; Kampagnen-Unterlagen"
-  - title: "Falcon BMS 4.38: Comms & Nav Book S. 8–15, 125–130; User Manual S. 59–60, 132, 144–146, 183 (im BMS-Ordner Docs)"
-  - title: "BMS KTO AIP 4.38.2 (im BMS-Ordner Docs\\03 KTO Charts\\KTO_AIP.pdf): Aufbau GEN/ENR/AD, Funkfeuer- und Preset-Tabellen"
+  - title: "Falcon BMS 4.38: Comms & Nav Book S. 8–15, 125–130; User Manual S. 59–60, 132, 144–146, 183 (liegt BMS bei, im Installationsordner unter Docs)"
+  - title: "BMS KTO AIP 4.38.2 (liegt BMS bei, im Installationsordner unter Docs\\03 KTO Charts\\KTO_AIP.pdf): Aufbau GEN/ENR/AD, Funkfeuer- und Preset-Tabellen"
   - title: "IL-2 Korea Dev Blog #58 (GCI)"
     url: https://media.il2-korea.com/news/dd_58
   - title: "Georgien eAIP, AD 2 UGKO Kutaisi"
@@ -29,6 +29,11 @@ Ein echter Militärpilot hat vor dem Flug einen ganzen Stapel Unterlagen:
 - **Briefing und Comm Card** für genau diesen Flug.
 
 Was davon wofür da ist, steht auf der Seite [Comm Plan, Comm Card und Missionsunterlagen](/wissen/comm-plan-und-missionsunterlagen).
+So können SPINS und SOP aussehen (gewürfelte Auszüge):
+
+::muster{doc=spins}
+
+::muster{doc=sop}
 
 In der Sim gibt es davon meist nur das Briefing und ein paar Karten (Falcon BMS bringt immerhin ein eigenes AIP
 für Korea mit). Umso wichtiger ist es zu wissen,
@@ -84,7 +89,7 @@ Die Kästen unten zeigen die Sims aus deinem Profil.
 - **Fester Comm Plan:** Die Presetnummer steht für die Rolle, die Frequenz hängt am Platz.
   Merkhilfe: **raus UHF 2-3-4** (Ground, Tower, Departure), **Mission 6** (Tactical), **Tanker 13**,
   **zurück 4-3-2** bzw. am Zielplatz 7-8-9, Ausweichplatz 10-11-12. ATIS auf VHF 2/7/10.
-- **Karten:** BMS-eigene Karten (AGC, APC, LOC, EOR) im Ordner `Docs\03 KTO Charts`; die LOC-Karte hat
+- **Karten:** BMS-eigene Karten (AGC, APC, LOC, EOR) im BMS-Installationsordner unter `Docs\03 KTO Charts`; die LOC-Karte hat
   alle Frequenzen eines Platzes auf einer Seite. Daneben liegen echte Anflugkarten; wo sie abweichen (wie bei
   Daegu), gelten die BMS-eigenen Karten.
 - **Eigenes AIP:** Im selben Ordner liegt das **KTO-AIP** (`KTO_AIP.pdf`), ein Handbuch für Korea nach dem

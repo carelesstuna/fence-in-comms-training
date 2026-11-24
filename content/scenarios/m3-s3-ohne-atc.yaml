@@ -16,6 +16,7 @@ vars:
   ang: { number: angels, range: [6, 16] }
   oth: { pool: callsigns.fighter, distinctFrom: [flightName] }
   othNum: { int: [1, 9] }
+place: "{af.name}"
 sketch: { airfield: af, weather: wx }
 kneeboard:
   title: "Briefing {af.name} – ohne Tower"
@@ -31,9 +32,10 @@ steps:
     pos: parking
     tune: { name: "{af.name} Traffic", freq: "{af.twr}" }
     situation: >-
-      In **{af.name}** sitzt heute niemand im Tower. Laut Missionsbriefing sprechen alle auf der
-      Platzfrequenz und sagen selbst an, was sie tun. Wind laut Windsack und Wetter: {wx.wind} – du
-      rollst zur Runway **{wx.runway}**. Sag dich an.
+      Heute sitzt niemand im Tower. Laut Missionsbriefing sprechen alle auf der Platzfrequenz und sagen
+      selbst an, was sie tun. Dein Flight aus **{flightSize} Flugzeugen** steht angelassen auf dem Vorfeld.
+      Wind laut Windsack und Wetter: {wx.wind} – du rollst gleich zur Runway **{wx.runway}**.
+    task: Stell die Platzfrequenz ein und sag dich an.
     you:
       mode: build
       distractors: ["{af.name} Ground", request taxi, please advise]
@@ -55,7 +57,8 @@ steps:
 
   - stage: Rollen
     pos: taxi
-    situation: Du rollst. Auf der Frequenz meldet sich ein anderer Flight.
+    situation: Du rollst zur Runway **{wx.runway}**.
+    task: Reagiere auf den Funkspruch.
     hear:
       - speaker: "{oth} {othNum}"
         segments:
@@ -72,7 +75,10 @@ steps:
 
   - stage: Start
     pos: holdshort
-    situation: Du stehst am Rollhalt von Runway **{wx.runway}**, der Anflug ist frei. Was sagst du an, bevor du auf die Bahn rollst?
+    situation: >-
+      Du stehst am Rollhalt von Runway **{wx.runway}**, der Anflug ist frei. Nach dem Start fliegst du laut
+      Missionsbriefing Richtung „{dir}“.
+    task: Sag dich an, bevor du auf die Bahn rollst.
     you:
       mode: choice
       wrong:
@@ -93,7 +99,9 @@ steps:
 
   - stage: Abflug
     pos: airborne
-    situation: Du bist in der Luft und drehst Richtung „{dir}“ ab. Sag an, dass du den Platzbereich verlässt – du steigst auf {ang}.000 ft.
+    place: Im Steigflug
+    situation: Du bist in der Luft und drehst Richtung „{dir}“ ab. Du steigst auf **{ang}.000 ft**.
+    task: Sag an, dass du den Platzbereich verlässt.
     you:
       mode: type
       hint: Platz Traffic – Rufzeichen – departing to the … – climbing to … – Platzname
@@ -109,7 +117,7 @@ steps:
           - text: "climbing to {ang|spoken} thousand"
             role: value
             optional: true
-            alt: ["climbing {ang|spoken} thousand", "climbing to {ang}000", "climbing {ang}000", "climbing angels {ang|spoken}", "angels {ang|spoken}"]
+            alt: ["climbing {ang|spoken} thousand", "climbing angels {ang|spoken}", "angels {ang|spoken}"]
             note: >-
               Auf der Platzfrequenz sprichst du die Höhe in Fuß wie bei ATC – Fremdverkehr kennt „angels“ nicht
               (Modul 1, Lektion 3). In Sim-Staffeln hört man trotzdem oft „angels …“; das zählt hier auch.
@@ -121,8 +129,12 @@ steps:
 
   - stage: Rückkehr
     pos: pattern
+    place: "Im Anflug auf {af.name}"
     tune: { name: "{af.name} Traffic", freq: "{af.twr}" }
-    situation: Die Mission ist vorbei. Schalte zurück auf die Platzfrequenz – du bist etwa zehn Meilen vom Platz, Richtung „{dirIn}“. Dann sag dich für den Overhead an.
+    situation: >-
+      Die Mission ist vorbei. Du bist etwa zehn Meilen vom Platz, Richtung „{dirIn}“, und willst über den
+      Overhead zur Landung kommen.
+    task: Stell die Platzfrequenz ein und sag dich an.
     you:
       mode: type
       hint: Platz Traffic – Rufzeichen – Position – Absicht – Runway – Platzname
@@ -144,7 +156,9 @@ steps:
 
   - stage: Landung
     pos: landed
-    situation: Gelandet und abgerollt. Die Bahn ist wieder frei – das sagst du an.
+    place: "{af.name}"
+    situation: Du bist gelandet und von Runway **{wx.runway}** abgerollt.
+    task: Sag an, dass die Bahn wieder frei ist.
     you:
       mode: type
       hint: Platz Traffic – Rufzeichen – clear of runway … – Platzname

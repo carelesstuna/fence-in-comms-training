@@ -34,7 +34,7 @@ export function AchievementToasts() {
               {many ? (
                 <>
                   … und {items.length - 1} weitere.{' '}
-                  <Link to="/profile" className="text-phosphor hover:underline" onClick={() => items.forEach((x) => dismiss(x.id))}>
+                  <Link to="/fortschritt#abzeichen" className="text-phosphor hover:underline" onClick={() => items.forEach((x) => dismiss(x.id))}>
                     Alle ansehen
                   </Link>
                 </>

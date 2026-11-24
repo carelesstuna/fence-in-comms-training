@@ -36,7 +36,7 @@ Sicht und Wolken dürfen fehlen, wenn die Wolkenuntergrenze über 5.000 ft und d
 sagt die Ansage dann „the weather is better than five thousand and five“.
 
 Nach ICAO klingen zwei Werte anders: die Sicht in Kilometern bzw. Metern und der Luftdruck als „QNH“ in Hektopascal.
-Die App spricht standardmäßig überall die US-Form. Mit der Einstellung „Kartenabhängig“ im [Profil](/profile) richtet
+Die App spricht standardmäßig überall die US-Form. Mit der Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) richtet
 sie sich nach dem Platz: In Nevada, auf Guam und in Korea hörst du die US-Form, in Georgien und am Golf die ICAO-Form
 (Modul 3, Lektion 1).
 

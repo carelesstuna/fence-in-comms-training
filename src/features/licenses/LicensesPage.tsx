@@ -115,7 +115,7 @@ export default function LicensesPage() {
         </>
       )}
 
-      {/* Nicht im Paket: lädt die App erst auf Klick von der Originalquelle (Profil → Hören) */}
+      {/* Nicht im Paket: lädt die App erst auf Klick von der Originalquelle (Einstellungen → Hören) */}
       <Table title="Sprachausgabe (auf Klick nachgeladen, nicht im Paket)" entries={[...TTS_LICENSES]} />
 
       <section className="rounded-xl border border-line bg-panel p-5">

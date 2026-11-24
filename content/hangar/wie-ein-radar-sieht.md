@@ -8,6 +8,10 @@ sources:
     url: https://en.wikipedia.org/wiki/Pulse-Doppler_radar
   - title: "Wikipedia: Radar horizon"
     url: https://en.wikipedia.org/wiki/Radar_horizon
+  - title: "U.S. Air Force Fact Sheet: E-3 Sentry (AWACS) – Gipfelhöhe über 29.000 ft, Radar über 250 Meilen, Blick nach unten auf Tiefflieger"
+    url: https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104504/e-3-sentry-awacs/
+  - title: "NATO: AWACS – Einsatzhöhe über 30.000 ft, 400 km gegen Tiefflieger"
+    url: https://www.nato.int/cps/en/natohq/topics_48904.htm
 ---
 
 Ein Radar schickt einen kurzen **Funkimpuls** los und lauscht auf das Echo. Die Zeit bis zur Rückkehr
@@ -31,4 +35,7 @@ sieht damit ein Ziel in Bodenhöhe bis rund **210 Meilen** weit – ein Radar am
 **12 Meilen**. Für ein Ziel in der Höhe kommt dessen eigener Horizont dazu: Einen Bomber auf 20.000 Fuß sieht
 dasselbe Bodenradar bis rund **185 Meilen**, einen Tiefflieger auf 500 Fuß nur rund **40 Meilen**.
 
-Darum fliegt der AWACS hoch – und darum versuchen Angreifer, tief zu fliegen.
+Darum fliegt der AWACS hoch (die E-3 auf rund 30.000 Fuß) – und darum versuchen Angreifer, tief zu fliegen. Weil
+sein Radar so weit reicht, kann der AWACS außerdem weit hinter der Front kreisen, außer Reichweite der meisten
+gegnerischen Waffen. Sein Schutz ist dieser Abstand, nicht die Höhe selbst. Dass er aus der Höhe auch weit funkt, ist
+ein willkommener Nebeneffekt.

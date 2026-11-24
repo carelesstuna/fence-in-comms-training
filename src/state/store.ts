@@ -4,7 +4,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Aircraft, Sim } from '../core/content/schema'
-import { EMPTY_PROGRESS, type ProgressState } from '../core/progress/progress'
+import { EMPTY_PROGRESS, recordModulesDone, type ProgressState } from '../core/progress/progress'
 import { applyEvent, awardAchievements, type TrackEvent } from '../core/progress/achievements'
 import type { PhraseologySetting } from '../core/random/phraseology'
 import { contentResult } from '../content'
@@ -41,8 +41,11 @@ export interface AudioSettings {
   tempo: number
   /** Text immer gleich zeigen – sonst erscheint er in Hörübungen erst nach dem Hören. */
   alwaysText: boolean
-  /** Empfang: 'good' fünf auf fünf, 'fair' mit etwas Rauschen, 'weak' schwach und verrauscht. */
-  signal: 'good' | 'fair' | 'weak'
+  /**
+   * Empfang der Funksprüche: 'realistic' = gewürfelt vier oder fünf auf fünf, mal mit Störungen; 'clear' = immer fünf
+   * auf fünf ohne Störungen. Übungen, in denen es um schlechten Empfang geht, klingen in beiden Fällen so schlecht wie nötig.
+   */
+  noise: 'realistic' | 'clear'
   /** Funksprüche im Szenario abspielen, sobald sie kommen. */
   autoplay: boolean
 }
@@ -52,7 +55,7 @@ export const DEFAULT_AUDIO: AudioSettings = {
   volume: 0.8,
   tempo: 1,
   alwaysText: false,
-  signal: 'fair',
+  noise: 'realistic',
   autoplay: true,
 }
 
@@ -118,6 +121,8 @@ interface AppState {
   finishOnboarding: () => void
   setProgress: (progress: ProgressState) => void
   markHangarSeen: (id: string) => void
+  /** Merk-Übung: Stufe geschafft (merkt sich die höchste). */
+  passMemoryLevel: (drillId: string, level: number) => void
   /** Etwas beim Üben ist passiert (Funkspruch, Schweigen, Einstellen, Szenario) – für Abzeichen. */
   track: (ev: TrackEvent) => void
   /** Abzeichen neu prüfen (z. B. beim Start für Fortschritt von vor den Abzeichen). */
@@ -130,11 +135,14 @@ interface AppState {
   importState: (state: PersistedState) => void
 }
 
-/** Fortschritt übernehmen und dabei neu erreichte Abzeichen eintragen und melden. */
+/**
+ * Fortschritt übernehmen: erledigte Module festhalten (bleiben erledigt, wenn Lektionen dazukommen), neu erreichte
+ * Abzeichen eintragen und melden.
+ */
 function withAwards(s: AppState, progress: ProgressState): Partial<AppState> {
   const index = contentResult.index
   if (!index) return { progress }
-  const r = awardAchievements(index, progress)
+  const r = awardAchievements(index, recordModulesDone(index, progress))
   return r.newly.length ? { progress: r.progress, toasts: [...s.toasts, ...r.newly.map((a) => a.id)] } : { progress: r.progress }
 }
 
@@ -152,6 +160,12 @@ export const useApp = create<AppState>()(
             ? s
             : withAwards(s, { ...s.progress, hangarSeen: [...s.progress.hangarSeen, id] }),
         ),
+      passMemoryLevel: (drillId, level) =>
+        set((s) =>
+          (s.progress.memory?.[drillId] ?? 0) >= level
+            ? s
+            : { progress: { ...s.progress, memory: { ...s.progress.memory, [drillId]: level } } },
+        ),
       track: (ev) => set((s) => withAwards(s, { ...s.progress, stats: applyEvent(s.progress.stats, ev) })),
       refreshAchievements: () => set((s) => withAwards(s, s.progress)),
       dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t !== id) })),
@@ -167,7 +181,8 @@ export const useApp = create<AppState>()(
     {
       name: STORE_KEY,
       version: STORE_VERSION,
-      // Ältere Stände ergänzen (v2: checkrides, v3: reviews und daily, v4: stats und achievements) …
+      // Ältere Stände ergänzen (v2: checkrides, v3: reviews und daily, v4: stats und achievements,
+      // v5: memory und modulesDone) …
       migrate: (persisted, version) => migratePersisted(persisted, version, STORE_DEFAULTS) as PersistedState,
       // … und jeden geladenen Stand prüfen: Standardwerte ergänzen, Ungültiges ersetzen (vorher sichern).
       // Nur die gespeicherten Felder übernehmen – gespeicherte Daten dürfen keine Aktionen überschreiben.

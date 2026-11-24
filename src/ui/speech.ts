@@ -13,6 +13,20 @@ export function hintContextForExchange(x: ResolvedExchange): HintContext {
   }
 }
 
+/** Für eine Freitext-Übung: nur das Modul (die Stationen stehen dort im Aufgabentext, nicht auf der Frequenz). */
+export function hintContextForDrill(drillId: string): HintContext {
+  return { moduleId: moduleOf(content, { drillId }) }
+}
+
+/**
+ * Dürfen Zahlen getippt in Ziffern stehen? Nur in Modulen mit `typedDigits` (Spur C); sonst zählen sie getippt nur in
+ * Worten, so wie man sie spricht. Unbekannte Übungen (z. B. Checkride-Szenarien außerhalb der Lektionen): in Worten.
+ */
+export function typedDigitsFor(ref: { drillId?: string; scenarioId?: string }): boolean {
+  const moduleId = moduleOf(content, ref)
+  return !!moduleId && !!content.modules.get(moduleId)?.typedDigits
+}
+
 /** Für ein Szenario: alle Stationen, die darin funken oder eingestellt werden. */
 export function hintContextForScenario(s: ResolvedScenario): HintContext {
   const tuned = s.steps.flatMap((st) => (st.tune ? [st.tune.name] : []))

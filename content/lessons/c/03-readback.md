@@ -105,6 +105,10 @@ Jetzt der ganze Ablauf in einer Übung: 9-Line mitschreiben, dann zurücklesen.
 
 ---
 
+::drill{id=track-c-l3-memory}
+
+---
+
 ## Dein erster Einsatz auf Station
 
 Ein ganzer Check-in, von der Übergabe durch den AWACS bis zur Halteposition. Die Frequenz des JTAC steht auf deiner

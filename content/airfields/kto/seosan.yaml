@@ -7,7 +7,7 @@ runways: ["03L/21R", "03R/21L"]
 atc: { uhf: 353.1, vhf: 126.75 }
 tacan: 73X
 freqs: { atis: 130.3, ground: 275.8, departure: 253.95, approach: 253.95 }
-# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Installationsordner)
 charts:
   - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_AGC.pdf" }
   - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_LOC.pdf" }

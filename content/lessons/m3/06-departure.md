@@ -83,8 +83,6 @@ gilt:
   „standby“ für „warten“ hat das nichts zu tun.)
 - Erst wenn der Flight sich aufteilt, bekommt jedes Flugzeug einen eigenen Code und eigene Freigaben.
 
-::drill{id=m3-l6-formation-squawk}
-
 :::layer{layer=community}
 In deutscher Militärpraxis hört man auch „squawk 2431 in sequence“: Jeder stellt den Code plus seine
 Position im Flight ein, also 2431, 2432 und so weiter. Das steht so in Community-Unterlagen (IVAO
@@ -113,8 +111,8 @@ In den USA liegt die Übergangshöhe einheitlich bei 18.000 ft. In Europa ist si
 verschieden. Mehr dazu auf der Seite [Höhen und Höhenmesser](/wissen/hoehen-und-hoehenmesser).
 
 Die Steigfreigabe klingt je nach Dialekt anders: in der US-Form „climb and maintain flight level …“, nach ICAO „climb
-to flight level …“. Die App spricht standardmäßig überall die US-Form, mit der Einstellung „Kartenabhängig“ im
-[Profil](/profile) in Georgien und am Golf die ICAO-Form. Du liest die Form des Lotsen zurück.
+to flight level …“. Die App spricht standardmäßig überall die US-Form, mit der Einstellung „Kartenabhängig“ in den
+[Einstellungen](/einstellungen/flugprofil) in Georgien und am Golf die ICAO-Form. Du liest die Form des Lotsen zurück.
 
 ---
 

@@ -49,7 +49,9 @@ sind, steht auf der Seite [Die ATC-Stellen](/wissen/atc-stellen), was ein Squawk
 
 ---
 
-::drill{id=m3-l3-clearance-items}
+::drill{id=m3-l3-memory-clearance}
+
+---
 
 :::layer{layer=community}
 An deutschen Militärplätzen läuft es oft anders herum: Die Jets rollen erst zum **Last Chance** (der letzten Kontrollstelle) am
@@ -96,7 +98,7 @@ Bahn rollen und dort halten.
 In der Sim fliegst du ständig auf Plätzen, die du nicht kennst. Raten ist keine gute Idee: Wer auf dem
 falschen Rollweg steht, blockiert andere – oder steht im schlimmsten Fall auf einer aktiven Bahn.
 
-Die Lösung heißt **progressive taxi**. Du sagst, dass du dich nicht auskennst, und Ground führt dich
+Die Lösung heißt **:term[progressive taxi]**. Du sagst, dass du dich nicht auskennst, und Ground führt dich
 Abschnitt für Abschnitt: Vor jeder Kreuzung kommt die nächste Anweisung.
 
 ::call{id=m3-progressive-taxi}

@@ -22,7 +22,7 @@ import type { ResolvedTransmission } from '../drills/types'
 export const SPELLED_OK = new Set([
   'EPU', 'AB', 'IP', 'CP', 'BP', 'TOT', 'BDA', 'ILS', 'IFR', 'VFR', 'UHF', 'VHF', 'FM', 'AM', 'GCI', 'RTB', 'EWR', 'CAP', 'DME', 'NM', 'IR',
   'HF', 'SAM', 'AAA', 'FAC', 'SEAD', 'TCN', 'ICS', 'ETA', 'RV', 'TACP', 'MSL', 'AGL', 'QNH', 'QFE', 'PAPI', 'NDB', 'VOR', 'MGRS',
-  'BMP', 'BTR', 'ZSU', 'GBU', 'AGM', 'CBU', 'SA', 'GPS',
+  'BMP', 'BTR', 'ZSU', 'GBU', 'AGM', 'CBU', 'SA', 'GPS', 'KLM',
 ])
 
 const dir = join(asrDir(), 'tts')

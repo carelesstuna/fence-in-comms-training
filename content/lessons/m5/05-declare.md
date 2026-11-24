@@ -155,6 +155,6 @@ hast. ⚠ Nicht jedes Modul bietet den Menüpunkt – prüf es im Spiel. SkyEye 
 :::sim{sim=bms}
 In Falcon BMS fragt „Declare“ im AWACS-Menü nach dem Ziel, das du auf dem Radar markiert hast. Liegen Freunde und
 Gegner dicht beieinander (etwa 4 NM seitlich, 10.000 ft in der Höhe), antwortet die KI mit **furball** und zählt
-beide Seiten: „Furball, 2 friendly, 3 bandit“. Seit 4.38 quittierst du eine Bedrohungswarnung von AWACS oder GCI
+beide Seiten: „Furball, 2 friendly, 3 bandit“. Eine Bedrohungswarnung von AWACS oder GCI quittierst du
 mit **JUDY** im AWACS-Menü (du hast das Ziel auf dem Radar und übernimmst); sonst wiederholt er sie alle 10 NM.
 :::

@@ -19,7 +19,8 @@
 - id: m4-l1-answer
   type: call
   call: m4-lead-directive
-  prompt: Der Lead gibt eine Anweisung an den Flight. Du bist **{selfNum}** ({callsign}). Was funkst du?
+  situation: Der Lead gibt eine Anweisung an den ganzen Flight.
+  prompt: Bestätige die Anweisung des Leads.
   explain: Nur die Nummer, in der Reihenfolge 2-3-4. Kein roger, kein wilco, keine Wiederholung.
 
 - id: m4-l1-three-fence
@@ -53,7 +54,8 @@
   type: call
   call: m4-push-net
   expect: silence
-  prompt: Du bist Wingman. Der Lead schickt den Flight auf ein anderes Netz. Was antwortest du?
+  situation: Der Lead schickt den Flight auf ein anderes Netz.
+  prompt: Reagiere auf den Ruf des Leads.
   explain: Nichts. Du wechselst sofort die Frequenz und meldest dich dort beim Check mit deiner Nummer.
 
 - id: m4-l1-ack-order
@@ -90,7 +92,8 @@
   type: build
   call: m4-kio
   as: two
-  prompt: "Der Lead ruft „knock it off“. Du bist Two. Bau deine Bestätigung."
+  situation: Mitten im Training ruft der Lead „knock it off“.
+  prompt: Bau deine Bestätigung.
   distractors: [roger, wilco, terminate, Two]
   explain: >-
     Bei knock it off bestätigt jeder mit vollem Rufzeichen und wiederholt das Wort. So ist für alle
@@ -148,7 +151,8 @@
 - id: m4-l2-call-pushing
   type: call
   call: m4-pushing
-  prompt: Die Push-Zeit ist da. Melde dem AWACS **{awacs}**, dass dein Flight jetzt den Push Point verlässt.
+  situation: Die gebriefte Push-Zeit ist da, und ihr verlasst jetzt den Push Point.
+  prompt: Melde dem AWACS, dass dein Flight aufbricht.
   hint: Adressat – Flight-Rufzeichen – Brevity
   explain: Drei Teile genügen. Du sprichst für den Flight, also mit dem Flight-Rufzeichen ohne Position.
 
@@ -264,7 +268,8 @@
 - id: m4-l3-answer-fence
   type: call
   call: m4-fence-in
-  prompt: Der Lead funkt „fence in“. Du bist **{selfNum}** ({callsign}). Was funkst du?
+  situation: Der Lead lässt alle die Schalter für das Einsatzgebiet setzen.
+  prompt: Bestätige die Anweisung des Leads.
   explain: Nur deine Nummer, in der Reihenfolge 2-3-4. Die Checkliste arbeitest du still ab.
 
 - id: m4-l3-roger-fence
@@ -299,7 +304,8 @@
 - id: m4-l3-call-feet
   type: call
   call: m4-feet-dry
-  prompt: Melde dem AWACS **{awacs}**, dass dein Flight jetzt „{coast}“ ist.
+  situation: Ihr habt eben die Küstenlinie überflogen und seid jetzt **{coast}**.
+  prompt: Melde das dem AWACS.
   hint: Adressat – Flight-Rufzeichen – Brevity
   explain: Wie bei pushing sprichst du für den ganzen Flight – mit dem Flight-Rufzeichen ohne Position.
 
@@ -329,9 +335,10 @@
   call: m4-fence-out-bd
   as: two
   transmission: 5
-  prompt: >-
-    Battle Damage Check. Du bist Two, bist einmal unter dem Lead durchgekreuzt und hast keinen Schaden
-    gesehen. Was funkst du?
+  situation: >-
+    Der Lead hat den Battle Damage Check angesagt. Du bist einmal unter ihm durchgekreuzt und hast **keinen Schaden**
+    gesehen.
+  prompt: Melde dem Lead, was du gesehen hast.
   hint: Adressat (der Lead) – Brevity
   explain: >-
     „{lead|spoken}, you're clean“ – du sprichst den Lead an und sagst, dass du keinen Schaden siehst. Vorschriftsnah ist
@@ -342,9 +349,10 @@
   type: call
   call: m4-ops-check-tiger
   as: two
-  prompt: >-
-    Ops Check. Du bist Two, dein Treibstoff: **{f2}** (Tausend Pfund). Sprit und Waffen reichen laut
-    Briefing für einen weiteren Einsatz. Was funkst du?
+  situation: >-
+    Der Lead ruft den Ops Check. Dein Treibstoff: **{f2}** (Tausend Pfund). Sprit und Waffen reichen laut Briefing für
+    einen weiteren Einsatz.
+  prompt: Melde dich im Ops Check.
   hint: Nummer – Treibstoff – tiger
   explain: Nummer, Treibstoff, tiger – drei Wörter, und der Lead weiß alles.
 
@@ -431,10 +439,11 @@
 - id: m4-l4-what-state
   type: call
   call: m4-what-state
-  prompt: >-
-    **{awacs}** fragt nach dem Stand. Laut letztem Ops Check – Raketen: aktiv **{ma}**, halbaktiv **{ms}**, IR **{mi}**
-    (Kanone mit Munition); niedrigster Treibstoff im Flight **{low}**. Laut Missionsbriefing meldest du für den ganzen
-    Flight. Was funkst du?
+  situation: >-
+    Laut Missionsbriefing meldest du für den ganzen Flight, mit den Werten des schwächsten Flugzeugs. Raketen:
+    aktiv **{ma}**, halbaktiv **{ms}**, IR **{mi}**, Kanone mit Munition. Niedrigster Treibstoff laut letztem Ops
+    Check: **{low}**.
+  prompt: Beantworte die Frage des AWACS.
   hint: Rufzeichen – aktive – halbaktive – IR – by – Treibstoff
   explain: >-
     Erst die Anzahl der Raketen in der festen Reihenfolge aktiv – halbaktiv – IR ({ma}-{ms}-{mi}), dann „by“ und der
@@ -506,7 +515,8 @@
 - id: m4-l4-bingo-lead
   type: call
   call: m4-bingo-rtb
-  prompt: Two hat gerade bingo gemeldet. Du bist Lead. Was funkst du an den Flight?
+  situation: Two hat eben bingo gemeldet.
+  prompt: Gib dem Flight deine Anweisung.
   hint: Adressat – Brevity
   explain: Der niedrigste Stand bestimmt – der ganze Flight fliegt nach Hause.
 
@@ -527,7 +537,8 @@
   type: call
   call: m4-blind
   as: two
-  prompt: Beim Kurswechsel verlierst du den Lead aus den Augen. Du fliegst auf **{a2.feet} Fuß**. Was funkst du?
+  situation: Du fliegst auf **{a2.feet} Fuß**. Beim Kurswechsel hast du den Lead aus den Augen verloren.
+  prompt: Melde das sofort dem Lead.
   hint: Rufzeichen – Brevity – Höhe auf hundert Fuß (z. B. 16.9)
   explain: >-
     Sofort melden, mit vollem Rufzeichen und Höhe auf hundert Fuß genau: „blind {a2|spoken}“ (AFMAN 11-2F-16 V3,
@@ -555,7 +566,7 @@
   prompt: >-
     Du fliegst auf **{alt.feet} Fuß** und hast den Lead verloren. Sprich die Meldung nach der USAF-Vorschrift:
     „blind“ plus Höhe auf hundert Fuß genau, ohne „angels“. (Das Rufzeichen lässt du hier weg.)
-  accept: ["blind {alt|spoken}", "blind {alt}"]
+  accept: ["blind {alt|spoken}"]
   explain: >-
     „Blind {alt|spoken}“ – {alt.feet} ft, auf hundert Fuß genau (AFMAN 11-2F-16 V3, Abs. 3.12.2.1). Ein
     Rufzeichen steht davor: „{two|spoken}, blind {alt|spoken}“. „angels {alt.angels|spoken}“ hört man in der Praxis
@@ -649,7 +660,8 @@
   call: m4-blind
   as: two
   transmission: 0
-  prompt: Beim Kurswechsel verlierst du den Lead aus den Augen. Du fliegst auf **{a2.feet} Fuß**. Bau deine Meldung.
+  situation: Du fliegst auf **{a2.feet} Fuß**. Beim Kurswechsel hast du den Lead aus den Augen verloren.
+  prompt: Bau deine Meldung an den Lead.
   distractors: [no joy, tally, "say position"]
   explain: >-
     „blind“ (nicht „no joy“ – das ist für Gegner), dazu deine Höhe auf hundert Fuß genau, ohne „angels“: {a2.feet} ft heißt
@@ -659,11 +671,12 @@
   type: call
   call: m4-posit
   as: two
-  prompt: >-
-    Der Lead fragt nach deiner Position. Du bist etwa **{pdist} Meilen „{pcard}“** von **{af.name}**,
-    auf **angels {a2}**. Was funkst du?
-  hint: Nummer – Position über einen Bezugspunkt – Höhe
-  explain: Position über einen Punkt, den beide kennen, und die Höhe. Mit Bullseye geht es noch schneller (Modul 5).
+  situation: >-
+    Getrennt vom Lead fliegst du auf **{a2}.000 Fuß**, etwa **{pdist} Meilen „{pcard}“** von **{af.name}** – den
+    Platz kennt ihr beide.
+  prompt: Beantworte die Frage des Leads nach deiner Position.
+  hint: Nummer – Position über einen Bezugspunkt – Höhe im taktischen Format
+  explain: Position über einen Punkt, den beide kennen, und die Höhe. Mit Bullseye geht es noch schneller (Modul 2, Lektion 9).
 
 # ------------------------------------------------------------ Lektion 6: Checkride
 - id: m4-l6-silence
@@ -731,9 +744,10 @@
   call: m4-lost-wingman
   as: two
   transmission: 0
-  prompt: >-
-    Du bist **Two** ({two}) und fliegst in Wolken. Der Lead ist plötzlich weg, du gehst auf Instrumente
-    und drehst weg. Welchen kurzen Ruf setzt du an den Lead ab?
+  situation: >-
+    Du fliegst im Verband. Der Lead ist plötzlich in der Wolke verschwunden; du gehst auf Instrumente und drehst
+    weg.
+  prompt: Informiere den Lead mit einem kurzen Ruf.
   hint: Rufzeichen – Brevity
   explain: >-
     Rufzeichen und „lost wingman“ – mehr nicht, denn Fliegen geht vor. Der Wortlaut ist Praxis; belegt ist
@@ -744,11 +758,13 @@
   call: m4-lost-wingman
   as: lead
   transmission: 1
-  prompt: >-
-    Du bist **Lead** und hörst „{two|spoken}, lost wingman“. Fluglage: **{att|spoken}**, Steuerkurs **{hdg}**,
-    Höhe **{alt.feet}** Fuß, Geschwindigkeit **{spd}** Knoten. Was funkst du an Two? (Die Zahlen leitest du am besten
-    mit „heading“, „altitude“ und „airspeed“ ein.)
-  hint: Adressat – Fluglage – Kurs – Höhe – Geschwindigkeit
+  situation: >-
+    Two hat eben den Anschluss verloren. Deine Fluglage: **{att|spoken}**, Steuerkurs **{hdg}**,
+    Höhe **{alt.feet}** Fuß, Geschwindigkeit **{spd}** Knoten.
+  prompt: Antworte Two mit deinen Werten.
+  hint: >-
+    Adressat – Fluglage – Kurs – Höhe – Geschwindigkeit (die Zahlen am besten mit „heading“, „altitude“ und
+    „airspeed“ einleiten)
   explain: >-
     Der Lead bestätigt und gibt Fluglage, Steuerkurs, Höhe und Geschwindigkeit durch – so weiß Two, wo der Lead
     ist, und kann auf Instrumenten sicher bleiben. Kürzere Formen wie „right turn“ oder Zahlen ohne Einleitungswort
@@ -775,9 +791,10 @@
   call: m4-blind-both
   as: two
   transmission: 1
-  prompt: >-
-    Der Lead hat gerade „blind, {a1}“ gerufen. Auch du siehst ihn nicht und fliegst auf **{a2.feet}
-    Fuß**. Was funkst du?
+  situation: >-
+    Du fliegst auf **{a2.feet} Fuß**. In einer Kurve habt ihr euch aus den Augen verloren; auch du siehst den Lead
+    nicht.
+  prompt: Melde das dem Lead.
   hint: Rufzeichen – Brevity – Höhe auf hundert Fuß (z. B. 16.9)
   explain: >-
     Auch der zweite meldet „blind“ mit seiner Höhe. Dann ordnet der Lead die Staffelung an (AFMAN 11-2F-16

@@ -49,10 +49,9 @@ function samples(): ResolvedTransmission[] {
 
 const PROBE = samples()
 
-const SIGNAL: { id: Settings['signal']; label: string }[] = [
-  { id: 'good', label: 'gut (fünf auf fünf)' },
-  { id: 'fair', label: 'mittel' },
-  { id: 'weak', label: 'schwach, verrauscht' },
+const NOISE: { id: Settings['noise']; label: string }[] = [
+  { id: 'realistic', label: 'realistisch (vier oder fünf auf fünf, mal mit Störungen)' },
+  { id: 'clear', label: 'immer klar (fünf auf fünf)' },
 ]
 
 export function AudioSettings() {
@@ -141,7 +140,7 @@ export function AudioSettings() {
             <p className="text-sm text-red-300">{audio.error}</p>
           )}
 
-          <div className="grid gap-3 text-sm sm:grid-cols-[10rem_1fr] sm:items-center">
+          <div className="grid gap-3 text-sm sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center">
             <label htmlFor="audio-volume" className="text-muted">
               Lautstärke
             </label>
@@ -182,18 +181,23 @@ export function AudioSettings() {
             </div>
 
             <span className="text-muted">Empfang</span>
-            <div className="flex flex-wrap gap-4" role="radiogroup" aria-label="Empfang">
-              {SIGNAL.map((o) => (
-                <label key={o.id} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="audio-signal"
-                    checked={s.signal === o.id}
-                    onChange={() => set({ signal: o.id })}
-                  />
-                  {o.label}
-                </label>
-              ))}
+            <div className="space-y-1">
+              <div className="flex flex-wrap gap-x-4 gap-y-1" role="radiogroup" aria-label="Empfang">
+                {NOISE.map((o) => (
+                  <label key={o.id} className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="audio-noise"
+                      checked={s.noise === o.id}
+                      onChange={() => set({ noise: o.id })}
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-muted">
+                Übungen zum Radio Check klingen immer so schlecht, wie die Aufgabe sagt.
+              </p>
             </div>
           </div>
 

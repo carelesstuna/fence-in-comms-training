@@ -28,7 +28,7 @@ belong there.
   (Kokoro-82M, with AM, FM and intercom sound) run entirely on your own PC.
 - **Sim-agnostic.** Official phraseology first, then community practice, then the details of each sim (DCS, BMS,
   IL-2, SRS) – filtered by the sims and aircraft in your profile.
-- **Hangar and glossary.** 59 background cards on history, technology and physics, plus more than 200 brevity
+- **Hangar and glossary.** 60 background cards on history, technology and physics, plus more than 200 brevity
   codes, prowords and the phonetic alphabet.
 
 <p>
@@ -41,7 +41,7 @@ belong there.
 | | Topics | Status |
 |---|---|---|
 | Module 1 – Basics | Structure of a call, alphabet, numbers, callsigns, radio physics, prowords, readback | available |
-| Module 2 – Radios & comm plan | UHF/VHF/FM, presets, "push", guard, radio discipline, SRS, charts and frequency sources | available |
+| Module 2 – Radios & comm plan | UHF/VHF/FM, presets, "push", guard, radio discipline, SRS, charts and frequency sources, bullseye and magnetic variation | available |
 | Module 3 – On the ground | Crew chief, ATIS, start-up, taxi, arming, tower, departure | available |
 | Module 4 – Formation | Lead and wingman, fence in/out, ops check, joker/bingo, lost wingman, NORDO | available |
 | Module 5 – AWACS basics | Check-in, bullseye, BRAA and bogey dope, picture, declare, CAP station | available |
@@ -60,7 +60,7 @@ belong there.
    code-signed, so Windows SmartScreen may warn you: *More info → Run anyway*.
 
 **Requirements:** Windows 10 or 11, 64-bit. WebView2 is installed automatically if it is missing. Optional
-downloads inside the app, offered on first start and later under Profil: a speech recognition model (small.en,
+downloads inside the app, offered on first start and later under Einstellungen (settings): a speech recognition model (small.en,
 about 190 MB; other sizes available) and the radio voices (about 340 MB). A Vulkan-capable graphics card makes
 speech recognition fast (about one second per call); on the CPU it takes a few seconds.
 
@@ -70,7 +70,7 @@ speech recognition fast (about one second per call); on the CPU it takes a few s
 ## Built by AI – standing on the shoulders of thousands
 
 Let's be honest up front: almost everything in this repository was written by an AI (Claude by Anthropic) – the
-code, the 47 lessons, the 500-odd drills, the glossary, the hangar stories, the tests and, yes, this README too.
+code, the 48 lessons, the 500-odd drills, the glossary, the hangar stories, the tests and, yes, this README too.
 My own contribution: the need ("I want to stop sounding like a tourist on SRS"), a lot of guiding and steering
 ("no, a wingman would never say that"), testing – and pressing the push-to-talk key far more often than any real
 pilot ever would. So think of me less as the author and more as a flight lead whose vocabulary is mostly
@@ -87,9 +87,19 @@ please open an issue. The AI will apologise profusely (it is really good at that
 
 ## Status and feedback
 
-Version 0.2 – early public release. Bugs, wrong phraseology, ideas: please open an
-[issue](https://github.com/carelesstuna/fence-in-comms-training/issues). Corrections from real-world pilots,
-controllers, JTACs and veteran simmers are especially welcome. How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
+Version 0.3 – early public release. Bugs, wrong phraseology, ideas: please open an
+[issue](https://github.com/carelesstuna/fence-in-comms-training/issues) and paste the small `Ref …` line shown
+below the exercise (a click copies it). Corrections from real-world pilots, controllers, JTACs and veteran simmers are
+especially welcome. How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Known limitations
+
+- **Spoken numbers: digit-by-digit can't be checked.** The speech recognition (Whisper) always writes numbers as
+  digits – "three five zero decimal five" and "three hundred fifty point five" both become "350.5". The app can only
+  check the value, so both count as correct. Say numbers digit by digit anyway, as on the radio. When typing, numbers
+  must be written in words (except in Track C and for calculation answers), so there the form is checked.
+- Whisper writes "five one" as "5.1", "5-1", "51" and more; the app reads these as "five one" when that gives the
+  expected number, and shows recognised numbers in words.
 
 ## Development
 
@@ -113,7 +123,7 @@ references to them in code comments lead nowhere.
 - Learning content in `content/`: CC BY-SA 4.0, see [LICENSE-CONTENT.md](LICENSE-CONTENT.md) (including the
   attribution for material from Wikipedia)
 - Third-party components: under their own licenses. The full list with all license texts is generated at build
-  time (`LICENSES.txt`, in the app under Profil → Lizenzen). Texts for packages without their own license file
+  time (`LICENSES.txt`, in the app under Einstellungen → Lizenzen). Texts for packages without their own license file
   are in [third-party-licenses/](third-party-licenses/).
 
 Contributions to `content/` are licensed under CC BY-SA 4.0, contributions to the code under MIT.

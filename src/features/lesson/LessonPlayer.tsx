@@ -13,6 +13,8 @@ import { Markdown, InlineMarkdown } from '../../components/Markdown'
 import { DrillView } from '../../components/Drills'
 import { HangarCardView } from '../../components/HangarCard'
 import { RankBar } from '../../components/Layout'
+import { RefTag } from '../../components/RefTag'
+import { TaskLine } from '../../components/RadioFrame'
 import { ScoreRing, StepFooter, StepHeader } from './Stepper'
 import { readSavedRun, type SavedRun } from './savedRun'
 
@@ -140,7 +142,10 @@ function LessonRun({ id }: { id: string }) {
     const nextLesson = nextId ? content.lessons.get(nextId) : undefined
     const mistakes = drillSteps
       .filter((i) => (results[i] ?? 0) < 0.999)
-      .map((i) => drills[i] ?? { prompt: `Szenario „${scenarios[i]?.title}“: ${Math.round((results[i] ?? 0) * 100)} %`, explain: 'Spiel es nochmal – jeder Durchlauf wird neu gewürfelt.' })
+      .map((i) => ({
+        i,
+        d: drills[i] ?? { prompt: `Szenario „${scenarios[i]?.title}“: ${Math.round((results[i] ?? 0) * 100)} %`, explain: 'Spiel es nochmal – jeder Durchlauf wird neu gewürfelt.' },
+      }))
     return (
       <RunContext.Provider value={run}>
         <div className="space-y-5">
@@ -165,16 +170,24 @@ function LessonRun({ id }: { id: string }) {
             <div className="rounded-xl border border-line bg-panel p-5">
               <h2 className="mb-3 font-semibold">Das solltest du dir nochmal ansehen</h2>
               <ul className="space-y-3">
-                {mistakes.map((d, i) => (
-                  <li key={i} className="rounded-lg bg-black/20 px-3 py-2">
-                    <InlineMarkdown text={d.prompt} />
-                    {d.explain && (
-                      <div className="mt-1 text-sm text-muted">
-                        <InlineMarkdown text={d.explain} />
-                      </div>
-                    )}
-                  </li>
-                ))}
+                {mistakes.map(({ i, d }) => {
+                  const s = steps[i]
+                  return (
+                    <li key={i} className="rounded-lg bg-black/20 px-3 py-2">
+                      <TaskLine drill={d} />
+                      {d.explain && (
+                        <div className="mt-1 text-sm text-muted">
+                          <InlineMarkdown text={d.explain} />
+                        </div>
+                      )}
+                      <RefTag
+                        parts={[lesson.id, `${i + 1}/${steps.length}`, s?.kind === 'drill' && s.drillId, s?.kind === 'scenario' && s.scenarioId]}
+                        seed={seed}
+                        className="mt-1"
+                      />
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           )}
@@ -198,6 +211,7 @@ function LessonRun({ id }: { id: string }) {
   }
 
   const answered = (current?.kind !== 'drill' && current?.kind !== 'scenario') || results[step] !== undefined
+  const stepRef = [lesson.id, `${step + 1}/${total}`]
   const prevIsDrill = step > 0 && (steps[step - 1].kind === 'drill' || steps[step - 1].kind === 'scenario')
 
   return (
@@ -219,9 +233,18 @@ function LessonRun({ id }: { id: string }) {
           </div>
         )}
         {current?.kind === 'scenario' && scenarios[step] && (
-          <ScenarioPlayer scenario={scenarios[step]!} seed={seed} onComplete={(sc) => setResults((r) => ({ ...r, [step]: sc }))} />
+          <ScenarioPlayer
+            scenario={scenarios[step]!}
+            seed={seed}
+            refParts={stepRef}
+            onComplete={(sc) => setResults((r) => ({ ...r, [step]: sc }))}
+          />
         )}
         <Folded pages={current?.after} label="Zum Abschluss nachlesen" />
+        {/* Szenarien zeigen die Referenz selbst – samt ihrem eigenen Schritt */}
+        {current?.kind !== 'scenario' && (
+          <RefTag parts={[...stepRef, current?.kind === 'drill' && current.drillId, current?.kind === 'hangar' && current.cardId]} seed={seed} />
+        )}
       </div>
       <StepFooter
         canBack={step > 0 && !prevIsDrill}

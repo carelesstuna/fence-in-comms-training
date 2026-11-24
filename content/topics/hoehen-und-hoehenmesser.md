@@ -51,7 +51,7 @@ Mehr zur Physik steht in der Hangar-Karte „Dein Höhenmesser ist ein Barometer
 
 Gesprochen wird jede Ziffer einzeln: „QNH one zero one three“, „altimeter two niner niner two“. Du liest die
 Einstellung zurück. In der App hörst du standardmäßig überall die US-Form („altimeter“, „descend and maintain …“).
-Mit der Einstellung „Kartenabhängig“ im [Profil](/profile) gilt in Georgien und am Golf die ICAO-Form („QNH“,
+Mit der Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) gilt in Georgien und am Golf die ICAO-Form („QNH“,
 „descend to …“), in Nevada, auf Guam und in Korea bleibt es bei der US-Form. Mehr dazu in Modul 1, Lektion 3.
 
 ## Flight Level und Übergangshöhe

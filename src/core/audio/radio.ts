@@ -52,6 +52,8 @@ export interface RadioProfile {
   drive: number
   /** Rauschen, solange gesendet wird (relativ zur Sprache); null = keins. */
   noiseDb: number | null
+  /** Pegel der Stimme nach dem Kompressor: Bei schwachem Signal versinkt sie im Rauschen. */
+  voiceDb: number
   /** Rauschstoß beim Auftasten, bevor die Stimme kommt. */
   squelchOpen: number
   /** Rauschstoß beim Loslassen (Squelch Tail). */
@@ -63,9 +65,33 @@ export interface RadioProfile {
   leadOut: number
 }
 
+/** Störungen auf dem Kanal: Knacken, kurze Aussetzer, Schwund (Fading). */
+export type Interference = 'none' | 'light' | 'heavy'
+
+/**
+ * Lesbarkeit (ICAO-Skala 1–5) in Signalstärke 0–1. 5 = einwandfrei, 4 = gut lesbar, 3 = nur mit Mühe,
+ * 2 = zeitweise lesbar, 1 = unlesbar.
+ */
+export const READABILITY_STRENGTH: Record<number, number> = { 5: 1, 4: 0.75, 3: 0.5, 2: 0.28, 1: 0.1 }
+
+export function strengthOf(readability: number): number {
+  return READABILITY_STRENGTH[Math.min(5, Math.max(1, Math.round(readability)))]
+}
+
+/** Störungen, wenn der Inhalt keine nennt: schlechter Empfang ist meist auch gestört, guter selten. */
+export function interferenceFor(readability: number, roll: number): Interference {
+  if (readability <= 2) return 'heavy'
+  if (readability === 3) return roll < 0.7 ? 'light' : 'heavy'
+  if (readability === 4) return roll < 0.3 ? 'light' : 'none'
+  return 'none'
+}
+
 /**
  * Klangwerte für einen Klang und eine Signalstärke (0 = kaum lesbar, 1 = fünf auf fünf). Schwaches
- * Signal heißt: mehr Rauschen, mehr Verzerrung.
+ * Signal heißt: mehr Rauschen, mehr Verzerrung, leisere Stimme.
+ *
+ * Vor der Stimme vergeht rund eine halbe Sekunde mit Trägerrauschen – so wie man die Sprechtaste drückt und kurz
+ * wartet, damit das erste Wort nicht verschluckt wird.
  */
 export function radioProfile(sound: RadioSound, strength = 0.8): RadioProfile {
   const s = Math.min(1, Math.max(0, strength))
@@ -78,12 +104,14 @@ export function radioProfile(sound: RadioSound, strength = 0.8): RadioProfile {
         lowpass: 2800,
         presence: { freq: 1700, gain: 4 },
         drive: 2.2 + 3 * weak,
-        noiseDb: -34 + 16 * weak,
+        // Rauschabstand grob: Stufe 5 rund 25 dB, 4 rund 19, 3 rund 12, 2 rund 5, 1 um 0 dB (Stimme im Rauschen)
+        noiseDb: -26 + 20 * weak,
+        voiceDb: -10 * weak * weak,
         squelchOpen: 0.06,
         squelchTail: 0.11,
         tailDb: -14,
-        leadIn: 0.12,
-        leadOut: 0.08,
+        leadIn: 0.44,
+        leadOut: 0.1,
       }
     case 'fm':
       return {
@@ -93,12 +121,13 @@ export function radioProfile(sound: RadioSound, strength = 0.8): RadioProfile {
         presence: { freq: 2200, gain: 5 },
         drive: 3 + 2 * weak,
         // FM rauscht bei gutem Signal kaum; erst schwach wird es laut
-        noiseDb: -46 + 24 * weak,
+        noiseDb: -40 + 32 * weak,
+        voiceDb: -10 * weak * weak,
         squelchOpen: 0.03,
         squelchTail: 0.22,
         tailDb: -8,
-        leadIn: 0.15,
-        leadOut: 0.05,
+        leadIn: 0.42,
+        leadOut: 0.06,
       }
     case 'intercom':
       return {
@@ -108,6 +137,7 @@ export function radioProfile(sound: RadioSound, strength = 0.8): RadioProfile {
         presence: { freq: 2500, gain: 1.5 },
         drive: 1,
         noiseDb: null,
+        voiceDb: 0,
         squelchOpen: 0,
         squelchTail: 0,
         tailDb: -60,

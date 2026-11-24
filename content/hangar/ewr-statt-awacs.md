@@ -16,7 +16,7 @@ trifft oft auf eine andere Gegenstelle als im modernen Einsatz: Statt eines AWAC
 **Frühwarnradare am Boden (EWR)**. Dahinter sitzt ein **menschlicher Controller (GCI)**, oder ein
 Bot beantwortet Anfragen.
 
-Beispiele aus Serverunterlagen (Stand 2026, sie ändern sich):
+Beispiele aus Serverunterlagen (sie ändern sich, maßgeblich ist die Serverinfo):
 
 - Auf einem Server spricht je Seite **ein** menschlicher GCI auf der gemeinsamen Frequenz der Seite.
   Dazu gibt es einen Bot, der nur Bogey Dope und Warnungen beantwortet, höchstens eine Anfrage alle

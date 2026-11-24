@@ -13,6 +13,7 @@ title: Auf CAP-Station mit {awacs}
 summary: Anmelden, Station beziehen, Lagebild, Bogey Dope, Declare, eine Bedrohung – und mit Pigeons nach Hause.
 layer: community
 as: lead
+place: Unterwegs zur CAP
 sources:
   - title: "ATP 3-52.4 „Air Control Communication“ (2. Sept. 2021), S. 8–9 (Check-in), S. 28–29 (Core Information), S. 46 (Threat Group), S. 50–51 (Declare), S. 61 (Threat)"
   - title: "ATP 1-02.1 Multi-Service Brevity Codes (2020/21) – CAP(ING), ANCHOR"
@@ -55,9 +56,9 @@ steps:
   - stage: Check-in
     tune: { name: "{awacs} ({cp.awacs.name})", freq: "{cp.awacs.freq}", channel: "{cp.awacs.channel}" }
     situation: >-
-      Dein Flight ({flightSize}× {ac.type}) ist unterwegs zur CAP und fliegt genau nach Einsatzbefehl. Die
-      Missionsnummer steht auf der Line-up-Card. Stell den AWACS ein und melde dich als Lead an – mit
-      Alpha Check vom Bullseye.
+      Dein Flight ({flightSize}× {ac.type}) fliegt genau nach Einsatzbefehl. Die Missionsnummer steht auf der
+      Line-up-Card.
+    task: Melde deinen Flight beim AWACS an und bitte um einen Alpha Check vom Bullseye.
     you:
       mode: type
       hint: Adressat – Rufzeichen – mission number … – checking in as fragged – request alpha check bullseye
@@ -79,6 +80,7 @@ steps:
 
   - stage: Check-in
     situation: Der AWACS hat dich auf dem Schirm und dir gleich deine Position genannt.
+    task: Antworte dem AWACS.
     you:
       mode: type
       transmission:
@@ -90,7 +92,8 @@ steps:
       Bullseye-Cursor – zurücklesen musst du ihn nicht.
 
   - stage: Station
-    situation: Der AWACS schickt dich auf deine Station.
+    situation: Der AWACS meldet sich wieder und weist dir deine Station zu.
+    task: Antworte dem AWACS.
     hear:
       - speaker: "{awacs}"
         segments:
@@ -109,9 +112,11 @@ steps:
       Ab jetzt rechnet der AWACS jedes BRAA von deiner Station aus.
 
   - stage: Picture
+    place: Auf Station
     situation: >-
-      Du kreist auf deiner Station. Dein Flight ist noch nicht „commit“ gegangen – der AWACS gibt dir das Lagebild als
-      Core Information, ohne Label. Frag danach.
+      Du kreist über **bullseye {pic.own.bulls}**. Dein Flight ist noch nicht „commit“ gegangen – der AWACS gibt
+      dir das Lagebild deshalb als Core Information, ohne Label.
+    task: Frag den AWACS nach dem Lagebild.
     you:
       mode: type
       transmission:
@@ -129,7 +134,8 @@ steps:
           - { text: "{pic.g2.call|spoken}", role: value, note: "Zweite Gruppe im selben Muster – {pic.g2.call}." }
 
   - stage: Picture
-    situation: Das Picture ist durch. Was antwortest du?
+    situation: Das Picture ist durch.
+    task: Antworte dem AWACS.
     you:
       mode: choice
       wrong:
@@ -143,7 +149,8 @@ steps:
     explain: Kurz bestätigen und merken – zwei Gruppen. Ein Picture liest man nicht zurück.
 
   - stage: Bogey Dope
-    situation: Welche der beiden Gruppen ist dir am nächsten – und wie steht sie zu dir? Frag nach.
+    situation: Im Picture waren zwei Gruppen. Welche dir am nächsten ist und wie sie zu dir steht, weißt du nicht.
+    task: Frag den AWACS nach der Gruppe, die dir am nächsten ist.
     you:
       mode: type
       transmission:
@@ -164,6 +171,7 @@ steps:
 
   - stage: Bogey Dope
     situation: Der AWACS hat geantwortet.
+    task: Antworte dem AWACS.
     you:
       mode: type
       transmission:
@@ -178,7 +186,8 @@ steps:
     situation: >-
       Ein paar Minuten später: Dein Radar zeigt die Gruppe bei **bullseye {pic.near.bulls}**, **{pic.near.alt}**. Im
       Picture war sie noch „bogey“ – Identität unbekannt. Laut Missionsbriefing bekämpfst du nur, was der AWACS als
-      hostile meldet. Frag nach, ob er inzwischen mehr weiß.
+      hostile meldet.
+    task: Frag den AWACS, ob er inzwischen mehr über diese Gruppe weiß.
     you:
       mode: type
       hint: Adressat – Rufzeichen – declare – bullseye … – Höhe (bullseye 045/60 oder 045, 60 – beides geht)
@@ -200,7 +209,8 @@ steps:
           - { text: "{decl}", role: brevity, note: "Die neue Declaration – im Picture war die Gruppe noch bogey." }
 
   - stage: Declare
-    situation: Die Antwort ist da.
+    situation: Die Antwort des AWACS ist da.
+    task: Antworte dem AWACS.
     you:
       mode: type
       transmission:
@@ -214,6 +224,7 @@ steps:
 
   - stage: Threat
     situation: Plötzlich ruft dich der AWACS – ungefragt. Eine Gruppe, die im Picture nicht vorkam, ist aufgetaucht.
+    task: Antworte dem AWACS.
     hear:
       - speaker: "{awacs}"
         segments:
@@ -238,8 +249,8 @@ steps:
       dem Radar, du übernimmst) – sonst wiederholt der AWACS sie alle 10 NM.
 
   - stage: Heimweg
-    situation: >-
-      Dein Treibstoff erreicht Bingo. Melde dich beim AWACS ab und lass dir den Weg nach Hause geben.
+    situation: Dein Treibstoff erreicht Bingo.
+    task: Melde dich beim AWACS ab und lass dir den Weg nach Hause geben.
     you:
       mode: type
       hint: Adressat – Rufzeichen – RTB – request pigeons
@@ -261,7 +272,9 @@ steps:
           - { text: "{pr|spoken}", role: value }
 
   - stage: Heimweg
-    situation: Du drehst auf den Kurs nach Hause.
+    place: Auf dem Heimweg
+    situation: Der AWACS hat dir Kurs und Entfernung nach Hause gegeben. Du drehst auf den Kurs.
+    task: Antworte dem AWACS.
     you:
       mode: type
       transmission:
@@ -271,7 +284,9 @@ steps:
     explain: Kurs {pb}, {pr} Meilen bis {af.name}.
 
   - stage: Heimweg
-    situation: Kurz vor dem Heimatplatz. Schick deinen Flight zu Approach.
+    place: Im Anflug auf {af.name}
+    situation: Der Heimatplatz ist nicht mehr weit. Dein Flight ist noch mit dir auf der AWACS-Frequenz.
+    task: Schick deinen Flight zu Approach.
     you:
       mode: type
       transmission:
@@ -283,7 +298,8 @@ steps:
 
   - stage: Heimweg
     tune: { name: "{af.name} {cp.approach.name}", freq: "{cp.approach.freq}", channel: "{cp.approach.channel}" }
-    situation: Stell Approach ein und prüf deinen Flight.
+    situation: Du hast deinen Flight zu Approach geschickt und wechselst selbst die Frequenz.
+    task: Prüf, ob dein Flight mitgekommen ist.
     you:
       mode: type
       transmission:

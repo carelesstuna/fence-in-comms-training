@@ -33,6 +33,12 @@ export interface ResolvedTransmission {
   channel: 'radio' | 'intercom'
   /** Funkgerät (C-F6), z. B. fm beim JTAC. */
   radio?: RadioKind
+  /** Lesbarkeit 1–5 aus dem Inhalt; ohne Angabe würfelt die Wiedergabe. */
+  readability?: number
+  interference?: 'none' | 'light' | 'heavy'
+  pace?: 'lines'
+  /** Überlagerung zweier Übertragungen (Indizes im Funkspruch). */
+  mix?: [number, number]
   segments: ResolvedSegment[]
   note?: string
 }
@@ -42,6 +48,7 @@ export interface ResolvedExchange {
   title: string
   context?: string
   freq?: string
+  place?: string
   layer: string
   transmissions: ResolvedTransmission[]
 }
@@ -52,8 +59,25 @@ interface Base {
   explain?: string
 }
 
+/** Rahmen und Lage einer Übung, in der du selbst funkst (call, build, cloze); `prompt` ist der Auftrag. */
+export interface RadioTaskFrame {
+  /** Eigenes Rufzeichen (Rahmenleiste); fehlt z. B. im Baukasten innerhalb eines Szenarios. */
+  self?: string
+  place?: string
+  freq?: string
+  situation?: string
+}
+
+/** Hörprobe über einer Auswahl- oder Freitext-Übung. */
+export interface HearProbe {
+  exchange: ResolvedExchange
+  transmission: number
+  noAudio?: string
+}
+
 export interface ChoiceDrill extends Base {
   kind: 'choice'
+  hear?: HearProbe
   options: string[]
   /** Indizes der richtigen Optionen (nach dem Mischen). */
   correct: number[]
@@ -76,7 +100,7 @@ export interface BuildTile {
   text: string
 }
 
-export interface BuildDrill extends Base {
+export interface BuildDrill extends Base, RadioTaskFrame {
   kind: 'build'
   exchange: ResolvedExchange
   transmission: number
@@ -94,12 +118,32 @@ export interface AnatomyDrill extends Base {
 
 export interface InputDrill extends Base {
   kind: 'input'
+  hear?: HearProbe
   accept: string[]
   hint?: string
   placeholder?: string
 }
 
-export interface ClozeDrill extends Base {
+/** Eine Quelle der Merk-Übung: gehörte Übertragungen und der erwartete Readback. */
+export interface MemorySet extends RadioTaskFrame {
+  exchange: ResolvedExchange
+  /** Indizes der gehörten Übertragungen in `exchange`. */
+  heard: number[]
+  /** Funkspruch mit dem Readback (oft derselbe wie `exchange`). */
+  answerExchange: ResolvedExchange
+  answer: number
+}
+
+export interface MemoryDrill extends Base {
+  kind: 'memory'
+  /** Wenig Angaben (Stufen 1, 3, 5, 7) und viele (2, 4, 6, 8). */
+  few: MemorySet
+  many: MemorySet
+  /** Startstufe 1–8. */
+  level: number
+}
+
+export interface ClozeDrill extends Base, RadioTaskFrame {
   kind: 'cloze'
   exchange: ResolvedExchange
   transmission: number
@@ -112,6 +156,8 @@ export interface SequenceItem {
   label: string
   /** Optional: sprechende Station (bei Übertragungen). */
   speaker?: string
+  /** Die Übertragung selbst (zum Anhören). */
+  t?: ResolvedTransmission
 }
 
 export interface SequenceDrill extends Base {
@@ -119,6 +165,8 @@ export interface SequenceDrill extends Base {
   items: SequenceItem[]
   /** Schlüssel in richtiger Reihenfolge. */
   solution: string[]
+  /** Funkspruch, aus dem die Einträge stammen (zum Anhören). */
+  exchange?: ResolvedExchange
 }
 
 export interface FormField {
@@ -143,7 +191,7 @@ export interface FormDrill extends Base {
   fields: FormField[]
 }
 
-export interface CallDrill extends Base {
+export interface CallDrill extends Base, RadioTaskFrame {
   kind: 'call'
   exchange: ResolvedExchange
   /** Index der eigenen Übertragung; null bei expect: silence. */
@@ -214,6 +262,9 @@ export interface ResolvedScenarioStep {
   stage: string
   tune?: ResolvedTune
   situation?: string
+  task?: string
+  /** Ort ab diesem Schritt – schon fortgeschrieben aus früheren Schritten bzw. dem Szenario. */
+  place?: string
   freq?: string
   pos?: string
   hear: ResolvedTransmission[]
@@ -259,6 +310,7 @@ export type ResolvedDrill =
   | AnatomyDrill
   | InputDrill
   | ClozeDrill
+  | MemoryDrill
   | SequenceDrill
   | FormDrill
   | CallDrill

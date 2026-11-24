@@ -115,7 +115,7 @@ Notier sie auf dem Kneeboard, bevor du Ground rufst. Dann musst du nicht nachfra
 
 :::tip
 Standardmäßig klingt die ATIS in der App überall nach US-Format: Sicht in Meilen, „altimeter“ in inHg. Mit der
-Einstellung „Kartenabhängig“ im [Profil](/profile) gilt in Georgien und am Golf die ICAO-Form: Sicht in Kilometern
+Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) gilt in Georgien und am Golf die ICAO-Form: Sicht in Kilometern
 („visibility one zero kilometers“) und „QNH“ in Hektopascal; in Nevada, auf Guam und in Korea bleibt es beim
 US-Format. Wolken und die Bitte am Schluss spricht die App überall im US-Format.
 :::

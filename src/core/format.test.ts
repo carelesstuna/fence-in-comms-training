@@ -86,6 +86,17 @@ describe('Variablen', () => {
     expect(resolveVars({ f: { number: 'vhf-fm', range: [42.5, 42.5] } }, env('f')).f.text).toBe('42.5')
   })
 
+  it('Entfernung (distance): ganze Zahl wie im Bullseye, ziffernweise als Feld – Antworten nehmen beide an', () => {
+    const v = resolveVars({ r: { number: 'distance', range: [25, 25] } }, env('d')).r
+    expect(v.text).toBe('25')
+    expect(v.spoken).toBe('twenty-five')
+    expect(v.fields!.digits.spoken).toBe('two five')
+    const accept = [`bullseye zero six five, ${v.spoken}`, `bullseye zero six five, ${v.fields!.digits.spoken}`]
+    expect(matchesAny('bullseye zero six five, twenty five', accept)).toBe(true)
+    expect(matchesAny('bullseye zero six five two five', accept)).toBe(true)
+    expect(matchesAny('bullseye zero six five, two six', accept)).toBe(false)
+  })
+
   it('Höhe mit Hunderterstelle (blind): 16.9, angels und Fuß als Felder', () => {
     const v = resolveVars({ a: { number: 'thousands', range: [16.9, 16.9] } }, env('t')).a
     expect(v.text).toBe('16.9')
@@ -200,7 +211,7 @@ describe('Neue Übungstypen', () => {
   })
 
   it('Lückentext nutzt Segmente eines Funkspruchs', () => {
-    const drill = fixtureDrill({ id: 'zz-cloze', type: 'cloze', call: 'm1-radio-check', transmission: 0, blanks: [0, 3] })
+    const drill = fixtureDrill({ id: 'zz-cloze', type: 'cloze', call: 'm1-radio-check', transmission: 0, blanks: [0, 3], situation: 'Lage' })
     const d = resolveDrill(drill, env('c'))
     if (d.kind !== 'cloze') throw new Error('falscher Typ')
     expect(d.exchange.transmissions[0].segments[d.blanks[0]].role).toBe('addressee')
@@ -252,10 +263,18 @@ describe('Validator', () => {
   it('V1: Störbausteine dürfen Variablen des Funkspruchs nutzen', () => {
     const r = buildWith({
       'content/drills/zz-test.yaml': [
-        { id: 'zz-v1', type: 'build', call: 'm1-radio-check', distractors: ['{airfield.name} Ground', '{airfield.vhf|spoken}'] },
+        { id: 'zz-v1', type: 'build', call: 'm1-radio-check', situation: 'Lage', distractors: ['{airfield.name} Ground', '{airfield.vhf|spoken}'] },
       ],
     })
     expect(r.errors).toEqual([])
+  })
+
+  it('::sketch kennt nur die vorhandenen Skizzen', () => {
+    const card = (kind: string) =>
+      ['---', 'id: zz-sketch', 'title: Test', 'category: praxis', 'teaser: Test', 'sources: [{ title: x, url: "https://example.org" }]', '---', `::sketch{kind=${kind}}`, ''].join('\n')
+    expect(buildContentIndex({ ...raw, 'content/hangar/zz-sketch.md': card('variation') }).errors).toEqual([])
+    const msgs = buildContentIndex({ ...raw, 'content/hangar/zz-sketch.md': card('nope') }).errors.map((e) => e.message)
+    expect(msgs.join(' | ')).toContain('::sketch: unbekannte Skizze "nope"')
   })
 
   it('meldet Fehler in den neuen Formaten', () => {

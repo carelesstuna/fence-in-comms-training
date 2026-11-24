@@ -13,6 +13,10 @@ import { builtinVars } from '../core/random/vars'
 import { useRun } from '../ui/run'
 import { CallAnatomy } from './CallAnatomy'
 import { ChartBlock } from './ChartBlock'
+import { SampleDocBlock } from './SampleDoc'
+import { SAMPLE_DOCS, type SampleDocKind } from '../core/docs/kinds'
+import { BullseyeSketch } from './BullseyeSketch'
+import { SKETCHES, type SketchKind } from '../core/content/schema'
 import { Callout, LayerNote, SimNote, AircraftNote, EraNote } from './Notes'
 import { GlossaryTerm } from './GlossaryTerm'
 
@@ -48,9 +52,18 @@ function remarkRadio() {
           data.hName = 'radio-call'
           data.hProperties = { call: attrs.id, as: attrs.as }
           break
+        case 'sketch':
+          data.hName = 'sketch-block'
+          data.hProperties = { kind: attrs.kind }
+          break
         case 'chart':
           data.hName = 'chart-block'
-          data.hProperties = { kind: attrs.kind, airfield: attrs.airfield, freqs: attrs.freqs }
+          // annotate steht ohne Wert im Baustein (::chart{kind=approach annotate}) und kommt als "" an
+          data.hProperties = { kind: attrs.kind, airfield: attrs.airfield, freqs: attrs.freqs, annotate: attrs.annotate !== undefined ? 'true' : undefined }
+          break
+        case 'muster':
+          data.hName = 'sample-doc'
+          data.hProperties = { doc: attrs.doc }
           break
         case 'sim':
           data.hName = 'sim-note'
@@ -90,8 +103,12 @@ const components = {
       kind={p.kind === 'approach' ? 'approach' : 'airport'}
       airfield={p.airfield ? String(p.airfield) : undefined}
       freqs={p.freqs === 'real' ? 'real' : 'sim'}
+      annotate={p.annotate === 'true'}
     />
   ),
+  'sample-doc': (p: P) =>
+    (SAMPLE_DOCS as readonly string[]).includes(String(p.doc)) ? <SampleDocBlock doc={String(p.doc) as SampleDocKind} /> : null,
+  'sketch-block': (p: P) => (SKETCHES.includes(p.kind as SketchKind) ? <BullseyeSketch kind={p.kind as SketchKind} /> : null),
   'sim-note': (p: P) => <SimNote sim={String(p.sim)}>{p.children}</SimNote>,
   'aircraft-note': (p: P) => <AircraftNote aircraft={String(p.aircraft)}>{p.children}</AircraftNote>,
   'era-note': (p: P) => <EraNote era={String(p.era)}>{p.children}</EraNote>,

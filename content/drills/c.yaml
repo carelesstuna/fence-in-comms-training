@@ -18,7 +18,8 @@
 - id: track-c-l1-build
   type: build
   call: track-c-checkin
-  prompt: Bau deinen Check-in beim JTAC {jtac}.
+  situation: Der AWACS hat dich eben auf das FM-Netz des JTAC geschickt. Der JTAC weiß noch nichts über deinen Flight.
+  prompt: Bau deinen Check-in beim JTAC.
   distractors: [request taxi, bogey dope, ready to copy]
 
 - id: track-c-l1-anatomy-position
@@ -53,9 +54,10 @@
 - id: track-c-l1-checkin-type
   type: call
   call: track-c-checkin
-  prompt: >-
-    Du bist **{callsign}** mit {flightSize} A-10C am IP **{cas.ip}** auf **angels {cas.hold}**. An Bord: {ord}. Playtime
-    {playtime}. Melde dich beim JTAC **{jtac}** an – mit allem, was in den Check-in gehört.
+  situation: >-
+    Der AWACS hat dich eben zum JTAC geschickt. Dein Flight (**{flightSize}× A-10C**) kreist auf **{cas.hold}.000 ft**,
+    an Bord **{ord}**, Playtime **{playtime}**.
+  prompt: Melde dich beim JTAC an – mit allem, was in den Check-in gehört.
   hint: Adressat – Rufzeichen – Anzahl und Typ – Position – Höhe – Bewaffnung – Playtime – Abort Code
   explain: Den Zielbehälter mit Laser-Code darfst du nennen, musst du aber nicht.
 
@@ -89,12 +91,14 @@
 - id: track-c-l1-ready
   type: call
   call: track-c-gameplan
-  prompt: Der JTAC hat seinen Game Plan durchgegeben. Du hast dein Kneeboard bereit. Was funkst du?
+  situation: Check-in und Lage sind durch. Der JTAC hat eben seinen Game Plan durchgegeben, dein Kneeboard liegt bereit.
+  prompt: Antworte dem JTAC.
 
 - id: track-c-l1-holding
   type: call
   call: track-c-keyhole
-  prompt: Der JTAC schickt dich auf eine Halteposition. Bestätige sie.
+  situation: Vor dir ist noch ein anderer Flight dran. Der JTAC schickt dich so lange auf eine Halteposition.
+  prompt: Lies die Anweisung zurück.
   layer: community
 
 # ------------------------------------------------------------------ Lektion 2: der 9-Line
@@ -170,6 +174,30 @@
   params: { kind: lasercode }
 
 # ------------------------------------------------------------------ Lektion 3: Readback
+- id: track-c-l3-memory
+  type: memory
+  callsignPool: attack
+  # Gehörter 9-Line und dein Readback stammen aus zwei Funksprüchen – die Variablen hier gelten für beide
+  vars:
+    jtac: { pool: callsigns.jtac }
+    cas: { casArea: true, dangerClose: any }
+  prompt: >-
+    Der JTAC spricht, du schreibst mit und liest zurück, was Pflicht ist. Auf den hohen Stufen bleibt dir nur, was auf
+    deinem Kneeboard steht – genau wie im Cockpit.
+  few:
+    call: track-c-keyhole
+    heard: 0
+    situation: Du bist auf Station eingetroffen und wartest auf deinen Auftrag.
+  many:
+    call: track-c-nineline
+    heard: [0, 1, 2, 4]
+    answerCall: track-c-readback
+    situation: Du hältst im Keyhole, hast „ready to copy“ gemeldet, und der JTAC gibt dir den 9-Line samt Remarks.
+  explain: >-
+    Beim Keyhole liest du Halteposition und Höhe zurück. Beim 9-Line ist Pflicht: Line 4 (Zielhöhe), Line 6 (Zielort)
+    und jede Restriktion, etwa der Final Attack Heading und „danger close“. Mitgeschrieben wird alles, Zeile für Zeile
+    auf einer vorbereiteten 9-Line-Karte – zurückgelesen nur das Pflichtteil.
+
 - id: track-c-l3-what
   type: choice
   prompt: Was musst du nach dem 9-Line zurücklesen? (Alles Zutreffende)
@@ -190,7 +218,8 @@
   call: track-c-readback
   vars:
     cas: { casArea: true }
-  prompt: Bau den Readback an {jtac}.
+  situation: Der JTAC hat dir den 9-Line und die Remarks gegeben, alles steht auf deinem Kneeboard.
+  prompt: Bau deinen Readback an den JTAC – nur mit dem, was Pflicht ist.
   distractors: ["IP {cas.ip}", "{cas.target}", "{cas.friend|spoken}"]
 
 - id: track-c-l3-readback-type
@@ -198,9 +227,10 @@
   call: track-c-readback
   vars:
     cas: { casArea: true }
-  prompt: >-
-    Der 9-Line ist durch: Line 4 **{cas.elev} ft**, Line 6 **{cas.grid}**, in den Remarks Final Attack Heading
-    **{cas.fah.from}–{cas.fah.to}**. Lies dem JTAC {jtac} zurück, was Pflicht ist.
+  situation: >-
+    Der 9-Line und die Remarks sind durch. Auf deinem Kneeboard stehen Line 4 **{cas.elev} ft**, Line 6 **{cas.grid}**
+    und aus den Remarks **FAH {cas.fah.from}–{cas.fah.to}**.
+  prompt: Lies dem JTAC zurück, was Pflicht ist.
   explain: Nur die Pflicht – mehr kostet Zeit, und jede Zahl mehr ist eine Gelegenheit für einen Dreher.
 
 - id: track-c-l3-decoder
@@ -233,7 +263,8 @@
   type: call
   call: track-c-readback-correction
   transmission: 2
-  prompt: Der JTAC hat deine Koordinate korrigiert. Was funkst du?
+  situation: In deinem Readback steckte ein Zahlendreher in Line 6. Der JTAC hat die Koordinate eben korrigiert.
+  prompt: Lies die Korrektur zurück.
 
 - id: track-c-l3-dc
   type: choice
@@ -251,5 +282,8 @@
 - id: track-c-l3-dc-call
   type: call
   call: track-c-danger-close
-  prompt: Der JTAC hat dir die Remarks gegeben. Lies zurück.
+  situation: >-
+    Die eigenen Leute stehen nah am Ziel. Auf deinem Kneeboard stehen Line 4 **{cas.elev} ft** und Line 6
+    **{cas.grid}**, eben hat der JTAC die Remarks durchgegeben.
+  prompt: Lies dem JTAC zurück, was Pflicht ist.
   explain: Höhe, Koordinate, Final Attack Heading, Danger Close und die Initialen (⚠ Initialen nicht an der JP 3-09.3 geprüft).

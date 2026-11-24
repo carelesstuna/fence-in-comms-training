@@ -59,7 +59,14 @@ function ScenarioRun({ id, checkride }: { id: string; checkride: boolean }) {
           {mode ? '→ Als Training spielen' : '→ Als Checkride spielen (Vorschau, zählt nicht)'}
         </Link>
       </div>
-      <ScenarioPlayer key={seed} scenario={resolved} seed={seed} checkride={mode} onRestart={() => setSeed(newSeed())} />
+      <ScenarioPlayer
+        key={seed}
+        scenario={resolved}
+        seed={seed}
+        checkride={mode}
+        refParts={[mode ? 'Szenario (Checkride-Vorschau)' : 'Szenario']}
+        onRestart={() => setSeed(newSeed())}
+      />
     </RunContext.Provider>
   )
 }

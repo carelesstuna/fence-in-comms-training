@@ -10,6 +10,10 @@ sources:
   - title: "ICAO Doc 4444 (PANS-ATM), 4.5.7.5 – Read-back requirements"
   - title: "SKYbrary: Read-back or Hear-back"
   - title: "UK CAA CAP 413 Radiotelephony Manual, Abs. 2.69 – Readback-Liste (ICAO-Umsetzung)"
+  - title: "UK CAA CAP 413 Radiotelephony Manual (Ausgabe 24), Kap. 2, Abs. 2.56 und Table 1 – Informationen nicht zurücklesen, mit Rufzeichen oder „roger“ quittieren; Abs. 5.26/5.27 – Verkehrsinformation"
+    url: https://www.caa.co.uk/publication/download/18165
+  - title: "ICAO Doc 4444 (PANS-ATM, 16. Ausgabe), 12.3.1.7 – LOOKING OUT, TRAFFIC IN SIGHT, NEGATIVE CONTACT"
+  - title: "FAA Pilot/Controller Glossary: TRAFFIC IN SIGHT, NEGATIVE CONTACT"
   - title: "ICAO Doc 9432 – Manual of Radiotelephony (Readability Scale)"
   - title: "ICAO Annex 10, Volume II, 5.2.1.8.4 – Lesbarkeitsskala 1 bis 5"
   - title: "ACP 125 – Communication Instructions, Radiotelephone Procedures (LOUD, CLEAR; über Wikipedia)"
@@ -40,9 +44,20 @@ Zurückgelesen wird alles, was bei einem Missverständnis gefährlich wird:
 - **Transpondercodes** (:term[squawk]): Der Transponder ist das Gerät, das einem Radar automatisch mit einem Code
   antwortet (mehr auf der Seite [Squawk, Transponder und IFF](/wissen/squawk-transponder-iff))
 
-Nur bestätigt („roger“) werden dagegen Wetter und Verkehrshinweise. Die :term[ICAO]-Liste ist dabei etwas
-länger als die der US-Flugsicherung (:term[FAA]). In Europa gehört z. B. auch der :term[Transition Level] dazu: das
-unterste Flight Level über der Übergangshöhe (Modul 1, Lektion 3).
+Die :term[ICAO]-Liste ist dabei etwas länger als die der US-Flugsicherung (:term[FAA]). In Europa gehört z. B. auch
+der :term[Transition Level] dazu: das unterste Flight Level über der Übergangshöhe (Modul 1, Lektion 3).
+
+**Nicht** zurückgelesen werden **Informationen**: Wetter, Wind und Verkehrshinweise. Was du dann sagst, hängt davon
+ab, wie sie kommen:
+
+| So kommt die Information | Das sagst du |
+|---|---|
+| Mitten in einer Freigabe, z. B. der Wind in der Startfreigabe | Nur die Freigabe zurücklesen. Der Wind fällt im Readback einfach weg. |
+| Allein, z. B. „wind now two seven zero at one five“ | Kurz quittieren: nur dein Rufzeichen oder „roger“ und dein Rufzeichen |
+| Als Verkehrshinweis („traffic, two o'clock, five miles …“) | Ob du ihn siehst: „traffic in sight“, sonst „negative contact“. „looking“ heißt „suche noch“ (in den USA üblich). |
+
+Eine Ausnahme gehört trotzdem auf die Readback-Liste oben: der **Luftdruck** (altimeter bzw. QNH). Er klingt nach
+Wetter, aber eine falsche Einstellung verfälscht deine Höhe.
 
 ::call{id=m1-taxi-request}
 
@@ -52,7 +67,7 @@ unterste Flight Level über der Übergangshöhe (Modul 1, Lektion 3).
 
 ---
 
-::drill{id=m1-l6-cloze-taxi}
+::drill{id=m1-l6-memory-readback}
 
 ---
 
@@ -118,9 +133,17 @@ Woher die Antworten kommen:
 
 ::call{id=m1-radio-check-readability}
 
+So klingen die Stufen (mehr auf der Seite [Lesbarkeit 1 bis 5 zum Anhören](/wissen/lesbarkeit-zum-anhoeren)):
+
+::call{id=m1-readability-samples}
+
 ---
 
 ::drill{id=m1-l6-radio-check-answer}
+
+---
+
+::drill{id=m1-l6-listen-readability}
 
 ---
 

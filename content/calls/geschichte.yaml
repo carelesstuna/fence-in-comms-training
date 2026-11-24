@@ -1,0 +1,116 @@
+# Nachgestellte Funksprüche aus der Geschichte (Hangar-Karten). Fester Wortlaut, nichts gewürfelt.
+#
+# Teneriffa 1977: Wortlaut nach den Untersuchungsberichten (spanischer Bericht über NOVA/PBS, Zusammenstellung der
+# CVR-Abschrift, Wikipedia nach dem niederländischen Bericht). Die amtlichen Berichte liegen nur als Scans vor;
+# kleine Abweichungen zwischen den Quellen stehen auf der Karte. Synthetische Stimmen, keine Originalaufnahme.
+- id: tenerife-1977-funk
+  title: Teneriffa, 27. März 1977, die letzten Funksprüche (nachgestellt)
+  context: >-
+    Los Rodeos, dichter Nebel. Die KLM 4805 hat am Ende der Bahn gewendet und steht startbereit, die Pan Am
+    „Clipper 1736“ rollt noch auf derselben Bahn. Gesprochen von synthetischen Stimmen, Wortlaut nach den Untersuchungsberichten.
+  freq: Tenerife Tower · VHF
+  place: Los Rodeos, Teneriffa
+  transmissions:
+    - speaker: Tenerife Tower
+      readability: 4
+      segments:
+        - text: KLM eight seven zero five
+          role: addressee
+          note: >-
+            Der Tower ruft die KLM – und verdreht dabei die Flugnummer (richtig wäre four eight zero five). Aufgefallen
+            ist es niemandem.
+        - text: you are cleared to the Papa beacon
+          role: instruction
+          note: >-
+            Die Streckenfreigabe (ATC clearance): wohin die KLM nach dem Start fliegen soll. Eine Startfreigabe ist das
+            nicht – die heißt „cleared for takeoff“ und kam nie.
+        - text: climb to and maintain flight level nine zero
+          role: instruction
+          note: Die Höhe nach dem Start.
+        - text: right turn after takeoff, proceed with heading zero four zero until intercepting the three two five radial from Las Palmas VOR
+          role: instruction
+          note: >-
+            Der Weg nach dem Start. Mittendrin steht das Wort „takeoff“ – für eine Crew, die nur auf den Start wartet,
+            klingt die ganze Freigabe leicht wie ein Startsignal. Deshalb ist „takeoff“ heute der Startfreigabe
+            vorbehalten.
+    - speaker: KLM 4805
+      readability: 4
+      segments:
+        - text: ah, roger, sir
+          role: proword
+          note: Empfangen.
+        - text: we're cleared to the Papa beacon, flight level nine zero
+          role: instruction
+          note: Der Readback der Strecke und der Höhe.
+        - text: right turn out zero four zero until intercepting the three two five
+          role: instruction
+          note: Der Readback des Wegs.
+        - text: and we're now at takeoff
+          role: intent
+          critical: true
+          note: >-
+            Die verhängnisvolle Formulierung. Die KLM rollte in diesem Moment schon los. Der Tower verstand „wir stehen
+            startbereit“. Andere Quellen hören „we're now, uh, taking off“. Standard wäre „ready for departure“, und
+            gestartet wird erst nach „cleared for takeoff“.
+    - speaker: Tenerife Tower
+      readability: 4
+      segments:
+        - text: OK
+          role: info
+          note: >-
+            Dieses „OK“ kam im KLM-Cockpit klar an. Es ist keine Freigabe – nach der Streckenfreigabe klang es aber wie
+            eine.
+    - speaker: Tenerife Tower
+      readability: 4
+      note: So hat der Tower gesendet …
+      segments:
+        - text: stand by for takeoff
+          role: instruction
+          critical: true
+          note: >-
+            Die entscheidende Anweisung – warten, die Startfreigabe kommt noch. Bei der KLM kam sie nicht an.
+        - text: I will call you
+          role: info
+          note: „Ich rufe Sie.“
+    - speaker: Clipper 1736
+      readability: 4
+      note: … und im selben Augenblick die Pan Am.
+      segments:
+        - text: and we're still taxiing down the runway
+          role: position
+          critical: true
+          note: Pan Am meldet, dass sie noch auf der Bahn rollt. Auch das hörte die KLM-Crew nicht.
+        - text: the Clipper one seven three six
+          role: callsign
+          note: Das Rufzeichen der Pan Am, hier am Ende.
+    - speaker: Im KLM-Cockpit
+      mix: [3, 4]
+      readability: 4
+      note: So kam es im KLM-Cockpit an – drei bis vier Sekunden fast nur Pfeifen.
+      segments:
+        - text: "[Pfeifton – Tower und Pan Am senden gleichzeitig]"
+          role: info
+          note: >-
+            Zwei AM-Sender auf derselben Frequenz: Die Träger überlagern sich, der Empfänger pfeift. Keiner der beiden
+            Sender merkt etwas davon. Übrig blieb für die KLM das „OK“ von eben.
+    - speaker: Tenerife Tower
+      readability: 4
+      segments:
+        - text: Papa Alpha one seven three six
+          role: addressee
+          note: Der Tower ruft jetzt die Pan Am. Diese Sendung war im KLM-Cockpit wieder zu hören.
+        - text: report runway clear
+          role: instruction
+          note: „Melden Sie, wenn die Bahn frei ist.“ Die Bahn war also noch nicht frei.
+    - speaker: Clipper 1736
+      readability: 4
+      segments:
+        - text: OK, we'll report when we're clear
+          role: instruction
+          note: Pan Am bestätigt.
+    - speaker: Tenerife Tower
+      readability: 4
+      segments:
+        - text: thank you
+          role: info
+          note: Der letzte Funkspruch. Knapp zwanzig Sekunden später stießen die beiden Flugzeuge zusammen.

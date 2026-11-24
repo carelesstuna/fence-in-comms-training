@@ -15,11 +15,12 @@ vars:
   side: { oneOf: [from the left, from the right] }
   oc: { pool: callsigns.attack }
   ocn: { int: [2, 8] }
-  # Höhen in Tausend Fuß: so ergibt "{altA}000" die Ziffernform zum Eintippen (siehe format-wuensche SZ1).
+  # Höhen in ganzen Tausend Fuß („passing four thousand“). Getippt zählen Zahlen nur in Worten (24.11.2026).
   # Über dem Platz (E3-01): leaving mindestens 1.000 ft, freigegeben mindestens 4.000 ft über Platzhöhe.
   altA: { int: [2, 4], above: { airfield: af, add: 1000, unit: 1000 } }
   altB: { int: [6, 9], above: { airfield: af, add: 4000, unit: 1000 } }
   fl: { int: [18, 26] }
+place: "{af.name}"
 sketch: { airfield: af, weather: wx }
 kneeboard:
   title: "Comm Card {af.name}"
@@ -43,8 +44,9 @@ steps:
     pos: parking
     tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
     situation: >-
-      Dein Flight ({flightSize} Flugzeuge) steht angelassen auf dem Vorfeld von **{af.name}**. Die ATIS
-      hast du gehört: Information **{info}**, Runway **{wx.runway}**. Bitte um die Rollfreigabe.
+      Dein Flight aus **{flightSize} Flugzeugen** steht angelassen auf dem Vorfeld. Die ATIS hast du gehört:
+      Information **{info}**, Runway **{wx.runway}**.
+    task: Stell Ground ein und bitte um die Rollfreigabe.
     you:
       mode: type
       hint: Adressat – Rufzeichen – Anzahl – ATIS – Anfrage
@@ -66,16 +68,17 @@ steps:
 
   - stage: Ground
     pos: parking
-    situation: Lies die Rollfreigabe zurück.
+    situation: Du stehst noch auf dem Vorfeld. Ground hat dir eben die Rollfreigabe gegeben.
+    task: Lies die Rollfreigabe zurück.
     you:
       mode: type
       hint: Runway – Rollweg – hold short – Rufzeichen
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: "via {twA}, {twB}", role: instruction, alt: ["taxi via {twA}, {twB}"] }
-          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}"] }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: >-
       Runway und „hold short“ mit der Bahn sind Pflicht – ein „hold short“ ohne Bahn reicht nicht. Den Rollweg
@@ -83,7 +86,8 @@ steps:
 
   - stage: Rollen
     pos: taxi
-    situation: Du rollst. An einer Kreuzung meldet sich Ground.
+    situation: Du rollst auf **{twA}** und kommst an eine Kreuzung. Da meldet sich Ground.
+    task: Bestätige die Anweisung von Ground.
     hear:
       - speaker: "{af.name} Ground"
         segments:
@@ -101,7 +105,8 @@ steps:
 
   - stage: Rollen
     pos: taxi
-    situation: Kurz darauf, noch vor dem Rollhalt.
+    situation: Kurz darauf rollst du auf **{twB}**, der Rollhalt ist noch ein Stück entfernt.
+    task: Bestätige die Anweisung von Ground.
     hear:
       - speaker: "{af.name} Ground"
         segments:
@@ -124,7 +129,8 @@ steps:
 
   - stage: Rollen
     pos: taxi
-    situation: Ground lässt dich weiterrollen. Lies die Anweisung zurück.
+    situation: Du stehst auf **{twB}**. Ground lässt dich weiterrollen.
+    task: Lies die Anweisung zurück.
     you:
       mode: type
       hint: (continue taxi) – hold short – Runway – Rufzeichen
@@ -132,7 +138,7 @@ steps:
         speaker: "{callsign}"
         segments:
           - { text: continue taxi, role: instruction, optional: true, alt: ["continuing taxi"] }
-          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}"] }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: >-
       „hold short“ liest du immer zurück – mit der Bahn. Ein überhörtes „hold short“ ist eine der
@@ -140,7 +146,7 @@ steps:
 
   - stage: EOR
     pos: holdshort
-    freq: "Intercom · EOR-Crew"
+    freq: "EOR-Crew · Intercom"
     situation: >-
       Du bist am Bahnende angekommen und hältst an. Die EOR-Crew kommt zum Flugzeug. Du hast die
       Waffenschalter auf safe und die Hände sichtbar.
@@ -158,8 +164,8 @@ steps:
   - stage: Tower
     pos: holdshort
     tune: { name: "{af.name} Tower", freq: "{cp.tower.freq}", channel: "{cp.tower.channel}" }
-    situation: >-
-      Du stehst am Rollhalt und wechselst zum Tower. Auf der Frequenz läuft gerade ein anderer Funkspruch.
+    situation: Die EOR-Crew ist fertig. Du stehst am Rollhalt von Runway **{wx.runway}**.
+    task: Stell den Tower ein.
     hear:
       - speaker: "{af.name} Tower"
         segments:
@@ -174,7 +180,8 @@ steps:
 
   - stage: Tower
     pos: holdshort
-    situation: Die Frequenz ist frei, {oc} {ocn}-1 ist gestartet. Melde dich abflugbereit.
+    situation: Die Frequenz ist frei, {oc} {ocn}-1 ist gestartet. Du stehst weiter am Rollhalt.
+    task: Melde dem Tower, dass dein Flight bereit ist.
     you:
       mode: choice
       wrong:
@@ -202,20 +209,22 @@ steps:
 
   - stage: Tower
     pos: holdshort
-    situation: Lies „line up and wait“ zurück.
+    situation: Du stehst noch am Rollhalt. Der Tower hat dir eben geantwortet.
+    task: Lies die Anweisung des Towers zurück.
     you:
       mode: type
       hint: Runway – Anweisung – Rufzeichen
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: line up and wait, role: instruction, critical: true, alt: ["position and hold"], note: "„position and hold“ ist die alte FAA-Form – so spricht die ATC in Falcon BMS. Es zählt auch." }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
 
   - stage: Start
     pos: runway
-    situation: Du stehst ausgerichtet auf der Bahn.
+    situation: Du stehst ausgerichtet auf Runway **{wx.runway}** und wartest.
+    task: Lies die Freigabe des Towers zurück.
     hear:
       - speaker: "{af.name} Tower"
         segments:
@@ -229,14 +238,16 @@ steps:
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: cleared for takeoff, role: instruction, critical: true }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: Erst jetzt darfst du starten. Bahn und Freigabe zurücklesen, dann Gas.
 
   - stage: Departure
     pos: airborne
-    situation: Du bist in der Luft. Der Tower schickt dich weiter.
+    place: Im Steigflug
+    situation: Du bist eben gestartet und steigst vom Platz weg.
+    task: Lies die Anweisung des Towers zurück.
     hear:
       - speaker: "{af.name} Tower"
         segments:
@@ -250,14 +261,15 @@ steps:
         segments:
           - { text: "departure {cp.departure.freq|spoken}", role: value, critical: true, alt: ["contact departure {cp.departure.freq|spoken}", "{cp.departure.freq|spoken}"] }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
-    explain: Auf deiner Comm Card steht Departure auf Kanal {cp.departure.channel}.
+    explain: >-
+      Frequenzen liest du immer zurück. Die Frequenz hast du jetzt gehört – auf deiner Comm Card steht Departure
+      auch als Kanal.
 
   - stage: Departure
     pos: airborne
     tune: { name: "{af.name} Departure", freq: "{cp.departure.freq}", channel: "{cp.departure.channel}" }
-    situation: >-
-      Schalte auf Departure. Du steigst gerade durch **{altA}.000** ft, freigegeben bist du auf
-      **{altB}.000** ft. Dann mach deinen Erstanruf.
+    situation: Du steigst gerade durch **{altA}.000 ft**, freigegeben bist du auf **{altB}.000 ft**.
+    task: Stell Departure ein und mach deinen Erstanruf.
     you:
       mode: type
       hint: Adressat – Rufzeichen – aktuelle Höhe – freigegebene Höhe
@@ -266,8 +278,8 @@ steps:
         segments:
           - { text: "{af.name} Departure", role: addressee, alt: ["Departure", "{af.alias} Departure"] }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
-          - { text: "leaving {altA|spoken} thousand", role: value, critical: true, alt: ["passing {altA|spoken} thousand", "leaving {altA}000", "passing {altA}000"] }
-          - { text: "climbing to {altB|spoken} thousand", role: value, critical: true, alt: ["climbing {altB|spoken} thousand", "for {altB|spoken} thousand", "climbing to {altB}000", "climbing {altB}000", "for {altB}000"] }
+          - { text: "leaving {altA|spoken} thousand", role: value, critical: true, alt: ["passing {altA|spoken} thousand"] }
+          - { text: "climbing to {altB|spoken} thousand", role: value, critical: true, alt: ["climbing {altB|spoken} thousand", "for {altB|spoken} thousand"] }
     reply:
       - speaker: "{af.name} Departure"
         segments:

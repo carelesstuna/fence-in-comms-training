@@ -10,7 +10,8 @@
   context: >-
     Der AWACS hat dich auf das FM-Netz des JTAC geschickt. Jetzt meldest du dich mit allem, was er für seine Planung
     braucht: wer du bist, wo, womit und wie lange.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: "Am IP {cas.ip}"
   layer: core
   callsignPool: attack
   vars:
@@ -88,7 +89,7 @@
   title: Situation Update
   context: >-
     Nach dem Check-in schildert der JTAC die Lage. Die Bedrohung kommt zuerst, weil sie Höhe und Anflug bestimmt.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
   layer: core
   callsignPool: attack
   vars:
@@ -131,7 +132,8 @@
   title: Game Plan und „ready to copy“
   context: >-
     Bevor der 9-Line kommt, sagt der JTAC, wie er den Angriff führen will. Dann holst du dein Kneeboard heraus.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Holding
   layer: core
   callsignPool: attack
   vars:
@@ -175,7 +177,8 @@
   context: >-
     Bis du dran bist, schickt dich der JTAC auf eine Halteposition. Auf Servern mit menschlichen JTACs ist dafür das
     Keyhole üblich.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Auf Station
   layer: community
   callsignPool: attack
   vars:
@@ -217,7 +220,7 @@
   context: >-
     Der JTAC gibt dir das Briefing für den Angriff, Zeile für Zeile. Die Zeilennummern spricht er hier nicht mit – ob
     sie gesprochen werden, ist in den Quellen offen ⚠. Drei Zeilen pro Übertragung, dann die Remarks.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
   layer: core
   callsignPool: attack
   vars:
@@ -225,6 +228,7 @@
     cas: { casArea: true, dangerClose: any }
   transmissions:
     - speaker: "{jtac}"
+      pace: lines
       radio: fm
       segments:
         - { text: "{callsign|spoken}", role: addressee }
@@ -242,6 +246,7 @@
           note: >-
             **Line 3 – Distance:** vom IP zum Ziel in NM. Von einer Battle Position (Hubschrauber) käme sie in Metern.
     - speaker: "{jtac}"
+      pace: lines
       radio: fm
       segments:
         - text: "{cas.elev|spoken} feet"
@@ -258,6 +263,7 @@
             **Line 6 – Target Location:** die Koordinate (MGRS), zwei Buchstaben und acht Ziffern. Zweite Pflicht im
             Readback.
     - speaker: "{jtac}"
+      pace: lines
       radio: fm
       segments:
         - text: "{cas.mark|spoken}"
@@ -285,6 +291,7 @@
           role: request
           note: Bereit für die Remarks (Wortlaut aus dem DCS-Handbuch der F-5E).
     - speaker: "{jtac}"
+      pace: lines
       radio: fm
       segments:
         - { text: "{callsign|spoken}", role: addressee }
@@ -317,7 +324,8 @@
     Nach den Remarks liest du genau das zurück, was Pflicht ist: Line 4, Line 6 und jede Restriktion. So steht der Ablauf
     in den DCS-Handbüchern (ein Readback nach den Remarks). Der JTAC-Leitfaden der Community kennt eine zweite Folge:
     erst Line 4 und 6, nach den Remarks noch einmal die Restriktionen.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Holding
   layer: core
   callsignPool: attack
   vars:
@@ -325,6 +333,7 @@
     cas: { casArea: true, dangerClose: any }
   transmissions:
     - speaker: "{callsign}"
+      pace: lines
       you: true
       radio: fm
       segments:
@@ -373,7 +382,8 @@
 - id: track-c-readback-correction
   title: Korrektur im Readback
   context: Im Readback steckt ein Zahlendreher in Line 6. Der JTAC korrigiert, du liest richtig neu.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Holding
   layer: core
   callsignPool: attack
   vars:
@@ -420,7 +430,8 @@
   title: Danger Close im Readback
   context: >-
     Die eigenen Leute stehen nah am Ziel. Der JTAC sagt es in den Remarks, und du liest es mit zurück.
-  freq: VHF-FM (fox mike)
+  freq: "{jtac} · VHF-FM"
+  place: Im Holding
   layer: core
   callsignPool: attack
   vars:

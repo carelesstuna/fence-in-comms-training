@@ -3,6 +3,7 @@
  * Alle Funksprüche und Übungen darin werden daraus deterministisch gewürfelt.
  */
 import { createContext, useContext } from 'react'
+import { knownAircraft } from '../core/content/aircraft'
 import type { ContentIndex } from '../core/content/index'
 import { createRng, newSeed } from '../core/random/rng'
 import { randomSelf, type ResolveEnv, type SelfCallsign } from '../core/random/vars'
@@ -27,8 +28,12 @@ export interface Run {
   envFor: (label: string | number) => ResolveEnv
 }
 
-export function makeRun(profile: Profile, seed = newSeed()): Run {
+export function makeRun(profileIn: Profile, seed = newSeed()): Run {
   lastSeed = seed
+  // Veraltete Flugzeug-IDs fallen weg – so filtern Übungen genauso wie die Flugzeug-Kästen (`AircraftNote`)
+  const profile: Profile = contentResult.index
+    ? { ...profileIn, aircraft: knownAircraft(profileIn.aircraft, contentResult.index.aircraftTypes) as Profile['aircraft'] }
+    : profileIn
   const base = createRng(seed)
   // Ohne Inhalte gibt es keine Rufzeichen zum Würfeln – dann das feste aus dem Profil
   const self: SelfCallsign =

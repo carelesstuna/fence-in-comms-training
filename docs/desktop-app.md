@@ -45,13 +45,20 @@ npm run desktop:build   # Release: NSIS-Installer + SHA256SUMS.txt
     ebenso, benennt den Installer ohne Leerzeichen (`Fence-In-Comms-Training_<Version>_x64-setup.exe`),
     schreibt `SHA256SUMS.txt`, hängt eine Herkunftsbescheinigung an (`gh attestation verify`) und legt
     einen **Release-Entwurf** an. Veröffentlicht wird von Hand auf GitHub; Text aus
-    `.github/release-notes.md`.
+    `.github/release-notes.md`, „What's new“ aus dem Abschnitt der Version in `CHANGELOG.md` (fehlt er,
+    steht dort ein Platzhalter).
   - whisper.cpp v1.9.5 baut der Workflow selbst mit Vulkan (Vulkan SDK per Prüfsumme geprüft, statische
     C-Laufzeit, ohne OpenMP) und hebt das Ergebnis im Cache auf; ein Schritt bricht ab, wenn die Dateien
     doch die Visual-C++-Laufzeit brauchen.
-- Ablauf für eine neue Version: `version` in `tauri.conf.json` und `package.json` erhöhen, committen,
-  `npm run export-public -- <öffentliches Repo>`, dort committen, pushen, dann `git tag v<Version>` und
-  `git push origin v<Version>`.
+- Ablauf für eine neue Version:
+  1. **Changelog:** `git log v<letzte Version>..HEAD` im privaten Repo zeigt alle Änderungen seit dem letzten Release.
+     Daraus einen Abschnitt `## <Version> – <Datum>` oben in `CHANGELOG.md` schreiben – was sich für Nutzer ändert,
+     englisch, darunter `### Deutsch`; Tests, Plan und Umbauten ohne Wirkung weglassen. Die Commits sind die
+     Quelle, eine eigene Liste wird nebenher nicht gepflegt.
+  2. `version` in `tauri.conf.json` und `package.json` erhöhen, committen und im privaten Repo `git tag -a v<Version>`
+     setzen (Marke für den nächsten Changelog).
+  3. `npm run export-public -- <öffentliches Repo>`, dort committen, pushen, dann `git tag v<Version>` und
+     `git push origin v<Version>`.
 
 ## Festlegungen, die sich nicht mehr ändern dürfen
 

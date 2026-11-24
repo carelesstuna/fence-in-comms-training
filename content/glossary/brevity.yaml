@@ -136,6 +136,9 @@
   meaning: Gebriefter Bezugspunkt. Positionen werden als magnetische Peilung und Entfernung in NM von diesem Punkt angegeben.
   category: anfragen
   example: "Group bullseye 045/60, 25 thousand, track west, hostile."
+  note: >-
+    Die Peilung zeigt vom Bullseye zum Objekt, dreistellig und magnetisch; nie zu „bull“ verkürzen (ATP 3-52.4 (2021),
+    S. 22). Grundlagen und Umrechnung von der Karte in Modul 2, Lektion 9, der AWACS-Funk in Modul 5, Lektion 2.
   see: [BRAA, PICTURE]
 - word: COMMIT
   meaning: Die genannte Gruppe abfangen und die gebriefte Abfanggeometrie einnehmen.

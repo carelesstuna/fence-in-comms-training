@@ -124,8 +124,8 @@ sich auf einen Punkt, den beide kennen – etwa einen Flugplatz – und enthält
 
 ::call{id=m4-posit}
 
-Mit einem **Bullseye** – einem gemeinsamen Bezugspunkt aus dem Briefing – geht das noch schneller.
-Das kommt in Modul 5.
+Mit einem **Bullseye** – einem gemeinsamen Bezugspunkt aus dem Briefing – geht das noch schneller:
+„Two, bullseye 270/30, angels 20“ (Modul 2, Lektion 9).
 
 :::layer{layer=community}
 Zum Wiederaufschließen funkt der Lead oft „rejoin“, und der Wingman meldet sich, wenn er wieder in

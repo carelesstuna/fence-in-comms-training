@@ -15,7 +15,7 @@ sources:
     url: https://ntrs.nasa.gov/citations/20090020584
   - title: "RTL-SDR.com: Demonstrating the FM capture effect – why aircraft use AM"
     url: https://www.rtl-sdr.com/demonstrating-the-fm-capture-effect-why-aircraft-use-am/
-  - title: "Falcon BMS 4.38 Technical Manual (im BMS-Ordner Docs), S. 57 – Blockieren und gleichzeitiges Hören von UHF und VHF"
+  - title: "Falcon BMS 4.38 Technical Manual (liegt BMS bei, im Installationsordner unter Docs), S. 57 – Blockieren und gleichzeitiges Hören von UHF und VHF"
 ---
 
 ## Senden oder hören – nie beides

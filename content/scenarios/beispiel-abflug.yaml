@@ -10,6 +10,7 @@ vars:
   info: { letter: true }
   cp: { commplan: true, airfield: af }
   tw: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot] }
+place: "{af.name}"
 sketch: { airfield: af, weather: wx }
 kneeboard:
   title: "Comm Card {af.name}"
@@ -24,7 +25,8 @@ steps:
   - stage: ATIS
     pos: parking
     tune: { name: "{af.name} ATIS", freq: "{cp.atis.freq}", channel: "{cp.atis.channel}" }
-    situation: Du sitzt kalt auf dem Vorfeld von **{af.name}**. Erst einmal hörst du die ATIS ab.
+    situation: Du sitzt kalt auf dem Vorfeld, die Checks vor dem Anlassen sind durch.
+    task: Stell die ATIS ein und hör sie ab.
     hear:
       - speaker: "{af.name} ATIS"
         segments:
@@ -39,7 +41,8 @@ steps:
   - stage: Startup
     pos: parking
     tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
-    situation: Du bittest Ground ums Anlassen.
+    situation: Du sitzt noch kalt auf dem Vorfeld. Die ATIS hast du gehört.
+    task: Stell Ground ein und bitte um die Anlassfreigabe.
     you:
       mode: build
       distractors: [request taxi, "{wingman|spoken}"]
@@ -58,7 +61,8 @@ steps:
 
   - stage: Taxi
     pos: parking
-    situation: Triebwerk läuft, Checks fertig. Bitte um Rollfreigabe – diesmal tippst du selbst.
+    situation: Das Triebwerk läuft, die Checks sind fertig. Du stehst noch auf deiner Parkposition.
+    task: Bitte Ground um die Rollfreigabe.
     you:
       mode: type
       hint: Adressat – Rufzeichen – Anfrage
@@ -78,23 +82,25 @@ steps:
 
   - stage: Taxi
     pos: taxi
-    situation: Lies die Rollfreigabe zurück.
+    situation: Ground hat dir eben die Rollfreigabe gegeben.
+    task: Lies die Rollfreigabe zurück.
     you:
       mode: type
       hint: Runway – Rollweg – „hold short“ mit Bahn – dann dein Rufzeichen
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: "via {tw}", role: instruction, alt: ["taxi via {tw}"] }
-          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"], note: "„Hold short“ wird IMMER zurückgelesen, mit der Bahn – das ist der wichtigste Readback am Boden." }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}"], note: "„Hold short“ wird IMMER zurückgelesen, mit der Bahn – das ist der wichtigste Readback am Boden." }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: Readbacks bestehen aus den Werten der Anweisung plus dein Rufzeichen. „Roger“ allein reicht bei Runway und Hold Short nie.
 
   - stage: Tower
     pos: holdshort
     tune: { name: "{af.name} Tower", freq: "{cp.tower.freq}", channel: "{cp.tower.channel}" }
-    situation: Du stehst am Haltepunkt von Runway **{wx.runway}** und bist startbereit. Melde dich beim Tower.
+    situation: Du stehst am Haltepunkt von Runway **{wx.runway}**, alle Checks vor dem Start sind fertig.
+    task: Stell den Tower ein und melde dich dort.
     you:
       mode: choice
       wrong:
@@ -118,21 +124,24 @@ steps:
 
   - stage: Tower
     pos: runway
-    situation: Lies die Startfreigabe zurück.
+    situation: Der Tower hat dir eben die Startfreigabe gegeben.
+    task: Lies die Startfreigabe zurück.
     you:
       mode: type
       hint: Runway – Freigabe – Rufzeichen (den Wind musst du nicht zurücklesen)
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: cleared for takeoff, role: instruction, critical: true }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: Bahn und Freigabe zurücklesen, dann erst Gas.
 
   - stage: Departure
     pos: airborne
-    situation: Du bist in der Luft. Der Tower schickt dich weiter.
+    place: Im Steigflug
+    situation: Du bist eben gestartet und steigst vom Platz weg.
+    task: Lies die Anweisung des Towers zurück.
     hear:
       - speaker: "{af.name} Tower"
         segments:

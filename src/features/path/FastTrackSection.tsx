@@ -1,5 +1,5 @@
 /**
- * Profil-Sektion „Weg für Erfahrene“: Einstufungstests jederzeit, Freischaltungen und Kompaktmodus.
+ * Abschnitt „Weg für Erfahrene“ auf der Seite Fortschritt: Einstufungstests jederzeit, Freischaltungen und Kompaktmodus.
  */
 import { Link } from 'react-router'
 import {

@@ -430,12 +430,8 @@ export function runGenerator(id: GeneratorId, params: Record<string, unknown>, e
       const name = rng.pick(content.callsigns.fighter ?? Object.values(content.callsigns)[0])
       const flight = rng.int(1, 9)
       const pos = rng.int(1, 4)
-      const roles = [
-        'Flight Lead (Nummer 1)',
-        'Wingman des Flight Leads (Nummer 2)',
-        'Element Lead (Nummer 3)',
-        'Wingman des Element Leads (Nummer 4)',
-      ]
+      // Ohne Nummer in Klammern – sonst verrät die Antwort sich selbst (die Nummer steht im Rufzeichen)
+      const roles = ['Flight Lead', 'Wingman des Flight Leads', 'Element Lead', 'Wingman des Element Leads']
       const why = [
         'Nummer 1 führt den ganzen Flight und spricht in der Regel für ihn.',
         'Nummer 2 fliegt beim Flight Lead – im Briefing „Dash 2“ genannt.',

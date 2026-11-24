@@ -10,7 +10,7 @@
  * („Two seven point two“ → 27.2), werden sie anhand der erwarteten Werte wieder getrennt –
  * so funktioniert die Bewertung auch für Sprach-Transkripte ohne Kommas.
  */
-import { normalizeTokens } from '../phraseology/normalize'
+import { matchAny, normalizeTokens, normalizeTokensWithDigits, type SpellingFix } from '../phraseology/normalize'
 
 export interface ScoreSegment {
   text: string
@@ -72,7 +72,8 @@ type Num = { n: number; text: string }
  * 47 und 20000 oder 40 und 720000, „twenty five thousand“ ist 25000 oder 20 und 5000. Die erste Lesart
  * gilt, wenn nichts anderes besser zu den erwarteten Werten passt.
  */
-type Item = { kind: 'word'; w: string; i: number } | { kind: 'num'; n: number; text: string; i: number; readings?: Num[][] }
+/** `digits`: Die Zahl wurde (mindestens teilweise) mit Ziffern geschrieben („11“, „1-1“), nicht in Worten. */
+type Item = { kind: 'word'; w: string; i: number } | { kind: 'num'; n: number; text: string; i: number; readings?: Num[][]; digits?: boolean }
 
 const TEENS: Record<string, number> = {
   ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19,
@@ -91,14 +92,18 @@ export function toItems(text: string): Item[] {
 }
 
 function chunkItems(text: string): Item[] {
-  const t = normalizeTokens(text)
+  const { tokens: t, digits } = normalizeTokensWithDigits(text)
   const items: Item[] = []
   for (let i = 0; i < t.length; ) {
     if (/^\d$/.test(t[i])) {
       let s = ''
+      let written = false
       const start = i
       // höchstens ein Dezimalpunkt – "9.9.9" ist keine Zahl
-      while (i < t.length && (/^\d$/.test(t[i]) || (t[i] === '.' && !s.includes('.') && /^\d$/.test(t[i + 1] ?? '')))) s += t[i++]
+      while (i < t.length && (/^\d$/.test(t[i]) || (t[i] === '.' && !s.includes('.') && /^\d$/.test(t[i + 1] ?? '')))) {
+        if (digits[i]) written = true
+        s += t[i++]
+      }
       let n = Number(s)
       // "two five thousand" = 25000, "one niner thousand five hundred" = 19500, "five hundred" = 500
       let scaled = false
@@ -125,7 +130,7 @@ function chunkItems(text: string): Item[] {
         if (tens !== undefined && /^[1-9]$/.test(t[i] ?? '')) n += Number(t[i++])
         s = String(n)
       }
-      items.push({ kind: 'num', n, text: s, i: start })
+      items.push({ kind: 'num', n, text: s, i: start, ...(written && { digits: true }) })
       continue
     }
     if (TENS[t[i]] !== undefined) {
@@ -274,7 +279,7 @@ function splitMergedNumbers(user: Item[], expected: Num[]): Item[] {
   return user
     .flatMap((u): Item[] => {
       const parts = replace.get(u) ?? (u.kind === 'num' ? u.readings?.[0] : undefined)
-      return parts ? parts.map((p) => ({ kind: 'num', n: p.n, text: p.text, i: u.i })) : [u]
+      return parts ? parts.map((p): Item => ({ kind: 'num', n: p.n, text: p.text, i: u.i, ...(u.kind === 'num' && u.digits && { digits: true }) })) : [u]
     })
     .map((it, i) => ({ ...it, i }))
 }
@@ -328,6 +333,8 @@ interface Match {
   end: number
   /** Zahlen passen nicht (aber die Wörter). */
   wrongNumber: boolean
+  /** Zahl stimmt, ist aber mit Ziffern getippt, wo der Funkspruch sie in Worten hat (`numbersInWords`). */
+  digitForm?: boolean
   heard: string
   typos: [string, string][]
   /** Weggelassene, entbehrliche Wörter („runway“ vor der richtigen Bahnnummer). */
@@ -356,11 +363,14 @@ interface MatchRules {
   leniency: Leniency
   /** Gesprochen: Artikel dürfen fehlen. */
   spoken: boolean
+  /** Getippt: Zahlen, die der Funkspruch in Worten hat, gelten nur in Worten. */
+  numbersInWords: boolean
 }
 
 function matchAt(seg: Item[], user: Item[], start: number, used: boolean[], rules: MatchRules): Match | null {
   const { tol, leniency } = rules
   let wrong = false
+  let digitForm = false
   const heard: string[] = []
   const typos: [string, string][] = []
   const dropped: string[] = []
@@ -386,12 +396,13 @@ function matchAt(seg: Item[], user: Item[], start: number, used: boolean[], rule
     } else {
       if (u.kind !== 'num') return null
       if (Number.isNaN(u.n) || numDiff(s.n, u.n, tol) > (tol ?? 0)) wrong = true
+      else if (rules.numbersInWords && u.digits && !s.digits) digitForm = true
       heard.push(u.text)
     }
     j++
   }
   if (j === start) return null
-  return { start, end: j, wrongNumber: wrong, heard: heard.join(' '), typos, dropped }
+  return { start, end: j, wrongNumber: wrong, ...(digitForm && { digitForm }), heard: heard.join(' '), typos, dropped }
 }
 
 /**
@@ -405,7 +416,7 @@ function findMatch(alts: Item[][], user: Item[], from: number, used: boolean[], 
     for (const [a, seg] of alts.entries()) {
       if (seg.length === 0) continue
       const m = matchAt(seg, user, start, used, rules)
-      if (!m || (!allowWrong && m.wrongNumber)) continue
+      if (!m || (!allowWrong && (m.wrongNumber || m.digitForm))) continue
       // Bei gleicher Länge gewinnt die frühere Formulierung – Text und `alt` vor `weak`
       const longer = !best || m.end > best.end || (m.end === best.end && (m.dropped?.length ?? 0) < (best.dropped?.length ?? 0))
       if (longer) best = { ...m, alt: a }
@@ -587,6 +598,8 @@ function prepareSpoken(input: string, expected: Set<number>, expectedNums: Num[]
       // „Enfield one one“ schreibt die Erkennung gern als „Enfield 1.1“: der Punkt trennt nur die Ziffern
       attempt(replaced(b.replace('.', ' ')))
     }
+    // … oder als „Enfield 1,1“ bzw. „1/1“ – auch das trennt nur, wenn so die erwartete Zahl herauskommt
+    else if (/^\d+[,/]\d+$/.test(b)) attempt(replaced(b.replace(/[,/]/, ' ')))
   }
   // Mehrere Durchgänge: Eine Umschreibung kann die nächste erst möglich machen
   // („for 0.8“ → „for point 8“ → „four point 8“)
@@ -595,6 +608,32 @@ function prepareSpoken(input: string, expected: Set<number>, expectedNums: Num[]
     rewritePass()
   }
   return words.join(' ')
+}
+
+/** Normalisierte Wörter als Items (Ziffern bleiben einzelne Wörter) – für `joinCompounds` außerhalb der Segmente. */
+const wordItems = (tokens: readonly string[]): Item[] => tokens.map((w, i) => ({ kind: 'word', w, i }))
+
+/**
+ * Gesprochene Antwort einer Freitext-Übung („Sprich die Frequenz …“) mit festen Antworten vergleichen – nach
+ * denselben Regeln wie einen gesprochenen Funkspruch: Verhörer bei Zahlen (`prepareSpoken`), getrennt oder
+ * zusammen geschriebene Wörter, Verzögerungslaute. Je akzeptierter Antwort eine Lesart; gilt eine davon,
+ * kommen die verziehenen Schreibungen wie bei `matchAny` zurück. Ein falsch gesprochener Wert wird nie richtig.
+ */
+export function matchSpoken(input: string, accepted: readonly string[]): SpellingFix[] | null {
+  let best: SpellingFix[] | null = null
+  for (const answer of accepted) {
+    const items = toItems(answer)
+    const nums = items.flatMap((x) => (x.kind === 'num' ? [x] : []))
+    const words = new Set(items.flatMap((x) => (x.kind === 'word' ? [x.w] : [])))
+    const spoken = prepareSpoken(input, new Set(nums.map((x) => x.n)), nums, words)
+    const want = normalizeTokens(answer)
+    const heard = joinCompounds(wordItems(normalizeTokens(spoken)), [[wordItems(want)]])
+      .flatMap((it) => (it.kind === 'word' && !HESITATIONS.has(it.w) ? [it.w === '.' ? 'point' : it.w] : []))
+      .join(' ')
+    const fixes = matchAny(heard, [answer]) ?? matchAny(input, [answer])
+    if (fixes && (!best || fixes.length < best.length)) best = fixes
+  }
+  return best
 }
 
 // ---------------------------------------------------------------------------
@@ -610,6 +649,11 @@ export interface ScoreOptions {
    * Brevity und Standardwörter bleiben streng.
    */
   source?: 'typed' | 'spoken'
+  /**
+   * Getippt in der App: Zahlen, die der Funkspruch in Worten hat („Enfield one one“), gelten nur in Worten – „Enfield
+   * 1-1“ ist dann fast richtig (halbe Punkte), aber nicht richtig. Gesprochen nie: Die Erkennung schreibt Ziffern.
+   */
+  numbersInWords?: boolean
 }
 
 export function scoreCall(input: string, segments: readonly ScoreSegment[], roleLabel: (role: string) => string = (r) => r, options: ScoreOptions = {}): CallScore {
@@ -650,7 +694,7 @@ export function scoreCall(input: string, segments: readonly ScoreSegment[], role
   segments.forEach((seg, index) => {
     const alts = segItems[index]
     const leniency: Leniency = STRICT_ROLES.has(seg.role) ? 'strict' : spoken && NAME_ROLES.has(seg.role) ? 'name' : 'typo'
-    const rules: MatchRules = { tol: seg.tolerance, leniency, spoken }
+    const rules: MatchRules = { tol: seg.tolerance, leniency, spoken, numbersInWords: !!options.numbersInWords && !spoken }
     // 1. an der erwarteten Stelle (ab cursor), Zahlen korrekt
     let m = findMatch(alts, user, seg.free ? 0 : cursor, used, rules, false)
     if (m) {
@@ -675,6 +719,12 @@ export function scoreCall(input: string, segments: readonly ScoreSegment[], role
     if (m) {
       mark(m, index)
       if (!seg.free && m.start >= cursor) cursor = m.end
+      if (m.digitForm && !m.wrongNumber) {
+        // Der Wert stimmt, nur die Schreibweise nicht
+        slots[index] = { index, status: 'wrong', heard: m.heard, near: true }
+        issues.push(`In Ziffern getippt: „${m.heard}“ – Zahlen tippst du in Worten, so wie du sie sprichst: „${seg.text}“.`)
+        return
+      }
       slots[index] = { index, status: 'wrong', heard: m.heard }
       issues.push(`Falscher Wert: „${m.heard}“ statt „${seg.text}“${seg.tolerance ? ` (Toleranz ±${seg.tolerance})` : ''}.`)
       return

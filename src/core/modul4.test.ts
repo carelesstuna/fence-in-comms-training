@@ -10,7 +10,7 @@ import type { ResolvedSegment, ResolvedTransmission } from './drills/types'
 import { buildGlossary, lookupTerm, searchGlossary } from './glossary/glossary'
 import { createRng } from './random/rng'
 import { randomSelf } from './random/vars'
-import { scoreCall } from './scoring/score'
+import { scoreCall, toItems } from './scoring/score'
 
 const index = contentResult.index!
 const glossary = buildGlossary(index.brevity, index.prowords, index.basics)
@@ -54,7 +54,7 @@ describe('Ops Check mit Außentanks (E1-03)', () => {
       const x = exchange('m4-ops-check-tiger', `spread-${seed}`, 'two')
       const fuels = x.transmissions
         .filter((t) => !t.skip && t.station !== 'lead')
-        .map((t) => Number(t.segments.find((s) => s.role === 'value')!.alt![0]))
+        .map((t) => toItems(t.segments.find((s) => s.role === 'value')!.text).flatMap((it) => (it.kind === 'num' ? [it.n] : []))[0])
       expect(Math.max(...fuels) - Math.min(...fuels)).toBeLessThanOrEqual(1.2)
     }
   })

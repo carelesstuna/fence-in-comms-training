@@ -6,7 +6,7 @@ teaser: Der Kompass zeigt nicht zum Nordpol. Warum Karte und Cockpit manchmal ei
 sources:
   - title: "NOAA: Magnetic declination / World Magnetic Model"
     url: https://www.ncei.noaa.gov/products/world-magnetic-model
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 99, 102 – Missweisung auf den Platzkarten"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 99, 102 – Missweisung auf den Platzkarten"
   - title: "DCS F-16C Early Access Guide (liegt DCS bei), S. 92, 356 – Bullseye-Peilung in Grad magnetisch"
 ---
 
@@ -31,6 +31,6 @@ Ein guter Plausibilitätscheck ist die Bahn: Bahn 36 zeigt etwa nach 360° **mag
 Lineal auf der Karte für dieselbe Bahn 353°, kennst du die Missweisung – rund 7° West.
 
 :::tip
-Seit Version 4.38 modelliert Falcon BMS die Missweisung. In DCS hängt sie von der Karte ab. Wenn ein
+Falcon BMS modelliert die Missweisung. In DCS hängt sie von der Karte ab. Wenn ein
 Kurs von der F10-Karte nicht zu deinem Kompass oder HSI passt, ist das meist der Grund.
 :::

@@ -22,7 +22,8 @@ sources:
 
 ## Der Bullseye
 
-Der **Bullseye** ist ein Punkt, den alle im Einsatz vorher bekommen – aus dem Missionsbriefing, im
+Die Grundlagen – lesen, Richtung, Missweisung – kennst du aus Modul 2, Lektion 9. Hier geht es darum, wie der
+AWACS mit dem Bullseye arbeitet. Zur Erinnerung: Der **Bullseye** ist ein Punkt, den alle im Einsatz vorher bekommen – aus dem Missionsbriefing, im
 Navigationssystem gespeichert. Jede Position wird von dort aus angegeben:
 
 - erst die **Peilung vom Bullseye** – drei Ziffern, missweisend
@@ -50,8 +51,8 @@ plus Entfernung: „bullseye 225/30“ heißt „two-two-five thirty“. Die App
 - Steht im Briefing ein **Codename** für den Bullseye, nimmt der AWACS ihn statt „bullseye“.
 - „Bull“ allein sagt er nie, damit es nicht mit „BRAA“ verwechselt wird.
 
-Die Höhe spricht die ATP 3-52.4 als ganze Zahl („thirty-nine thousand“). Tippst du sie ziffernweise
-(„three niner thousand“) oder als Zahl, zählt das genauso. Ganze Zahlen bei Entfernung und Kontakthöhe sind eine
+Die Höhe spricht die ATP 3-52.4 als ganze Zahl („thirty-nine thousand“). Sprichst oder tippst du sie ziffernweise
+(„three niner thousand“), zählt das genauso – getippt aber in Worten, nicht als „39000“. Ganze Zahlen bei Entfernung und Kontakthöhe sind eine
 der Ausnahmen von „Ziffer für Ziffer“, siehe [Zahlen im Funk](/wissen/zahlen-im-funk). Das ältere Korea-BEM (2005) nennt für „über
 dem Bullseye“ übrigens noch 3 NM.
 :::

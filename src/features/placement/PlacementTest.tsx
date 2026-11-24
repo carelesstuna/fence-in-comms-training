@@ -11,6 +11,8 @@ import { applyExamMistakes, applyReviews } from '../../core/progress/review'
 import { useApp } from '../../state/store'
 import { content, makeRun, RunContext } from '../../ui/run'
 import { DrillView } from '../../components/Drills'
+import { RefTag } from '../../components/RefTag'
+import { TaskLine } from '../../components/RadioFrame'
 import { InlineMarkdown } from '../../components/Markdown'
 import { SkipToModule } from '../path/SkipToModule'
 import { ScoreRing, StepFooter, StepHeader } from '../lesson/Stepper'
@@ -51,7 +53,7 @@ function passedAgainText(isExam: boolean, via: Outcome['wasDoneVia']): string {
 }
 
 /** Eine falsch beantwortete Frage: Aufgabe, richtige Antwort, Erklärung und die passende Lektion. */
-function Mistake({ id, drill, moduleId }: { id: string; drill: ResolvedDrill; moduleId: string }) {
+function Mistake({ id, drill, moduleId, refParts, seed }: { id: string; drill: ResolvedDrill; moduleId: string; refParts: string[]; seed: string }) {
   const progress = useApp((s) => s.progress)
   const solution = drillSolution(drill)
   const lessonId = drillLessonId(content, id, moduleId)
@@ -59,7 +61,7 @@ function Mistake({ id, drill, moduleId }: { id: string; drill: ResolvedDrill; mo
   const open = !!lessonId && lessonState(content, progress, lessonId) !== 'locked'
   return (
     <li className="rounded-lg bg-black/20 px-3 py-2.5">
-      <InlineMarkdown text={drill.prompt} />
+      <TaskLine drill={drill} />
       {solution && solution.length > 0 && (
         <div className="mt-1.5 text-sm">
           <span className="text-emerald-300">Richtig: </span>
@@ -90,6 +92,7 @@ function Mistake({ id, drill, moduleId }: { id: string; drill: ResolvedDrill; mo
           )}
         </div>
       )}
+      <RefTag parts={[...refParts, id]} seed={seed} className="mt-1" />
     </li>
   )
 }
@@ -145,7 +148,7 @@ function PlacementRun({ moduleId, mode }: { moduleId: string; mode: 'placement' 
   }
 
   if (outcome) {
-    const wrong = items.filter((_, i) => !results[i])
+    const wrong = items.map((x, i) => ({ ...x, i })).filter(({ i }) => !results[i])
     const pass = Math.round(passScoreOf * 100)
     const locked = moduleState(content, progress, module.id) === 'locked'
     return (
@@ -200,7 +203,14 @@ function PlacementRun({ moduleId, mode }: { moduleId: string; mode: 'placement' 
               {isExam && <p className="mb-3 text-sm text-muted">Diese Fragen kommen in den nächsten Tagen im Funk-Drill wieder.</p>}
               <ul className="space-y-3">
                 {wrong.map((x) => (
-                  <Mistake key={x.id} id={x.id} drill={x.drill} moduleId={module.id} />
+                  <Mistake
+                    key={x.id}
+                    id={x.id}
+                    drill={x.drill}
+                    moduleId={module.id}
+                    refParts={[`${isExam ? 'Prüfung' : 'Einstufung'} ${module.id}`, `${x.i + 1}/${drills.length}`]}
+                    seed={seed}
+                  />
                 ))}
               </ul>
             </div>
@@ -253,6 +263,8 @@ function PlacementRun({ moduleId, mode }: { moduleId: string; mode: 'placement' 
       <div key={`${seed}-${step}`} className="rounded-xl border border-line bg-panel p-5">
         {drills[step] && <DrillView drill={drills[step]} onAnswered={(c) => setResults((r) => ({ ...r, [step]: c }))} />}
       </div>
+      {/* Die Übungs-ID kann die Antwort verraten – sie erscheint erst nach dem Antworten (Modul und Seed reichen zum Nachbauen) */}
+      <RefTag parts={[`${isExam ? 'Prüfung' : 'Einstufung'} ${module.id}`, `${step + 1}/${drills.length}`, answered && items[step]?.id]} seed={seed} />
       <StepFooter
         canBack={false}
         canNext={answered}

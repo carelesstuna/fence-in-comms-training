@@ -2,7 +2,7 @@
 id: comm-plan-und-missionsunterlagen
 title: Comm Plan, Comm Card und Missionsunterlagen
 summary: Wer auf welcher Frequenz spricht, wo das steht und welche Unterlagen von der Einsatzplanung bis zur Hausregel dazugehören.
-terms: [Comm Plan, Comm Card, Kneeboard, ATO, SPINS, SOP, Netz, DTC]
+terms: [Comm Plan, Comm Card, Kneeboard, ATO, Frag, SPINS, SOP, Netz, DTC]
 sources:
   - title: "Falcon BMS 4.38 Comms & Nav Book (4.38.2), Abschnitt 2 (Comm Plan, Presets, Tactical Net) und BMS User Manual, Briefing (Comm Ladder)"
   - title: "Falcon BMS 4.38 Technical Manual, Abs. 11.4 (IFF-Modes und -Codes kommen mit der Mission in den DTC)"
@@ -26,6 +26,10 @@ welchem Preset arbeitet. Er steht im Briefing der Mission und ist die wichtigste
   und so weiter.
 - **Warbirds** haben eine kurze Karte mit vier Zeilen, je eine pro Kanal.
 
+So kann eine Comm Card aussehen (gewürfelt, passend zu deinem Rufzeichen):
+
+::muster{doc=commcard}
+
 ## Netze
 
 Ein **Netz** ist eine Gruppe von Funkgeräten auf derselben Frequenz. Netze haben oft Namen statt Stellen: **Strike**
@@ -42,7 +46,7 @@ im Lagebild, siehe [ATC oder AWACS?](/wissen/atc-oder-awacs).
 
 | Unterlage | Das steht darin |
 |---|---|
-| **ATO** (Air Tasking Order) | der Einsatzbefehl für alle Flüge eines Tages. Dein Teil heißt „Frag“. |
+| **ATO** (Air Tasking Order) | der Einsatzbefehl für alle Flüge eines Tages, eine Zeile pro Mission. Den Ausschnitt für deinen Flight nennt man :term[Frag] (von *fragmentary order*, Teilbefehl): Missionsnummer, Rufzeichen, Anzahl und Muster, Auftrag und Ziel mit Zielzeit, Startzeit, Tanker und IFF-Codes. Ein Beispiel steht unten. |
 | **SPINS** (Special Instructions) | Zusatzanweisungen, die nicht ins feste Raster der ATO passen. Die ATP 3-52.4 verweist dafür ständig auf sie, etwa für Meldungen im Flug, den Codenamen des Bullseye und den Ablauf des Check-ins. |
 | **SOP** (Standard Operating Procedures) | die Hausregeln einer Einheit, eines Platzes oder eines Servers: Routen, Einflugpunkte, wer wann spricht |
 | **Briefing und Comm Card** | alles für genau diesen Flug |
@@ -51,6 +55,23 @@ im Lagebild, siehe [ATC oder AWACS?](/wissen/atc-oder-awacs).
 Die ATO und die SPINS stammen aus der echten Einsatzplanung. In der Sim gibt es meist nur das Briefing, manchmal
 SPINS in Form eines Dokuments oder einer Discord-Seite des Servers. Die SOP der Einheit oder des Servers nennt dann
 die Netznamen und die übliche Form der Meldungen.
+
+### So sieht das aus
+
+Gewürfelte Beispiele, passend zu deinem Rufzeichen. Echte Unterlagen sind länger und haben je nach Einheit ein
+eigenes Format; die Einträge sind aber dieselben.
+
+**Frag** – deine Zeile aus der ATO:
+
+::muster{doc=frag}
+
+**SPINS** – ein Auszug:
+
+::muster{doc=spins}
+
+**SOP** – ein Auszug aus den Hausregeln:
+
+::muster{doc=sop}
 
 ## Welche Quelle gilt
 

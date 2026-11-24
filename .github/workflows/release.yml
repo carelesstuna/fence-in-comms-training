@@ -169,7 +169,14 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           version="${TAG#v}"
-          sed "s/{{VERSION}}/${version}/g" .github/release-notes.md > notes.md
+          # What's new: the section of this version in CHANGELOG.md ("## 0.2.0 – …" up to the next version)
+          awk -v v="$version" 'index($0, "## " v " ") == 1 || $0 == "## " v {f = 1; next} /^## / && f {exit} f' CHANGELOG.md | sed '/./,$!d' > changes.md
+          if ! grep -q '[^[:space:]]' changes.md; then
+            echo "_No CHANGELOG.md section for ${version} – describe the changes here before publishing this draft._" > changes.md
+          fi
+          awk 'FNR == NR {c = c $0 "\n"; next} $0 == "{{CHANGES}}" {printf "%s", c; next} {print}' changes.md .github/release-notes.md \
+            | sed "s/{{VERSION}}/${version}/g" > notes.md
+          cat notes.md
           gh release create "$TAG" --draft --verify-tag \
             --title "Fence In Comms Training ${version}" --notes-file notes.md \
             release/*.exe release/SHA256SUMS.txt

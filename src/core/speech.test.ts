@@ -5,7 +5,11 @@
 import { describe, expect, it } from 'vitest'
 import { contentResult } from '../content'
 import { createRng } from './random/rng'
-import { scoreCall, type ScoreSegment } from './scoring/score'
+import { matchSpoken, scoreCall, type ScoreSegment } from './scoring/score'
+import { hasNumberInWords, matchAny, matchTyped, normalizeTokens, typedNeedsWords } from './phraseology/normalize'
+import { resolveDrill, resolveExchange, resolveScenario } from './drills/resolve'
+import { typedDigitsFor } from '../ui/speech'
+import { issueInWords, numberInWords, numberPhrases, transcriptInWords } from './speech/display'
 import { concat, decodeWav, encodeWav, levelStats, PreRoll, resample } from './speech/pcm'
 import { buildHints, DIGIT_PHRASE, estimateTokens, hasNumber, moduleOf, stationNames } from './speech/hints'
 import { checkRecording, cleanTranscript } from './speech/transcript'
@@ -233,6 +237,14 @@ describe('Transkript aufbereiten', () => {
 
 const seg = (text: string, role = 'info', extra: Partial<ScoreSegment> = {}): ScoreSegment => ({ text, role, ...extra })
 const spoken = (input: string, segs: ScoreSegment[]) => scoreCall(input, segs, undefined, { source: 'spoken' })
+/** Getippt in der App: Zahlen, die der Funkspruch in Worten hat, nur in Worten. */
+const typed = (input: string, segs: readonly ScoreSegment[]) => scoreCall(input, segs, undefined, { source: 'typed', numbersInWords: true })
+/** Zahlen als Ziffern, wie die Erkennung sie schreibt: „three zero five point two five“ → „305.25“. */
+const asDigits = (text: string) =>
+  normalizeTokens(text)
+    .join(' ')
+    .replace(/(\d|\.) (?=\d|\.\s*\d)/g, '$1')
+    .replace(/ \. /g, '.')
 
 describe('Bewertung: gesprochen', () => {
   const checkIn = [seg('Darkstar', 'addressee'), seg('Viper one one', 'callsign', { critical: true }), seg('checking in', 'request')]
@@ -326,6 +338,11 @@ describe('Bewertung: gesprochen', () => {
     expect(heard('Batumi Ground, Enfield 1.1, request startup.', startup).correct).toBe(true)
     expect(heard('Batumi Ground, Enfield 1.1. Request startup.', startup).correct).toBe(true)
     expect(heard('Batumi Ground, Enfield 1.2, request startup.', startup).correct).toBe(false)
+    // Jede Schreibweise der Erkennung für „one one“ (Fall aus dem Spieltest: „Pontiac 5.1“)
+    for (const c of ['1.1', '1-1', '1–1', '1,1', '1:1', '1/1', '1. 1', '1 1', '11', 'one-one', 'One, one']) {
+      expect(heard(`Batumi Ground, Enfield ${c}, request startup.`, startup).correct, c).toBe(true)
+    }
+    for (const c of ['1,2', '2/1', '1.11']) expect(heard(`Batumi Ground, Enfield ${c}, request startup.`, startup).correct, c).toBe(false)
     // Mit Frequenz: die echte Dezimalzahl bleibt eine, der Punkt im Rufzeichen trennt
     const tune = [seg('Enfield one one', 'callsign'), seg('switching to two six one point eight', 'value')]
     expect(heard('Enfield 1.1, switching to 261.8.', tune).correct).toBe(true)
@@ -364,6 +381,200 @@ describe('Bewertung: gesprochen', () => {
       .filter(({ r }) => !r.correct)
       .map(({ c, r }) => `${c.source}: ${r.issues.join(' | ')}`)
     expect(failed.slice(0, 8), `${failed.length} von ${calls.length}`).toEqual([])
+  })
+})
+
+describe('Bewertung: getippt, Zahlen in Worten', () => {
+  const checkIn = [seg('Darkstar', 'addressee'), seg('Viper one one', 'callsign', { critical: true }), seg('checking in', 'request')]
+
+  it('Zahlen, die der Funkspruch in Worten hat, gelten getippt nur in Worten – fast richtig, halbe Punkte', () => {
+    expect(typed('Darkstar, Viper one one, checking in', checkIn).correct).toBe(true)
+    const r = typed('Darkstar, Viper 1-1, checking in', checkIn)
+    expect(r.correct).toBe(false)
+    expect(r.slots[1]).toMatchObject({ status: 'wrong', near: true })
+    expect(r.score).toBeCloseTo(2.5 / 3)
+    expect(r.issues.join(' ')).toMatch(/In Ziffern getippt: „viper 11“.*„Viper one one“/)
+    // ein falscher Wert bleibt ein falscher Wert
+    expect(typed('Darkstar, Viper 1-2, checking in', checkIn).issues.join(' ')).toMatch(/Falscher Wert/)
+    // gesprochen und ohne die Regel wie bisher
+    expect(spoken('Darkstar Viper 1-1 checking in', checkIn).correct).toBe(true)
+    expect(scoreCall('Darkstar, Viper 1-1, checking in', checkIn).correct).toBe(true)
+  })
+
+  it('wo der Funkspruch selbst Ziffern hat (Bahn wie auf der Karte, Variante), gehen Ziffern und Wörter', () => {
+    const takeoff = [seg('runway 13R', 'value'), seg('cleared for takeoff', 'clearance'), seg('Colt three one', 'callsign')]
+    expect(typed('runway 13R, cleared for takeoff, Colt three one', takeoff).correct).toBe(true)
+    expect(typed('runway one three right, cleared for takeoff, Colt three one', takeoff).correct).toBe(true)
+    expect(typed('runway 13R, cleared for takeoff, Colt 31', takeoff).correct).toBe(false)
+    const freq = [seg('Colt three one', 'callsign'), seg('two six one decimal eight', 'value', { alt: ['261.8'] })]
+    expect(typed('Colt three one, 261.8', freq).correct).toBe(true)
+  })
+
+  it('Inhalt: jede Musterlösung gilt getippt; in Ziffern nicht, wo ein Pflichtteil Zahlen nur in Worten hat', () => {
+    const failed: string[] = []
+    let checked = 0
+    for (const c of calls) {
+      if (!typed(c.segments.map((s) => s.text).join(', '), c.segments).correct) failed.push(`${c.source}: Musterlösung getippt falsch`)
+      const wordsOnly = c.segments.some((s) => !s.optional && [s.text, ...(s.alt ?? []), ...(s.weak ?? [])].every(hasNumberInWords))
+      if (!wordsOnly) continue
+      checked++
+      const digits = c.segments.map((s) => asDigits(s.text)).join(', ')
+      if (typed(digits, c.segments).correct) failed.push(`${c.source}: in Ziffern richtig: ${digits}`)
+      if (!spoken(digits.replace(/,/g, ''), c.segments).correct) failed.push(`${c.source}: gesprochen in Ziffern falsch: ${digits}`)
+    }
+    expect(failed.slice(0, 8), `${failed.length} Funde`).toEqual([])
+    expect(checked).toBeGreaterThan(20)
+  })
+})
+
+describe('Anzeige: erkannte Zahlen in Worten', () => {
+  const startup = ['Senaki-Kolkhi Ground', 'Pontiac five one', 'information Oscar', 'request startup']
+
+  it('im Wortlaut der Musterlösung, auch mit den Trennzeichen der Erkennung', () => {
+    for (const c of ['5.1', '5-1', '5,1', '5/1', '51']) {
+      expect(transcriptInWords(`Senaki-Kolkhi Ground, Pontiac ${c}, information Oscar, request startup.`, startup), c).toBe(
+        'Senaki-Kolkhi Ground, Pontiac five one, information Oscar, request startup.',
+      )
+    }
+    expect(transcriptInWords('Raven61, ready', ['Raven six one', 'ready'])).toBe('Raven six one, ready')
+    expect(transcriptInWords('350.5', ['three five zero decimal five'])).toBe('three five zero decimal five')
+    expect(transcriptInWords('Bandit 39,000', ['thirty-nine thousand'])).toBe('Bandit thirty-nine thousand')
+    expect(transcriptInWords('passing 3000 for 6000', ['passing three thousand', 'for six thousand'])).toBe('passing three thousand for six thousand')
+  })
+
+  it('stimmt der Wert nicht, Ziffer für Ziffer – mit dem Wort für den Punkt aus der Musterlösung', () => {
+    // „5.2“ für gesprochenes „five two“: Die Musterlösung hat hier eine zweistellige ganze Zahl, der Punkt trennt nur
+    expect(transcriptInWords('Pontiac 5.2', startup)).toBe('Pontiac five two')
+    expect(transcriptInWords('Two, 4.9', ['Two', 'four point eight'])).toBe('Two, four point niner')
+    expect(numberInWords('5.2', ['Pontiac five one', 'four point eight'], ['Pontiac five one'])).toBe('five two')
+    expect(issueInWords('Falscher Wert: „pontiac 5.2“ statt „Pontiac five one“ (Toleranz ±5).', startup)).toBe(
+      'Falscher Wert: „pontiac five two“ statt „Pontiac five one“ (Toleranz ±5).',
+    )
+    expect(transcriptInWords('350.7', ['three five zero decimal five'])).toBe('three five zero decimal seven')
+    expect(transcriptInWords('Viper 1-2', ['Viper one one'])).toBe('Viper one two')
+    expect(transcriptInWords('runway 09', [])).toBe('runway zero niner')
+    expect(transcriptInWords('request startup', startup)).toBe('request startup')
+  })
+
+  it('Zahlwörter der Musterlösung: Ziffern im Text zählen nicht, ein Komma trennt', () => {
+    expect(numberPhrases('Pontiac five one')).toEqual([{ n: 51, words: 'five one' }])
+    expect(numberPhrases('bullseye zero four five, sixty')).toEqual([{ n: 45, words: 'zero four five' }, { n: 60, words: 'sixty' }])
+    expect(numberPhrases('runway 13R, cleared for takeoff')).toEqual([])
+    expect(numberInWords('51', ['Pontiac five one'])).toBe('five one')
+    expect(numberInWords('52', ['Pontiac five one'])).toBe('five two')
+  })
+})
+
+describe('Spur C: getippt auch Ziffern', () => {
+  it('Übungen und Szenarien aus Spur C erlauben Ziffern, die Kernmodule nicht', () => {
+    expect(typedDigitsFor({ drillId: 'track-c-l7-decoder' })).toBe(true)
+    expect(typedDigitsFor({ drillId: 'track-c-l1-ready' })).toBe(true)
+    expect(typedDigitsFor({ scenarioId: 'track-c-s1-auf-station' })).toBe(true)
+    expect(typedDigitsFor({ drillId: 'm1-l2-call-startup' })).toBe(false)
+    expect(typedDigitsFor({ scenarioId: 'm3-s2-taxi-departure' })).toBe(false)
+    expect(typedDigitsFor({ drillId: 'gibt-es-nicht' })).toBe(false)
+  })
+
+  it('Inhalt: Teile mit Zahlen in Worten haben nur in Spur C eine Variante mit Ziffern', () => {
+    type Seg = { text: string; alt?: readonly string[]; weak?: readonly string[] }
+    const found = new Set<string>()
+    const check = (where: string, segs: readonly Seg[]) => {
+      for (const s of segs) {
+        if (/\d/.test(s.text) || !hasNumberInWords(s.text)) continue
+        for (const a of [...(s.alt ?? []), ...(s.weak ?? [])]) if (/\d/.test(a)) found.add(`${where}: ${s.text} → ${a}`)
+      }
+    }
+    const env = (seed: string) => ({ rng: createRng(seed), content: index, self: { name: 'Colt', flight: 3, position: 1 } })
+    const spurC = (moduleId: string | undefined) => !!moduleId && !!index.modules.get(moduleId)?.typedDigits
+    for (const [id, x] of index.exchanges) {
+      const usedIn = [...index.drills.entries()].filter(([, d]) => (d as { call?: string }).call === id).map(([drillId]) => drillId)
+      if (spurC(moduleOf(index, { exchangeId: id })) || usedIn.some((d) => typedDigitsFor({ drillId: d }))) continue
+      for (let i = 0; i < 3; i++) check(id, resolveExchange(x, env(`${id}${i}`)).transmissions.flatMap((t) => t.segments))
+    }
+    for (const [id, sc] of index.scenarios) {
+      if (typedDigitsFor({ scenarioId: id })) continue
+      for (let i = 0; i < 3; i++) check(id, resolveScenario(sc, env(`${id}${i}`)).steps.flatMap((st) => st.you?.transmission.segments ?? []))
+    }
+    expect([...found]).toEqual([])
+  })
+})
+
+describe('Freitext: gesprochen', () => {
+  const ok = (transcript: string, accepted: string[]) => matchSpoken(transcript, accepted) !== null
+
+  it('Ziffern, Satzzeichen und Großschreibung der Erkennung zählen nicht', () => {
+    const freq = ['three zero one decimal two five']
+    expect(ok('301.25', freq)).toBe(true)
+    expect(ok('Three, zero, one, decimal, two, five.', freq)).toBe(true)
+    expect(ok('301.26', freq)).toBe(false)
+    expect(ok('Angels 22.', ['angels two two'])).toBe(true)
+    expect(ok('Angels 23.', ['angels two two'])).toBe(false)
+    expect(ok('Sierra, Alpha, Bravo, Echo, Romeo.', ['Sierra Alfa Bravo Echo Romeo'])).toBe(true)
+  })
+
+  it('Verhörer bei Zahlen wie beim Funkspruch: „Enfield 1.1“, „to“ neben Ziffern', () => {
+    const readback = ['departure two six one decimal eight Enfield one one', 'two six one decimal eight Enfield one one']
+    expect(ok('Departure 261.8, Enfield 1.1.', readback)).toBe(true)
+    expect(ok('Departure 261.9, Enfield 1.1.', readback)).toBe(false)
+    // Getippt bleibt „1.1“ eine Dezimalzahl
+    expect(matchAny('Departure 261.8, Enfield 1.1', readback)).toBeNull()
+    expect(ok('Heading to seven zero.', ['heading two seven zero'])).toBe(true)
+    expect(ok('Heading to seven one.', ['heading two seven zero'])).toBe(false)
+  })
+
+  it('getrennt oder zusammen geschrieben, Verzögerungslaute', () => {
+    const takeoff = ['runway two seven cleared for takeoff Viper one one']
+    expect(ok('Runway 27, cleared for take off, Viper 1-1.', takeoff)).toBe(true)
+    expect(ok('Uh, holding position.', ['holding position'])).toBe(true)
+    expect(ok('Holding short.', ['holding position'])).toBe(false)
+  })
+
+  it('getippt zählen Ziffern nur, wo die Antwort an dieser Stelle selbst Ziffern hat', () => {
+    const freq = ['three zero one decimal two five']
+    expect(matchTyped('three zero one decimal two five', freq)).not.toBeNull()
+    expect(matchTyped('Three zero one point two five', freq)).not.toBeNull()
+    expect(matchTyped('301.25', freq)).toBeNull()
+    expect(matchTyped('301,25', freq)).toBeNull()
+    // gesprochen schreibt die Erkennung Ziffern – gesagt wurden die Wörter
+    expect(ok('301.25', freq)).toBe(true)
+    // Bahn darf wie auf der Karte stehen („13R“), das Rufzeichen nur in Worten
+    const takeoff = ['runway one three right cleared for takeoff Colt three one', 'runway 13R cleared for takeoff Colt three one']
+    expect(matchTyped('runway 13R cleared for takeoff Colt three one', takeoff)).not.toBeNull()
+    expect(matchTyped('runway 13R cleared for takeoff Colt 3-1', takeoff)).toBeNull()
+    expect(matchTyped('runway one three right, cleared for takeoff, Colt 31', takeoff)).toBeNull()
+    // Wo die Antwort Ziffern hat, gehen Ziffern und Wörter
+    expect(matchTyped('1435', ['1435', 'one four three five zulu'])).not.toBeNull()
+    expect(matchTyped('one four three five', ['1435'])).not.toBeNull()
+    expect(matchTyped('2', ['two'])).toBeNull()
+    expect(typedNeedsWords(freq)).toBe(true)
+    expect(typedNeedsWords(takeoff)).toBe(true)
+    expect(typedNeedsWords(['2', 'two'])).toBe(false)
+    expect(typedNeedsWords(['information Kilo'])).toBe(false)
+  })
+
+  it('Inhalt: Steht die Antwort in Worten, scheitert getippt die Ziffern-Form, gesprochen gilt sie', () => {
+    const failed: string[] = []
+    let checked = 0
+    for (const [id, drill] of index.drills) {
+      for (let i = 0; i < 3; i++) {
+        const d = resolveDrill(drill, { rng: createRng(`${id}${i}`), content: index, self: { name: 'Colt', flight: 3, position: 1 } })
+        if (d.kind !== 'input') continue
+        for (const a of d.accept) if (!matchTyped(a, d.accept)) failed.push(`${id}: Musterlösung getippt falsch: ${a}`)
+        if (!typedNeedsWords(d.accept)) continue
+        checked++
+        const digits = asDigits(d.accept[0])
+        if (matchTyped(digits, d.accept)) failed.push(`${id}: getippt „${digits}“ gilt`)
+        if (!matchSpoken(digits, d.accept)) failed.push(`${id}: gesprochen „${digits}“ gilt nicht`)
+      }
+    }
+    expect(failed).toEqual([])
+    expect(checked).toBeGreaterThan(10)
+  })
+
+  it('Erkennungshinweise einer Freitext-Übung: das Modul ihrer Lektion (auch für Fragen der Modulprüfung)', () => {
+    expect(moduleOf(index, { drillId: 'm1-l3-input-frequency' })).toBe('m1')
+    expect(moduleOf(index, { drillId: 'm5-l1-x-angels-own' })).toBe('m5')
+    expect(moduleOf(index, { drillId: 'gibt-es-nicht' })).toBeUndefined()
   })
 })
 

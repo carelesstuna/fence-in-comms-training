@@ -1,6 +1,6 @@
 ## What's new
 
-_Describe the changes here before publishing this draft._
+{{CHANGES}}
 
 ## Install
 

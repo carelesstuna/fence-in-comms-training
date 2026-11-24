@@ -7,6 +7,8 @@
   context: >-
     Der AWACS schickt dich zu einem JTAC am Boden. Der funkt hier, wie meist, mit einem Heeresfunkgerät auf
     VHF-FM – also brauchst du im Cockpit das passende Gerät.
+  freq: "{awacs} · AWACS"
+  place: In der Luft
   vars:
     awacs: { pool: callsigns.awacs }
     jtac: { pool: callsigns.jtac }
@@ -50,6 +52,8 @@
   context: >-
     Der Lead schickt den Flight auf einen anderen Preset-Kanal. Auf der neuen Frequenz prüft er, ob
     alle angekommen sind.
+  freq: Flight · UHF
+  place: In der Luft
   vars:
     ch: { number: channel }
   transmissions:
@@ -95,6 +99,8 @@
   context: >-
     Statt einer Kanalnummer nennt der Lead den Namen eines Netzes aus dem Comm Plan. Welcher Kanal
     das ist, steht auf deiner Comm Card.
+  freq: Flight · UHF
+  place: In der Luft
   vars:
     net: { oneOf: [Strike, Package, Tactical, Tanker] }
   transmissions:
@@ -128,7 +134,8 @@
   context: >-
     Approach erreicht dich auf der zugewiesenen Frequenz nicht mehr – vielleicht hast du dich
     verschaltet. Also ruft er dich auf Guard, der Frequenz, die jeder mithört.
-  freq: "243.0 UHF (Guard)"
+  freq: Guard · 243.0 UHF
+  place: "Im Anflug auf {airfield.name}"
   vars:
     airfield: { pool: airfields }
     app: { number: uhf }
@@ -169,13 +176,28 @@
   context: >-
     Ein ernster Notfall. Wenn du deine zuständige Stelle nicht erreichst oder nicht weißt, wer
     zuständig ist, ist Guard die richtige Wahl: Dort hört jeder mit.
-  freq: "243.0 UHF (Guard)"
+  freq: Guard · 243.0 UHF
+  place: In der Luft
   vars:
     airfield: { pool: airfields }
-    emerg: { oneOf: [engine failure, fire light, dual hydraulic failure] }
-    intent: { oneOf: [returning to base, diverting to the nearest airfield, preparing to eject] }
+    # text = Lage auf Deutsch (Übung), spoken = was du funkst
+    emerg:
+      oneOf:
+        - { text: "Dein Triebwerk ist ausgefallen", spoken: engine failure }
+        - { text: "Die Feuerwarnleuchte brennt", spoken: fire light }
+        - { text: "Beide Hydrauliksysteme sind ausgefallen", spoken: dual hydraulic failure }
+    intent:
+      oneOf:
+        - { text: "zurück zu deinem Startplatz", spoken: returning to base }
+        - { text: "zum nächsten Flugplatz ausweichen", spoken: diverting to the nearest airfield }
+        - { text: "dich auf den Ausstieg mit dem Schleudersitz vorbereiten", spoken: preparing to eject }
     dist: { int: [10, 40] }
-    dir: { oneOf: [north, east, south, west] }
+    dir:
+      oneOf:
+        - { text: nördlich, spoken: north }
+        - { text: östlich, spoken: east }
+        - { text: südlich, spoken: south }
+        - { text: westlich, spoken: west }
     altK: { int: [5, 25] }
   transmissions:
     - speaker: "{callsign}"
@@ -193,15 +215,18 @@
             Wer ist in Not? Auf Guard sagt man im Muster der F-14-NATOPS-Checkliste für Suche und Rettung
             (SAR) auch „This is {callsign|spoken} on guard“ (inoffizielle Sim-Aufbereitung). Die USAF-Vorschrift für die F-16
             beschreibt nur das Verfahren, keinen Wortlaut.
-        - text: "{emerg}"
+        - text: "{emerg|spoken}"
           role: info
           note: >-
             Was ist los – so knapp wie möglich: „engine failure“ (Triebwerksausfall), „fire light“ (die
             Feuerwarnleuchte brennt) oder „dual hydraulic failure“ (beide Hydrauliksysteme ausgefallen).
-        - text: "{intent}"
+        - text: "{intent|spoken}"
           role: intent
-          note: Was hast du vor? Danach richten sich alle, die dir helfen wollen.
-        - text: "{dist|spoken} miles {dir} of {airfield.name}"
+          note: >-
+            Was hast du vor? Danach richten sich alle, die dir helfen wollen: „returning to base“ (zurück zum
+            Startplatz), „diverting to the nearest airfield“ (zum nächsten Platz ausweichen) oder „preparing to eject“
+            (Ausstieg mit dem Schleudersitz).
+        - text: "{dist|spoken} miles {dir|spoken} of {airfield.name}"
           role: position
           note: Wo bist du? Ein bekannter Bezugspunkt plus Richtung und Entfernung.
         - text: "passing {altK|spoken} thousand"
@@ -215,11 +240,17 @@
   context: >-
     Du und ein anderer Pilot drückt im selben Moment die Sprechtaste. Keiner von euch merkt etwas –
     aber beim Tower kommt nur Pfeifen und Wortsalat an.
-  freq: "{airfield.twr} {airfield.twr.band}"
+  freq: "Tower · {airfield.twr} {airfield.twr.band}"
+  place: "Platzbereich {airfield.name}"
   vars:
     airfield: { pool: airfields }
     # Nur Anliegen, die zum Tower gehören (Anlassen und Rollen laufen über Ground)
-    req: { oneOf: [ready for departure, request landing, request closed traffic] }
+    # text = Bedeutung (Erklärung), spoken = was du funkst
+    req:
+      oneOf:
+        - { text: "Du bist abflugbereit.", spoken: ready for departure }
+        - { text: "Du bittest um die Landung.", spoken: request landing }
+        - { text: "Du bittest darum, in der Platzrunde zu bleiben und gleich noch einmal zu landen (closed traffic).", spoken: request closed traffic }
   transmissions:
     - speaker: zwei Stationen gleichzeitig
       segments:
@@ -249,9 +280,9 @@
         - text: "{callsign|spoken}"
           role: callsign
           note: Wer du bist.
-        - text: "{req}"
+        - text: "{req|spoken}"
           role: request
-          note: Dein Anliegen – unverändert, nicht ausgeschmückt.
+          note: "Dein Anliegen von eben – unverändert, nicht ausgeschmückt. {req}"
 
 # ------------------------------------------------------------ Lektion 5: SRS in der Praxis
 - id: m2-intercom-check
@@ -327,7 +358,8 @@
   context: >-
     Kurz nach dem Start gibt dich der Tower an Departure ab und nennt die Frequenz. Den passenden Kanal
     suchst du auf deiner Comm Card – und schaltest ihn, statt die Frequenz einzudrehen.
-  freq: "{cp.tower.freq} {cp.tower.band}"
+  freq: "Tower · {cp.tower.freq} {cp.tower.band}"
+  place: "Im Abflug von {airfield.name}"
   vars:
     airfield: { pool: airfields }
     cp: { commplan: true, airfield: airfield }
@@ -361,7 +393,8 @@
   context: >-
     Du stehst am Rollhalt und meldest dich abflugbereit – aber du hast noch Ground eingestellt statt
     Tower. Ground merkt es und schickt dich weiter.
-  freq: "{cp.ground.freq} {cp.ground.band}"
+  freq: "Ground · {cp.ground.freq} {cp.ground.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     cp: { commplan: true, airfield: airfield }
@@ -398,3 +431,41 @@
         - text: "{callsign|spoken}"
           role: callsign
           note: … umschalten und den Funkspruch beim Tower vollständig wiederholen.
+
+# ------------------------------------------------------------ Lektion 9: Bullseye – Positionen im Funk (m2-l10)
+- id: m2-posit-bullseye
+  title: POSIT mit Bullseye – wo bist du?
+  # POSIT ist core (ATP 1-02.1: Antwort über ein Geländemerkmal oder einen gemeinsamen Bezugspunkt). Die genaue
+  # Antwortform (Nummer – Bullseye – angels) ist community, wie bei m4-posit.
+  layer: community
+  context: >-
+    Lead und Two sind getrennt. Der Lead will wissen, wo Two steckt. Den Bullseye kennen beide aus dem
+    Missionsbriefing.
+  freq: Flight · UHF
+  place: In der Luft
+  perspective: [two]
+  vars:
+    pos: { geo: true, groups: 1 }
+    a2: { number: angels, range: [10, 30] }
+  transmissions:
+    - speaker: "{lead}"
+      station: lead
+      segments:
+        - { text: Two, role: addressee, note: Der Lead spricht Two direkt an. }
+        - text: posit
+          role: brevity
+          note: Bitte um die Position eines Freundes (mehr in Modul 4, Lektion 5).
+    - speaker: "{two}"
+      station: two
+      segments:
+        - { text: Two, role: callsign, critical: true, alt: ["{two|spoken}"] }
+        - text: "bullseye {pos.own.bulls|spoken}"
+          role: position
+          critical: true
+          note: >-
+            Deine Position vom Bullseye: {pos.own.bulls}. Erst die magnetische Peilung vom Bullseye zu dir, dann die
+            Entfernung. Der Lead weiß damit sofort, wo du bist – egal, wo er selbst fliegt.
+        - text: "angels {a2|spoken}"
+          role: value
+          critical: true
+          note: Die Höhe gehört dazu – bei dir selbst als angels, in Tausend Fuß.

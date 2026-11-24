@@ -8,7 +8,7 @@ atc: { uhf: 308.8, vhf: 122.1 }
 tacan: 116X
 ils: "ILS 09L/27R: 111.30"
 freqs: { atis: 132.125, ground: 253.7, departure: 306.3, approach: 306.3 }
-# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Installationsordner)
 charts:
   - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_AGC.pdf" }
   - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_LOC.pdf" }

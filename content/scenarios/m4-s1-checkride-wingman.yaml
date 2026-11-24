@@ -45,6 +45,7 @@ vars:
   clk: { oneOf: [left ten o'clock, left eight o'clock, right two o'clock, right four o'clock] }
   dist: { oneOf: [{ text: "1 mile", spoken: one mile }, { text: "2 miles", spoken: two miles }] }
   hl: { oneOf: [high, low] }
+place: "Abflug von {af.name}"
 kneeboard:
   title: "Line-up-Card {flight}"
   commplan: cp
@@ -64,8 +65,9 @@ steps:
   - stage: Abflug
     freq: "{cp.departure.name}"
     situation: >-
-      Dein Flight hat **{af.name}** verlassen und steigt in Formation. Du bist **Two** ({callsign}).
-      Laut Missionsbriefing meldet sich der Flight zuerst beim AWACS.
+      Dein Flight ist eben gestartet und steigt in Formation. Laut Missionsbriefing meldet sich der Flight
+      zuerst beim AWACS.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -82,7 +84,8 @@ steps:
 
   - stage: AWACS
     tune: { name: "{awacs} ({cp.awacs.name})", freq: "{cp.awacs.freq}", channel: "{cp.awacs.channel}" }
-    situation: Stell das Netz ein, das der Lead genannt hat. Dann hör auf den Check.
+    situation: Der Lead hat den Flight auf ein anderes Netz geschickt.
+    task: Stell das genannte Netz ein und reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -123,7 +126,9 @@ steps:
       Anzahl, Höhe und die übrigen Angaben gehören zur vollen Anmeldung (ATP 3-52.4 (2021), S. 7–9).
 
   - stage: Strike
-    situation: Der Lead schickt den Flight weiter.
+    place: Unterwegs zum Push Point
+    situation: Der Lead hat den Flight beim AWACS angemeldet.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -136,7 +141,8 @@ steps:
 
   - stage: Strike
     tune: { name: "{cp.strike.name}", freq: "{cp.strike.freq}", channel: "{cp.strike.channel}" }
-    situation: Neues Netz einstellen.
+    situation: Der Lead hat den Flight wieder auf ein anderes Netz geschickt.
+    task: Stell das genannte Netz ein und reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -160,9 +166,9 @@ steps:
           - { text: Four, role: callsign }
 
   - stage: Push Point
-    situation: >-
-      Der Flight kreist am Push Point und wartet auf die Push-Zeit. Auf dem Strike-Netz meldet sich
-      der Package Commander.
+    place: Am Push Point
+    situation: Der Flight kreist und wartet auf die Push-Zeit. Der Package Commander meldet sich.
+    task: Reagiere auf den Funkspruch.
     hear:
       - speaker: "{pkg} {pkgNum}"
         segments:
@@ -179,6 +185,7 @@ steps:
 
   - stage: Push Point
     situation: Es ist **{pushNew}Z** – die neue Push-Zeit.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -211,9 +218,11 @@ steps:
       mit deiner Nummer und arbeitest still die Checkliste ab.
 
   - stage: Im Gebiet
+    place: Im Einsatzgebiet
     situation: >-
-      Ihr seid im Einsatzgebiet. Dein Treibstoff zeigt **{f2}** (Tausend Pfund). Laut Line-up-Card
-      meldest du beim Ops Check Nummer und Treibstoff.
+      Dein Treibstoff zeigt **{f2}** (Tausend Pfund). Laut Line-up-Card meldest du beim Ops Check Nummer und
+      Treibstoff.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -227,7 +236,7 @@ steps:
         speaker: "{callsign}"
         segments:
           - { text: Two, role: callsign, critical: true }
-          - { text: "{f2|spoken}", role: value, critical: true, alt: ["{f2}"] }
+          - { text: "{f2|spoken}", role: value, critical: true }
           - { text: tanks dry, role: info, optional: true, free: true, alt: [tank dry, tanks feeding, tank feeding], note: "Nur mit Außentanks: „tank(s) feeding/dry“ (AFMAN 11-2F-16 V3, Abs. 3.30.4.3.2)." }
     reply:
       - speaker: "{three}"
@@ -242,7 +251,8 @@ steps:
           - { text: "{f4|spoken}", role: value }
 
   - stage: Im Gebiet
-    situation: Der Lead dreht den Flight.
+    situation: Ihr fliegt in Formation, du hältst deine Position am Lead.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -267,8 +277,8 @@ steps:
     explain: Um {chk} Grad nach {lr} drehen – nicht auf Kurs {chk}.
 
   - stage: Im Gebiet
-    situation: >-
-      In der Kurve verlierst du den Lead aus den Augen. Du fliegst auf **{a2.feet} Fuß**.
+    situation: In der Kurve verlierst du den Lead aus den Augen. Du fliegst auf **{a2.feet} Fuß**.
+    task: Melde das dem Lead.
     critical: true
     you:
       mode: type
@@ -296,6 +306,7 @@ steps:
 
   - stage: Im Gebiet
     situation: Du schaust dorthin, wo der Lead dich hingeschickt hat – da ist er.
+    task: Sag dem Lead Bescheid.
     you:
       mode: type
       transmission:
@@ -307,6 +318,7 @@ steps:
 
   - stage: Treibstoff
     situation: Dein Treibstoff fällt auf **{joker}**.
+    task: Melde das dem Lead.
     you:
       mode: type
       hint: Rufzeichen – Brevity
@@ -329,6 +341,7 @@ steps:
     situation: >-
       Der Lead beendet das Gefecht und führt den Flight zum Rückweg-Punkt. Der Rückweg zieht sich, jetzt zeigt
       dein Treibstoff **{bingo}**.
+    task: Melde das dem Lead.
     you:
       mode: type
       transmission:
@@ -339,7 +352,8 @@ steps:
     explain: Bingo – spätestens jetzt geht es nach Hause.
 
   - stage: Rückflug
-    situation: Der Lead reagiert auf deine Meldung.
+    situation: Du hast dem Lead deinen Treibstoffstand gemeldet.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -364,7 +378,9 @@ steps:
     explain: Der niedrigste Stand bestimmt – und das ist deiner. Der ganze Flight fliegt mit.
 
   - stage: Rückflug
-    situation: Der Flight verlässt das Einsatzgebiet.
+    place: "Rückflug nach {af.name}"
+    situation: Der Flight verlässt gerade das Einsatzgebiet.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -389,6 +405,7 @@ steps:
 
   - stage: Rückflug
     situation: Du kreuzt einmal unter dem Lead durch und schaust ihn dir genau an – kein Schaden zu sehen.
+    task: Sag dem Lead, was du gesehen hast.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -424,7 +441,8 @@ steps:
       („{lead|spoken}, you're clean“), „One“ oder „Lead“ ist verbreitete Praxis. Wortlaut und Ablauf regelt die SOP.
 
   - stage: Heimweg
-    situation: Kurz vor dem Heimatplatz.
+    situation: Ihr seid kurz vor dem Heimatplatz.
+    task: Reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead
@@ -437,7 +455,8 @@ steps:
 
   - stage: Heimweg
     tune: { name: "{af.name} {cp.approach.name}", freq: "{cp.approach.freq}", channel: "{cp.approach.channel}" }
-    situation: Stell Approach ein.
+    situation: Der Lead hat den Flight zu Approach geschickt.
+    task: Stell Approach ein und reagiere auf den Lead.
     hear:
       - speaker: "{lead}"
         station: lead

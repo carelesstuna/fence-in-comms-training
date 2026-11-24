@@ -45,10 +45,22 @@ describe('Wer spricht wie (voiceRequest)', () => {
     expect(req(0, 1, { ...DEFAULT_AUDIO, tempo: 1.2 }).speed).toBeCloseTo(base * 1.2, 2)
   })
 
-  it('setzt den Empfang in Signalstärke um', () => {
-    expect(req(1, 1, { ...DEFAULT_AUDIO, signal: 'weak' }).strength).toBeLessThan(
-      req(1, 1, { ...DEFAULT_AUDIO, signal: 'good' }).strength,
+  it('würfelt ohne Vorgabe vier oder fünf auf fünf, „immer klar“ gibt fünf ohne Störungen', () => {
+    const many = Array.from({ length: 40 }, (_, i) =>
+      voiceRequest({ key: 'k', transmissions: list, index: 1, cast: `c${i}` }, DEFAULT_AUDIO),
     )
+    expect(new Set(many.map((r) => r.readability))).toEqual(new Set([4, 5]))
+    const clear = req(1, 1, { ...DEFAULT_AUDIO, noise: 'clear' })
+    expect(clear.readability).toBe(5)
+    expect(clear.interference).toBe('none')
+  })
+
+  it('übernimmt die Lesbarkeit aus dem Inhalt, auch bei „immer klar“', () => {
+    const weak = [t('Batumi Approach', 'radio check', { readability: 2 })]
+    const r = voiceRequest({ key: 'w', transmissions: weak, index: 0, cast: 'x' }, { ...DEFAULT_AUDIO, noise: 'clear' })
+    expect(r.readability).toBe(2)
+    expect(r.interference).toBe('heavy')
+    expect(r.strength).toBeLessThan(req(1).strength)
   })
 
   it('nennt alle Texte zum Vorab-Rechnen, bei „blocked“ beide Stimmen', () => {

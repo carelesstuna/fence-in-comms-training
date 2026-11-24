@@ -192,11 +192,23 @@ am Boden auf deren Frequenzen.
 
 ---
 
-## Weitere Muster: vom Warbird bis zum Hubschrauber
+::drill{id=m2-l1-f16}
 
-Hier stehen die übrigen Muster aus der Flugzeugliste im Profil. Fliegst du keins davon, kannst du die
-Seite überspringen – die Kästen sind dann eingeklappt. Was „Presets“ und „Guard“ sind, steht auf der
-Seite davor; die Wörter sind auch hier antippbar.
+---
+
+::drill{id=m2-l1-hornet}
+
+---
+
+::drill{id=m2-l1-f14}
+
+---
+
+## Weitere Muster: Warbirds
+
+Hier stehen die Muster aus dem Zweiten Weltkrieg. Fliegst du keins davon, kannst du die Seite überspringen – die
+Kästen sind dann eingeklappt. Was „Presets“ und „Guard“ sind, steht weiter vorn; die Wörter sind auch hier
+antippbar.
 
 :::era{era=ww2}
 **Kanäle statt :term[Presets].** In den westalliierten Jägern ab etwa 1941 (P-51, P-47, Spitfire, Mosquito)
@@ -252,6 +264,21 @@ wählst du in SRS einen Kanal (Lektion 5).
   für den Piloten und die T.1154/R.1155 (vorwiegend Morsefunk) beim Beobachter. Die Funkdateien von DCS kennen
   beide Gerätearten. ⚠ Im Cockpit noch nicht geprüft.
 :::
+
+---
+
+::drill{id=m2-l1-scr522}
+
+---
+
+::drill{id=m2-l1-fug16}
+
+---
+
+## Weitere Muster: Kalter Krieg und Hubschrauber
+
+Die übrigen Muster aus der Flugzeugliste im Profil. Auch hier gilt: Fliegst du keins davon, sind die Kästen
+eingeklappt.
 
 :::aircraft{aircraft=f86}
 **F-86F Sabre**
@@ -352,26 +379,6 @@ wählst du in SRS einen Kanal (Lektion 5).
 - Frequenzsprung (das Funkgerät wechselt viele Male pro Sekunde die Frequenz, gegen Störsender: HAVE QUICK,
   SINCGARS) und Verschlüsselung sind laut DCS-Handbuch nicht umgesetzt.
 :::
-
----
-
-::drill{id=m2-l1-f16}
-
----
-
-::drill{id=m2-l1-hornet}
-
----
-
-::drill{id=m2-l1-f14}
-
----
-
-::drill{id=m2-l1-scr522}
-
----
-
-::drill{id=m2-l1-fug16}
 
 ---
 

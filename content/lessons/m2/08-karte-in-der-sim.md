@@ -8,10 +8,8 @@ minutes: 8
 xp: 80
 sources:
   - title: "DCS World User Manual (liegt DCS bei), S. 40–48, 97–100, 216; DCS F-16C Guide S. 21; Heatblur F-4E S. 779 f."
-  - title: "DCS F-16C Early Access Guide (liegt DCS bei), S. 92 und 356 – Bullseye-Peilung in Grad magnetisch (Funk, HUD, HSD-Cursor)"
-  - title: "DCS F/A-18C Early Access Guide (liegt DCS bei), S. 139 – HSI-DATA-Seite, Heading Mode magnetisch/rechtweisend"
   - title: "DCS World: Scripts\\UI\\F10View\\AirdromeDataNew.lua, Mods\\terrains\\<Karte>\\Radio.lua und Beacons.lua (im DCS-Ordner)"
-  - title: "Falcon BMS 4.38 User Manual S. 150–156; Training Manual S. 66–68; Comms & Nav Book S. 102 – Missweisung seit 4.38 (im BMS-Ordner Docs)"
+  - title: "Falcon BMS 4.38 User Manual S. 150–156; Training Manual S. 66–68; Comms & Nav Book S. 102 – Missweisung seit 4.38 (liegt BMS bei, im Installationsordner unter Docs)"
   - title: "ATP 1-02.1 Multi-Service Brevity Codes (BULLSEYE)"
     url: https://www.alssa.mil/MTTPs/Brevity/
   - title: "IL-2 Korea Dev Blog #52 – Settings and Navigational Map"
@@ -38,38 +36,25 @@ an der Karte, und in BMS verrät dir die Karte immerhin die Frequenzen der ander
 - **Farben:** In DCS und BMS sind Freunde blau und Gegner rot.
 - **Ein Lineal oder Messwerkzeug:** Damit misst du Kurs und Entfernung zwischen zwei Punkten.
 - **Koordinaten:** Lat/Long (Breite und Länge) oder MGRS (Military Grid Reference System, ein Planquadrat-Raster) in modernen Sims, Planquadrate in IL-2.
-- **Das Bullseye** (DCS, BMS): ein vereinbarter Bezugspunkt. Positionen gibst du als **magnetische**
-  Peilung und Entfernung **vom Bullseye aus** an – „bullseye 090/25“. Misst du dagegen von deinem eigenen
-  Flugzeug aus, heißt das :term[BRAA] (dazu kommen Höhe und Aspekt, mehr in Modul 5, Lektion 3).
+- **Der Bullseye** (DCS, BMS): ein gemeinsamer Bezugspunkt aus dem Briefing. Positionen im Funk gibt man als
+  Peilung und Entfernung **vom Bullseye aus** an. Das ist so wichtig, dass ihm die nächste Lektion ganz gehört
+  (Modul 2, Lektion 9).
 
 :::warn
 **Zwei Norden.** Planungskarten sind nach **geografisch** (rechtweisend) Nord ausgerichtet, und ihre
 Lineale messen in der Regel ebenso ⚠ – die Handbücher von DCS und BMS sagen dazu nichts, prüf es
-einmal an einer Bahn (siehe Hangar-Karte). Bullseye-Calls, Bahnnummern und Kompass sind dagegen
-**magnetisch**. Die Differenz ist die **Missweisung**.
-
-Für einen Bullseye-Call heißt das: **Linealwert umrechnen** – *east is least, west is best* – oder
-gleich die **Bullseye-Anzeige im Cockpit** nehmen. In der DCS-F-16 zeigen HUD (Head-up-Display) und HSD-Cursor (HSD = Horizontal Situation Display, die Kartenanzeige) die
-Bullseye-Peilung laut Handbuch bereits magnetisch.
-:::
-
-:::aircraft{aircraft=fa18}
-**F/A-18C:** Ob HSI, HUD und Radar magnetisch oder rechtweisend anzeigen, stellst du selbst ein: auf dem HSI unter
-**DATA → A/C** die Option **Heading Mode** (MAG oder TRUE). Lass sie für Bullseye-Calls auf **MAG**. Steht sie auf
-TRUE, erscheint ein „T“ bzw. „TRUE“ neben den Kursen – dann wären deine Peilungen um die Missweisung falsch.
+einmal an einer Bahn (siehe Hangar-Karte). Kompass, Bahnnummern und alle Kurse und Peilungen im Funk sind dagegen
+**magnetisch**. Die Differenz ist die :term[Missweisung]. Einen Kurs, den du auf der Karte misst, musst du also
+umrechnen, bevor du ihn nach Kompass fliegst oder in den Funk gibst – wie das geht, zeigt die nächste Lektion.
 :::
 
 ---
 
-::drill{id=m2-l8-ruler-variation}
+::drill{id=m2-l8-match-basics}
 
 ---
 
 ::hangar{id=missweisung}
-
----
-
-::drill{id=m2-l8-bullseye-call}
 
 ---
 
@@ -100,7 +85,7 @@ TRUE, erscheint ein „T“ bzw. „TRUE“ neben den Kursen – dann wären dei
   Flights zeigt er **UHF und VHF**.
 - **Ruler:** 20 NM lang, die Länge steht in der Mitte, die Peilungen an den Enden. „Doghouses“ an der
   Route zeigen Kurs und Distanz zwischen den Steerpoints.
-- **Missweisung:** Seit 4.38 modelliert BMS sie. Ob Ruler und Tooltip rechtweisend oder magnetisch
+- **Missweisung:** BMS modelliert sie. Ob Ruler und Tooltip rechtweisend oder magnetisch
   rechnen, steht nicht im Handbuch ⚠ – vergleich einmal einen Ruler-Wert mit dem HSD im Cockpit.
 - **Bedrohungen und Linien:** Statt der alten Threat Circles lieber PPTs und Linien eintragen – sie
   erscheinen nach dem DTC-Laden auf deinem HSD.
@@ -172,7 +157,6 @@ etwas, hat nur diese Richtung ein ILS. Was :term[TACAN], ILS, VOR und NDB leiste
 
 :::example
 **Die Karte sagt dir, wo du bist, wohin du musst und wo die anderen sind** – meist aber nicht, auf
-welcher Frequenz. Nord oben, Entfernungen in NM. Bullseye-Calls sind magnetische Peilung und
-Entfernung vom Bullseye aus: Linealwert um die Missweisung korrigieren oder die Cockpit-Anzeige
-nehmen.
+welcher Frequenz. Nord oben, Entfernungen in NM. Die Karte misst rechtweisend, Kompass und Funk sind
+magnetisch – dazwischen liegt die Missweisung.
 :::

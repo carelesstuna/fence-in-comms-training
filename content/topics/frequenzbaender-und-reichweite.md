@@ -46,12 +46,13 @@ immer noch AM ist“ erklärt den Grund.
 
 ## Wie weit trägt es
 
-VHF und UHF breiten sich geradeaus aus, also bis zum **Funkhorizont**. Eine Faustformel für die Reichweite einer
-Antenne: Wurzel aus der Höhe in Fuß mal 1,23 ergibt Seemeilen. Ein Flugzeug auf Reiseflughöhe (35.000 ft) kommt
-rechnerisch auf rund 230 NM, in der Praxis oft etwas weniger (Antennen, Empfindlichkeit des Empfängers). Bei
+VHF und UHF breiten sich geradeaus aus, also bis zum **Funkhorizont**. Merkwerte für ein Flugzeug und
+eine Antenne am Boden: 100 ft gut 10 NM, 1.000 ft 40 NM, 5.000 ft 90 NM, 10.000 ft 120 NM, 30.000 ft 210 NM. Vierfache
+Höhe heißt doppelte Reichweite, und zwei Flugzeuge addieren ihre Reichweiten. In der Praxis ist es oft etwas weniger
+(Antennen, Empfindlichkeit des Empfängers). Bei
 Inversionswetterlagen reicht es auch deutlich weiter (Überreichweiten), Regen und Wolken spielen auf VHF und UHF dagegen
-kaum eine Rolle. Ein Hubschrauber im Tiefflug kommt nur wenige Meilen weit. Deshalb fliegen AWACS hoch, und Berge
-schatten ab. Die Rechnung steht in der Hangar-Karte „Warum dich der Tower hinter dem Berg nicht hört“.
+kaum eine Rolle. Ein Hubschrauber im Tiefflug kommt nur wenige Meilen weit, und Berge schatten ab. Ein AWACS fliegt
+dagegen hoch, vor allem damit sein Radar weit über den Horizont sieht; nebenbei reicht so auch sein Funk weit. Woher die Werte kommen, steht in der Hangar-Karte „Warum dich der Tower hinter dem Berg nicht hört“.
 
 ## Senden oder hören
 
@@ -62,7 +63,7 @@ der wiederholt. Ruft er niemanden auf, hörst du kurz hinein und wiederholst dan
 ## Wo dir das begegnet
 
 - [Zahlen im Funk](/lesson/m1-l3) (Modul 1): die Bereiche UHF und VHF bei den Frequenzen.
-- [Funk und Physik](/lesson/m1-l7) (Modul 1): Wellenlänge, Funkhorizont, Funkschatten, Rauschen und AM/FM zum Mitrechnen.
+- [Funk und Physik](/lesson/m1-l7) (Modul 1): Wellenlänge, Funkhorizont zum Merken, Funkschatten, Rauschen und AM/FM.
 - [Funkgeräte im Cockpit](/lesson/m2-l1) (Modul 2): Bänder, Geräte und die Wörter uniform, victor, fox mike.
 - [Funkdisziplin auf vollen Frequenzen](/lesson/m2-l4) (Modul 2): Senden oder hören, blocked.
 - [SRS in der Praxis](/lesson/m2-l5) (Modul 2): Funkhorizont und Reichweite in der Sim.

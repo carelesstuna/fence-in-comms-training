@@ -52,7 +52,8 @@
 - id: w-l1-build-mayday
   type: build
   call: w-mayday-warbird
-  prompt: Der Motor ist aus, du bist über dem Wasser. Bau den Notruf so, wie ihn die Handbücher von P-51D und P-47D beschreiben.
+  situation: Dein Motor ist ausgefallen, die Küste erreichst du nicht mehr.
+  prompt: Bau den Notruf so, wie ihn die Handbücher von P-51D und P-47D beschreiben.
   distractors: [pan pan, roger, "say again"]
   explain: >-
     Erst dreimal mayday, dann dreimal das Rufzeichen, dann – wenn Zeit bleibt – Position, Kurs, Höhe und
@@ -87,7 +88,7 @@
   answer: 0
   explain: >-
     Kanal 2 ist der Jägerkanal. Den Plan schlägst du vor dem Flug nach – er ist von Server zu Server
-    verschieden. (Das Beispiel stammt von einem IL-2-Server, Stand 2026.)
+    verschieden. (Das Beispiel stammt von einem IL-2-Server.)
 
 - id: w-l2-clock
   type: choice
@@ -103,7 +104,10 @@
 - id: w-l2-build-contact
   type: build
   call: w-contact-report
-  prompt: Du siehst gegnerische Jäger. Bau die Meldung an deine Rotte – Rufzeichen, was, wo, wie weit, wie hoch.
+  situation: >-
+    Ohne Radar und Datenlink suchst du den Himmel mit den Augen ab. Jetzt siehst du Jäger, die du an Bauart und
+    Abzeichen als Gegner erkennst.
+  prompt: Bau die Kontaktmeldung an deine Rotte.
   distractors: [tally, bogey, roger]
   explain: >-
     Erst wer gerufen wird und wer ruft, dann was du siehst, dann Uhr, Entfernung und Höhenlage. So funken auch
@@ -174,9 +178,8 @@
 - id: w-l3-call-pancake
   type: call
   call: w-pancake
-  prompt: >-
-    Dein Treibstoff wird knapp. Melde der Leitstelle **{gci}**, dass du landen willst, und bitte um den Weg
-    nach Hause.
+  situation: Dein Treibstoff wird knapp, und den Heimatplatz hast du nicht in Sicht.
+  prompt: Melde der Leitstelle, dass du landen willst, und bitte um den Weg nach Hause.
   hint: Adressat – Rufzeichen – pancake fuel – request pigeons
   explain: >-
     PANCAKE mit Grund, dann die Bitte um PIGEONS. Die Antwort nennt Kurs und Entfernung zum Heimatplatz.

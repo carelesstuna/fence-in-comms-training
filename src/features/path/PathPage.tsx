@@ -44,7 +44,7 @@ function PlacementButton({ m, state }: { m: Module; state: ModuleState }) {
   const record = useApp((s) => s.progress.placements?.[m.id])
   if (!m.placement) return null
   if (state === 'done') {
-    // Wer per Lektionen fertig ist, braucht keine Einstufung mehr – nachgeholt werden kann sie im Profil
+    // Wer per Lektionen fertig ist, braucht keine Einstufung mehr – nachgeholt werden kann sie unter Fortschritt
     if (!record) return null
     return (
       <Link to={`/placement/${m.id}`} className="self-center px-1 text-sm text-muted underline-offset-2 hover:text-text hover:underline">

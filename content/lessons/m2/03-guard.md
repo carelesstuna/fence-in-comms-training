@@ -14,7 +14,7 @@ sources:
   - title: "ICAO Annex 10, Volume II, 5.3 – Distress and urgency radiotelephony procedures"
   - title: "FAS: AN/ARC-164 (Guard-Empfänger)"
     url: https://man.fas.org/dod-101/sys/ac/equip/an-arc-164.htm
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 31 – VHF-Guard über GD"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 31 – VHF-Guard über GD"
   - title: "Falcon BMS Technical Manual 4.38.1 (TO 1F-16CM/AM-34-1-1 BMS), Abs. 2.2 – COM-1-/COM-2-Modusknopf, UFC BOTH/MAIN, Backup-Panel"
   - title: "DCS A-10C II Flight Manual – UHF-Modus GRD, VHF EMER AM/FM; DCS UH-1H Flight Manual – UHF GD XMIT, T/R + G"
   - title: "F-14-SAR-Checkliste, inoffizielle Aufbereitung aus der Sim-Community – Mayday-Muster auf Guard, SAR-Primärfrequenz 282.8"

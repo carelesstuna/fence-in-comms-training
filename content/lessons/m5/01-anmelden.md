@@ -40,7 +40,11 @@ Als Merkwort dient **MNPOPCA**:
 7. **A**bort code – der Abbruchcode, ein vorab vereinbartes Codewort, mit dem ein Angriff abgebrochen wird
 
 Das ist die lange Fassung. In der Praxis gilt: Fliegt dein Flight **wie geplant**, kennt der AWACS das meiste
-aus dem Einsatzbefehl. Dann meldest du dich mit Missionsnummer und **:term[as fragged]** an und bittest gleich
+aus dem Einsatzbefehl. Deine Zeile darin, dein :term[Frag], sieht etwa so aus (gewürfelt):
+
+::muster{doc=frag}
+
+Dann meldest du dich mit Missionsnummer und **:term[as fragged]** an und bittest gleich
 um einen **Alpha Check** vom Bullseye (siehe Lektion 2):
 
 ::call{id=m5-awacs-checkin-fragged}
@@ -57,7 +61,7 @@ eine **Leitstelle am Boden** (GCI) mit Frühwarnradaren (EWR) – mal ein Mitspi
 meldest dich genauso an, und die Wörter bleiben dieselben: BOGEY DOPE, PICTURE, :term[VECTOR], ANGELS, :term[BUSTER]
 stehen alle im heutigen Brevity-Katalog. Der Unterschied liegt im Bild: Ein Radar am Boden sieht nur
 bis zum Horizont und tief fliegende Ziele schlecht. Ein CLEAN vom GCI heißt nur, dass er nichts sieht.
-In **IL-2 Korea** gibt es Bodenradar-Posten auch in der Sim selbst (siehe Modul 2, Lektion 9).
+In **IL-2 Korea** gibt es Bodenradar-Posten auch in der Sim selbst (siehe Modul 2, Lektion 10).
 :::
 
 ---

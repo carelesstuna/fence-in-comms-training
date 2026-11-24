@@ -9,6 +9,7 @@ summary: Vom AWACS auf das FM-Netz, Check-in, Lage, 9-Line mitschreiben, zurück
 layer: core
 as: lead
 callsignPool: attack
+place: Unterwegs ins Einsatzgebiet
 sources:
   - title: "DCS A-10C Flight Manual, S. 784–788 (JTAC-Ablauf)"
   - title: "DCS JFO/JTAC Pilot Guide (Community, 562nd Tactical School)"
@@ -44,10 +45,11 @@ kneeboard:
     srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Frequenz steht im Briefing oder in der Serverinfo."
 steps:
   - stage: Übergabe
-    freq: "{aw} · {awacs}"
+    freq: "{awacs} · {aw}"
     situation: >-
-      Dein Flight ({flightSize}× A-10C) ist auf dem Weg ins Einsatzgebiet und hört den AWACS. Laut Missionsbriefing
-      übernimmt dich gleich ein JTAC am Boden.
+      Dein Flight ({flightSize}× A-10C) hört den AWACS. Laut Missionsbriefing übernimmt dich gleich ein JTAC am
+      Boden.
+    task: Antworte dem AWACS.
     hear:
       - speaker: "{awacs}"
         radio: uhf
@@ -70,9 +72,11 @@ steps:
 
   - stage: Check-in
     tune: { name: "{jtac} (JTAC, VHF-FM)", freq: "{fm}" }
+    place: Am IP {cas.ip}
     situation: >-
-      Du bist am IP {cas.ip} auf angels {cas.hold}. Melde dich beim JTAC an – Bewaffnung und Playtime stehen auf deiner
-      Line-up-Card.
+      Dein Flight ({flightSize}× A-10C) kreist am IP auf **{cas.hold}.000 Fuß**. Bewaffnung und Playtime stehen auf
+      deiner Line-up-Card.
+    task: Melde dich beim JTAC an.
     you:
       mode: type
       hint: JTAC – Rufzeichen – Anzahl und Typ – Position – Höhe – Bewaffnung – Playtime – Abort Code
@@ -99,7 +103,8 @@ steps:
           - { text: ready to copy situation update?, role: request }
 
   - stage: Lage
-    situation: Der JTAC will dir die Lage geben. Du hast das Kneeboard bereit.
+    situation: Der JTAC hat deinen Check-in aufgenommen und will dir die Lage geben. Dein Kneeboard liegt bereit.
+    task: Antworte dem JTAC.
     you:
       mode: choice
       wrong:
@@ -128,7 +133,8 @@ steps:
       gebeten, sie kommt ohnehin.
 
   - stage: Lage
-    situation: Der JTAC hat die Lage durchgegeben. Bestätige kurz.
+    situation: Der JTAC hat die Lage durchgegeben.
+    task: Bestätige die Lage.
     you:
       mode: type
       transmission:
@@ -141,6 +147,7 @@ steps:
 
   - stage: Game Plan
     situation: Der JTAC gibt seinen Game Plan durch.
+    task: Antworte dem JTAC.
     hear:
       - speaker: "{jtac}"
         radio: fm
@@ -161,7 +168,8 @@ steps:
           - { text: ready to copy, role: request, critical: true }
 
   - stage: 9-Line
-    situation: Der 9-Line kommt. Hör zu – mitschreiben kannst du gleich, das Funk-Log bleibt stehen.
+    situation: Der 9-Line kommt. Mitschreiben kannst du gleich im Anschluss – das Funk-Log bleibt stehen.
+    task: Hör dir den 9-Line an und antworte dem JTAC.
     hear:
       - speaker: "{jtac}"
         radio: fm
@@ -203,14 +211,16 @@ steps:
           - { text: "time on target {cas.tot|spoken}", role: instruction }
 
   - stage: Mitschrift
-    situation: Trag den 9-Line und die Remarks in dein Kneeboard ein – alles steht im Funk-Log.
+    situation: 9-Line und Remarks sind durch. Alles steht im Funk-Log.
+    task: Schreib den 9-Line und die Remarks mit.
     decode: { area: cas }
     explain: >-
       Line 2 ist der Kurs vom IP zum Ziel, Line 8 die Richtung vom Ziel zu den Freunden. Die Lageskizze zeigt, wie alles
       zusammenhängt – der Anflug läuft quer zur Linie zu den Freunden.
 
   - stage: Readback
-    situation: Lies dem JTAC zurück, was Pflicht ist.
+    situation: 9-Line und Remarks stehen auf deinem Kneeboard.
+    task: Lies dem JTAC zurück, was Pflicht ist.
     you:
       mode: type
       hint: Rufzeichen – Line 4 – Line 6 – Final Attack Heading
@@ -252,6 +262,7 @@ steps:
 
   - stage: Halten
     situation: Vor dir ist noch ein anderer Flight dran. Der JTAC parkt dich.
+    task: Antworte dem JTAC.
     hear:
       - speaker: "{jtac}"
         radio: fm

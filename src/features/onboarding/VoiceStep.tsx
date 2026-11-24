@@ -44,7 +44,7 @@ export function VoiceStep() {
         <h2 className="mb-1 text-xl font-semibold text-white">Hören und sprechen</h2>
         <p className="text-sm text-muted">
           Beides ist freiwillig: Ohne Download bleibt jede Übung als Text lösbar. Alles läuft offline auf diesem Rechner – ins Internet geht die
-          App nur, wenn du hier auf „Laden“ klickst. Ändern kannst du alles später unter Profil → Hören und Sprechen.
+          App nur, wenn du hier auf „Laden“ klickst. Ändern kannst du alles später unter Einstellungen → Hören und Sprechen.
         </p>
       </div>
       <ListenPart />
@@ -113,7 +113,7 @@ function ListenPart() {
               </div>
             </ExchangeAudio>
           </div>
-          <p className="text-xs text-muted">Lautstärke, Tempo und Empfang stellst du im Profil ein.</p>
+          <p className="text-xs text-muted">Lautstärke, Tempo und Empfang stellst du unter Einstellungen → Hören ein.</p>
           {audio.error && <p className="text-sm text-red-300">{audio.error}</p>}
         </div>
       )}
@@ -127,7 +127,7 @@ function SpeakPart() {
   const speak = s.input === 'speak'
   const speech = useSpeech()
   const audio = useRadioAudio()
-  const micList = useMicList()
+  const micList = useMicList(s.input === 'speak')
   const [testing, setTesting] = useState(false)
   const desktop = isTauri()
   const key = keyLabel(s.pttKey)
@@ -141,9 +141,13 @@ function SpeakPart() {
         Deine eigenen Funksprüche sprichst du, statt sie zu tippen: {key} halten, sprechen, nach dem letzten Wort loslassen. Die Erkennung
         (Whisper) läuft auf diesem Rechner, Aufnahmen werden nicht gespeichert. Tippen geht in jeder Übung trotzdem.
       </p>
+      <p className="text-xs text-muted">
+        Bekannte Grenze: Die Erkennung schreibt Zahlen als Ziffern. Ob du „three five zero“ oder „three hundred fifty“ sagst, kann die
+        App deshalb nicht unterscheiden – beides zählt. Sprich trotzdem Ziffer für Ziffer, so wie im Funk.
+      </p>
       <Choice name="Selbst funken" value={speak} options={['Ja, Funksprüche sprechen', 'Nein, tippen']} onChange={(v) => setSpeech({ input: v ? 'speak' : 'type' })} />
       {speak && (
-        <div className="grid gap-3 text-sm sm:grid-cols-[7rem_1fr] sm:items-start">
+        <div className="grid gap-3 text-sm sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start">
           <span className="text-muted sm:pt-1">Modell</span>
           {desktop ? (
             <DesktopModel settings={s} set={setSpeech} compact blocked={blocked} />

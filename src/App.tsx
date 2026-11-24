@@ -15,7 +15,8 @@ import { LessonPlayer } from './features/lesson/LessonPlayer'
 import { PlacementTest } from './features/placement/PlacementTest'
 import { HangarPage } from './features/hangar/HangarPage'
 import { TopicPage, TopicsIndexPage } from './features/wissen/TopicPage'
-import { ProfilePage } from './features/profile/ProfilePage'
+import { ProgressPage } from './features/profile/ProgressPage'
+import { SettingsPage } from './features/profile/SettingsPage'
 import { DrillPreview } from './features/preview/DrillPreview'
 import { ScenarioPage } from './features/preview/ScenarioPage'
 import { CheckridePage } from './features/checkride/CheckridePage'
@@ -110,7 +111,11 @@ function Trainer() {
               <Route path="/hangar" element={<HangarPage />} />
               <Route path="/wissen" element={<TopicsIndexPage />} />
               <Route path="/wissen/:id" element={<TopicPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/fortschritt" element={<ProgressPage />} />
+              <Route path="/einstellungen" element={<SettingsPage />} />
+              <Route path="/einstellungen/:tab" element={<SettingsPage />} />
+              {/* Früher eine Seite für alles – alte Links landen in den Einstellungen */}
+              <Route path="/profile" element={<Navigate to="/einstellungen" replace />} />
               <Route path="/drill/:id" element={<DrillPreview />} />
               <Route path="/scenario/:id" element={<ScenarioPage />} />
               <Route path="/checkride/:rankId" element={<CheckridePage />} />

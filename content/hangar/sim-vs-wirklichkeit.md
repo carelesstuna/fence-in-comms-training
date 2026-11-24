@@ -7,7 +7,7 @@ sources:
   - title: "Georgien eAIP, AD 2 UGKO Kutaisi"
     url: https://airnav.ge/eaip/2023-03-23-AIRAC/html/eAIP/UG-AD-2.UGKO-en-GB.html
   - title: "DCS World: terrains\\Caucasus\\radio.lua und Kneeboard-Karten (im DCS-Ordner)"
-  - title: "Falcon BMS 4.38: KTO AIP und Comms & Nav Book S. 8, 99 (im BMS-Ordner Docs)"
+  - title: "Falcon BMS 4.38: KTO AIP und Comms & Nav Book S. 8, 99 (liegt BMS bei, im Installationsordner unter Docs)"
 ---
 
 Flugsims bilden echte Gegenden nach – aber nicht die echte Funkwelt. Dafür gibt es gleich mehrere

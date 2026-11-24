@@ -28,9 +28,10 @@
   layer: community
   call: m4-joker
   as: two
-  prompt: >-
-    Du bist **Two** ({two}). Dein Treibstoff erreicht die höhere der beiden gebrieften Treibstoffschwellen. Der Lead hat
-    nicht danach gefragt. Was funkst du?
+  situation: >-
+    Dein Treibstoff erreicht eben die höhere der beiden gebrieften Treibstoffschwellen. Der Lead hat nicht danach
+    gefragt.
+  prompt: Melde das dem Lead.
   explain: >-
     Der Lead muss das wissen, also meldest du es von dir aus. Wer von sich aus funkt, beginnt mit dem vollen Flight-Rufzeichen,
     damit auch andere Flights auf der Frequenz wissen, dass sie nicht gemeint sind. Die Kurzform „Two, joker“ gilt mit Abzug –
@@ -43,9 +44,9 @@
   call: m4-lead-directive
   as: four
   show: 1
-  prompt: >-
-    Der Lead hat dem 4-ship eine Anweisung gegeben: „{flightName}, {directive}.“ Two und Three haben schon geantwortet. Du
-    bist **Four**. Was funkst du?
+  situation: >-
+    Der Lead hat dem Flight eine Anweisung gegeben, Two und Three haben schon geantwortet.
+  prompt: Bestätige die Anweisung des Leads.
   explain: >-
     Auf eine Anweisung des Leads antwortet jeder nur mit seiner Nummer, in der Reihenfolge 2, 3, 4. Die Nummer heißt
     „verstanden, wird gemacht“ und ersetzt roger und wilco.
@@ -122,9 +123,8 @@
   layer: community
   call: m4-pushing
   blanks: [1, 2]
-  prompt: >-
-    Die gebriefte Push-Zeit ist da, und dein Flight verlässt den Push Point. Du bist Lead und meldest das dem AWACS
-    **{awacs}**. Ergänze deine Meldung.
+  situation: Die gebriefte Push-Zeit ist da, und ihr verlasst jetzt den Push Point.
+  prompt: Ergänze deine Meldung an den AWACS.
   explain: >-
     Du meldest für den ganzen Flight, also mit dem Flight-Rufzeichen ohne Position, und sagst „pushing“: Wir verlassen
     den festgelegten Punkt. Das ist nicht der Frequenzwechsel, der heißt „push“.
@@ -167,9 +167,10 @@
   as: four
   transmission: 7
   show: 5
-  prompt: >-
-    Der Lead hat nach dem Einsatz „battle damage check“ angesagt. Du bist **Four**, dein Element-Partner ist Three. Du bist
-    unter ihm durchgekreuzt und hast keinen Schaden gesehen. Was funkst du?
+  situation: >-
+    Der Lead hat nach dem Einsatz den Battle Damage Check angesagt. Du bist unter deinem Element-Partner
+    durchgekreuzt und hast **keinen Schaden** gesehen.
+  prompt: Melde deinem Element-Partner, was du gesehen hast.
   explain: >-
     Jeder schaut sich seinen Element-Partner an: Four prüft Three. Du sprichst ihn an und sagst „you're clean“, also kein
     sichtbarer Schaden.
@@ -202,10 +203,10 @@
   exam: true
   layer: community
   call: m4-what-state
-  prompt: >-
-    **{awacs}** fragt dich als Lead „what state“. Raketen im Flight: aktiv **{ma}**, halbaktiv **{ms}**, IR **{mi}**,
-    Kanone mit Munition; niedrigster Treibstoff im Flight **{low}**. Laut Missionsbriefing meldest du für den ganzen
-    Flight. Was funkst du?
+  situation: >-
+    Laut Missionsbriefing meldest du für den ganzen Flight, mit den Werten des schwächsten Flugzeugs. Raketen:
+    aktiv **{ma}**, halbaktiv **{ms}**, IR **{mi}**, Kanone mit Munition. Niedrigster Treibstoff im Flight: **{low}**.
+  prompt: Beantworte die Frage des AWACS.
   explain: >-
     Rufzeichen, dann die Raketen in fester Reihenfolge (aktiv, halbaktiv, IR), „by“ und der niedrigste Treibstoff
     im Flight: „{callsign|spoken}, {ma}-{ms}-{mi} by {low|spoken}“ (Format nach ATP 1-02.1).
@@ -249,9 +250,10 @@
   as: two
   transmission: 2
   show: 1
-  prompt: >-
-    Du bist **Two**, hast den Lead aus den Augen verloren und „blind“ gemeldet. Er sagt dir, wo er von dir aus steht:
-    „your {clk}, {dist|spoken}, {hl}.“ Du schaust dorthin und siehst ihn. Was funkst du?
+  situation: >-
+    Du hast den Lead aus den Augen verloren. Er hat dir gesagt, wo er von dir aus steht: „your {clk},
+    {dist|spoken}, {hl}.“ Du schaust dorthin und **siehst ihn wieder**.
+  prompt: Melde das dem Lead.
   explain: >-
     Du meldest dich mit „visual“ zurück: Du hast den Lead wieder in Sicht, und erst jetzt schließt du wieder auf. Die Meldung
     trägt das Flight-Rufzeichen, weil du von dir aus sprichst.
@@ -375,9 +377,10 @@
   as: two
   transmission: 1
   show: 1
-  prompt: >-
-    Ihr habt euch in einer Kurve verloren, und der Lead meldet sich blind. Auch du siehst ihn nicht. Du fliegst auf
-    **{a2.feet} Fuß**. Was funkst du?
+  situation: >-
+    Du fliegst auf **{a2.feet} Fuß**. In einer Kurve habt ihr euch aus den Augen verloren; auch du siehst den Lead
+    nicht.
+  prompt: Melde das dem Lead.
   explain: >-
     Auch der Zweite meldet „blind“ mit seiner Höhe auf hundert Fuß: „{two|spoken}, blind {a2|spoken}“. Dann ordnet der
     Lead die Höhenstaffelung an (AFMAN 11-2F-16 V3, Abs. 3.12.2.2).

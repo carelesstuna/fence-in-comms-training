@@ -10,12 +10,16 @@ import { spokenWholeNumber } from '../phraseology/spoken'
 interface SpokenSegment {
   text: string
   spoken?: string
+  role?: string
 }
 
 interface AudioTransmission {
+  speaker?: string
   segments: readonly SpokenSegment[]
   you?: boolean
   skip?: boolean
+  pace?: 'lines'
+  mix?: readonly [number, number]
 }
 
 /**
@@ -54,13 +58,57 @@ export function speakable(text: string): string {
 const NOISE = /^\s*\[.*\]\s*$/
 const BLOCKED = /pfeif|wortfetzen|blocked|gleichzeitig|überlager/i
 
-/** Ein Teil der Wiedergabe: gesprochener Text oder ein Rauschstoß (Funkloch). */
-export type SpeechPart = { kind: 'speech'; text: string } | { kind: 'static' }
+/** Ein Teil der Wiedergabe: gesprochener Text, ein Rauschstoß (Funkloch) oder eine Sprechpause. */
+export type SpeechPart = { kind: 'speech'; text: string } | { kind: 'static' } | { kind: 'pause'; seconds: number }
+
+/**
+ * Sprechpausen zwischen zwei Teilen eines Funkspruchs, in Sekunden. Ein Komma allein gibt der Sprachausgabe kaum
+ * eine Pause – an diesen Stellen setzt ein Sprecher im Funk aber deutlich ab:
+ * - vor „correction“: Man merkt den Fehler und überlegt kurz, was richtig ist; danach kurz bis zum richtigen Wert
+ * - nach „mayday, mayday, mayday“ bzw. „pan pan“, nach „break“, „I say again“ und „stand by“
+ * - nach der Anrufgruppe am Anfang (Adressat, Rufzeichen), bevor der Inhalt kommt
+ * - bei `pace: lines` (9-Line, Readback dazu) zwischen allen Teilen: Zeit zum Mitschreiben
+ */
+export const PAUSES = {
+  beforeCorrection: 0.7,
+  afterCorrection: 0.3,
+  afterProword: 0.4,
+  afterStandby: 0.6,
+  afterCallup: 0.2,
+  lines: 0.5,
+} as const
+
+/** Unter dieser Länge reicht das Komma. */
+const MIN_PAUSE = 0.15
+
+export function pauseBefore(segs: readonly SpokenSegment[], i: number, pace?: 'lines'): number {
+  if (i <= 0 || i >= segs.length) return 0
+  const cur = (segs[i].spoken ?? segs[i].text).trim()
+  const prev = (segs[i - 1].spoken ?? segs[i - 1].text).trim()
+  const p: number[] = [0]
+  if (pace === 'lines') p.push(PAUSES.lines)
+  if (/^correction\b/i.test(cur)) p.push(PAUSES.beforeCorrection)
+  if (/^correction[,.]?$/i.test(prev)) p.push(PAUSES.afterCorrection)
+  if (/^(mayday|pan[ -]?pan)\b/i.test(prev) || /^break(,? break)?$/i.test(prev) || /^i say again$/i.test(prev)) {
+    p.push(PAUSES.afterProword)
+  }
+  if (/^stand ?by$/i.test(prev)) p.push(PAUSES.afterStandby)
+  if (/ready to copy\??$/i.test(prev)) p.push(PAUSES.afterProword)
+  if (i === 2 && segs[0].role === 'addressee' && segs[1].role === 'callsign') p.push(PAUSES.afterCallup)
+  return Math.max(...p)
+}
 
 export type TransmissionAudio =
   | { kind: 'speech'; parts: SpeechPart[] }
   /** Zwei Sender gleichzeitig: beide Stimmen verstümmelt, dazu der Überlagerungston. */
-  | { kind: 'blocked'; texts: [string, string] }
+  | {
+      kind: 'blocked'
+      texts: [string, string]
+      /** Sprecher der beiden Texte (bei `mix`: deren Stimmen); ohne Angabe eine beliebige zweite Stimme. */
+      speakers?: [string, string]
+      /** Pfeifton im Vordergrund, die Stimmen gehen darunter fast unter (wie im KLM-Cockpit auf Teneriffa). */
+      strong?: boolean
+    }
   | { kind: 'none' }
 
 function join(a: string, b: string): string {
@@ -78,21 +126,31 @@ export function spokenText(t: { segments: readonly SpokenSegment[] }): string {
   return out
 }
 
-/** Was eine Übertragung hörbar macht: Sprache mit Rauschstößen an den „[…]“-Stellen. */
-export function speechParts(t: { segments: readonly SpokenSegment[] }): SpeechPart[] {
+/** Was eine Übertragung hörbar macht: Sprache mit Rauschstößen an den „[…]“-Stellen und Sprechpausen. */
+export function speechParts(t: { segments: readonly SpokenSegment[]; pace?: 'lines' }): SpeechPart[] {
   const parts: SpeechPart[] = []
   let text = ''
-  for (const seg of t.segments) {
+  // Vor einer Pause endet der Text mit Komma: Die Stimme hebt sich wie mitten im Satz, statt abzuschließen
+  const flush = (pause: boolean) => {
+    if (text) parts.push({ kind: 'speech', text: pause && !/[,.;:!?]$/.test(text) ? `${text},` : text })
+    text = ''
+  }
+  t.segments.forEach((seg, i) => {
     if (NOISE.test(seg.text)) {
-      if (text) parts.push({ kind: 'speech', text })
+      flush(false)
       parts.push({ kind: 'static' })
-      text = ''
-      continue
+      return
     }
     const part = speakable(seg.spoken ?? seg.text)
-    if (part) text = join(text, part)
-  }
-  if (text) parts.push({ kind: 'speech', text })
+    if (!part) return
+    const pause = pauseBefore(t.segments, i, t.pace)
+    if (pause >= MIN_PAUSE && text) {
+      flush(true)
+      parts.push({ kind: 'pause', seconds: pause })
+    }
+    text = join(text, part)
+  })
+  flush(false)
   return parts
 }
 
@@ -114,6 +172,18 @@ export function transmissionAudio(
 ): TransmissionAudio {
   const t = transmissions[index]
   if (!t || t.skip) return { kind: 'none' }
+  // Überlagerung zweier bestimmter Übertragungen: so, wie sie bei Dritten ankommt
+  if (t.mix) {
+    const [a, b] = t.mix.map((i) => transmissions[i])
+    if (a && b) {
+      return {
+        kind: 'blocked',
+        texts: [spokenText(a), spokenText(b)],
+        speakers: [a.speaker ?? '', b.speaker ?? ''],
+        strong: true,
+      }
+    }
+  }
   const noise = t.segments.filter((s) => NOISE.test(s.text))
   if (
     noise.length &&

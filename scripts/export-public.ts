@@ -23,6 +23,7 @@ export const PUBLIC: readonly string[] = [
   '.gitignore',
   '.prettierignore',
   '.prettierrc',
+  'CHANGELOG.md',
   'CONTRIBUTING.md',
   'LEGAL.md',
   'LICENSE',

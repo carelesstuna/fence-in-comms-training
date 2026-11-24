@@ -1,7 +1,7 @@
 /**
  * Übungskomponenten: Multiple Choice, Zuordnen, Baukasten, Anatomie, Freitext.
  */
-import { useState, type ReactNode } from 'react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
 import type {
   AnatomyDrill,
   BuildDrill,
@@ -10,27 +10,40 @@ import type {
   ChoiceDrill,
   ClozeDrill,
   FormDrill,
+  HearProbe,
   InputDrill,
   MatchDrill,
   PlotDrill,
   ResolvedDrill,
+  ResolvedTransmission,
   SequenceDrill,
   SequenceItem,
 } from '../core/drills/types'
 import { evaluateBuild, explainForBuild, tileMatches, type BuildTileStatus } from '../core/drills/resolve'
 import { restatesSolution } from '../core/drills/solution'
-import { matchAny, normalizeTokens, sameToken, segmentAnswers, type SpellingFix } from '../core/phraseology/normalize'
+import { containsNumber, matchAny, matchTyped, normalizeTokens, sameToken, segmentAnswers, typedNeedsWords, type SpellingFix } from '../core/phraseology/normalize'
 import { InlineMarkdown } from './Markdown'
 import { RadioPanel, RoleLegend, SegmentDetail, TransmissionLine } from './CallAnatomy'
+import { RadioTaskHeader } from './RadioFrame'
 import { roleInfo } from '../ui/roles'
-import { toItems } from '../core/scoring/score'
+import { matchSpoken, toItems } from '../core/scoring/score'
 import { angleDiff, bearingDeg, distNm, type Point } from '../core/random/geo'
 import { CallInput } from './CallInput'
-import { hintContextForExchange } from '../ui/speech'
+import { SpeakPanel } from './speech/SpeakPanel'
+import { SpeakToggle } from './speech/SpeakToggle'
+import { useSpeakMode, useTypeToFocus } from './speech/speak-mode'
+import { hintContextForDrill, hintContextForExchange, typedDigitsFor } from '../ui/speech'
+import { SpokenNumbersNote, TypedNumbersNote } from './TypedNumbersNote'
+import { transcriptInWords } from '../core/speech/display'
 import { useApp } from '../state/store'
+import { useRadioAudio } from '../platform/audio-context'
 import { Scope, ScopeLegend, type ScopeMarker } from './Scope'
 import { Chart, type ChartMark } from './Chart'
 import { NineLineDrillView } from './NineLine'
+import { MemoryDrillView } from './MemoryDrill'
+import { ExchangeAudio } from './audio/ExchangeAudio'
+import { useLineAudio } from './audio/exchange-audio'
+import { quotedCalls } from '../core/audio/quoted'
 
 type Answer = (correct: boolean) => void
 
@@ -48,6 +61,8 @@ export function DrillView({ drill, onAnswered }: { drill: ResolvedDrill; onAnswe
       return <Input drill={drill} onAnswered={onAnswered} />
     case 'cloze':
       return <Cloze drill={drill} onAnswered={onAnswered} />
+    case 'memory':
+      return <MemoryDrillView drill={drill} onAnswered={onAnswered} />
     case 'sequence':
       return <Sequence drill={drill} onAnswered={onAnswered} />
     case 'form':
@@ -93,17 +108,28 @@ export function Feedback({ correct, explain, children }: { correct: boolean; exp
   )
 }
 
-/** Hinweis auf verziehene Tippfehler bei Buchstabierwörtern: Die Antwort zählt als richtig, die Schreibung wird gezeigt. */
-function SpellingNote({ fixes }: { fixes: SpellingFix[] }) {
+/**
+ * Hinweis auf verziehene Tippfehler bei Buchstabierwörtern: Die Antwort zählt als richtig, die Schreibung wird gezeigt.
+ * Gesprochen ist es kein Tippfehler, sondern die Schreibung der Erkennung.
+ */
+function SpellingNote({ fixes, spoken = false }: { fixes: SpellingFix[]; spoken?: boolean }) {
   if (fixes.length === 0) return null
   const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
   return (
     <p className="mt-1 text-sm text-muted">
-      Schreibung:{' '}
+      {spoken ? 'Erkannt als:' : 'Schreibung:'}{' '}
       {fixes.map((f, i) => (
         <span key={i}>
           {i > 0 && ', '}
-          <span className="font-mono text-text">{cap(f.want)}</span> statt „{f.got}“
+          {spoken ? (
+            <>
+              „{f.got}“ – gemeint <span className="font-mono text-text">{cap(f.want)}</span>
+            </>
+          ) : (
+            <>
+              <span className="font-mono text-text">{cap(f.want)}</span> statt „{f.got}“
+            </>
+          )}
         </span>
       ))}
     </p>
@@ -122,6 +148,60 @@ function Btn({ children, onClick, disabled }: { children: ReactNode; onClick: ()
   )
 }
 
+/**
+ * Hörprobe über einer Auswahl- oder Freitext-Übung: die Übertragung zum Abspielen (z. B. der Ruf, dessen Lesbarkeit du
+ * meldest). Ohne Sprachausgabe steht dort, was du gehört hättest.
+ */
+function HearProbeView({ hear }: { hear: HearProbe }) {
+  const audio = useRadioAudio()
+  const t = hear.exchange.transmissions[hear.transmission]
+  if (!t) return null
+  const silent = !audio.enabled || !audio.available
+  return (
+    <div className="mb-4 space-y-2">
+      <RadioPanel exchange={hear.exchange} neutral>
+        <TransmissionLine t={t} />
+      </RadioPanel>
+      {silent && hear.noAudio && (
+        <p className="rounded-md border border-amber-hud/30 bg-amber-hud/5 px-3 py-2 text-sm text-amber-100">
+          Ohne Ton: {hear.noAudio}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Funksprüche, die nur als Zitat in der Aufgabe stehen („Batumi Tower: „…““), zum Anhören. Nur mit eingeschalteter
+ * Sprachausgabe – ohne Ton wäre es dieselbe Zeile noch einmal.
+ */
+function QuotedCallsProbe({ prompt }: { prompt: string }) {
+  const audio = useRadioAudio()
+  const lines = useMemo<ResolvedTransmission[]>(
+    () =>
+      quotedCalls(prompt).map((q) => ({
+        speaker: q.speaker,
+        you: false,
+        channel: 'radio',
+        segments: [{ text: q.text, role: 'info' }],
+      })),
+    [prompt],
+  )
+  if (!audio.enabled || lines.length === 0) return null
+  return (
+    <div className="-mt-2 mb-4 rounded-lg border border-line bg-black/20 px-3 py-2">
+      <div className="mb-1 text-xs text-muted">Zum Anhören:</div>
+      <ExchangeAudio transmissions={lines}>
+        <div className="space-y-1.5">
+          {lines.map((t, i) => (
+            <TransmissionLine key={i} t={t} neutral />
+          ))}
+        </div>
+      </ExchangeAudio>
+    </div>
+  )
+}
+
 // ---------------------------------------------------------------------------
 
 function Choice({ drill, onAnswered }: { drill: ChoiceDrill; onAnswered: Answer }) {
@@ -136,6 +216,7 @@ function Choice({ drill, onAnswered }: { drill: ChoiceDrill; onAnswered: Answer 
   return (
     <div>
       <Prompt text={drill.prompt} kind={drill.multi ? 'Mehrfachauswahl' : 'Auswahl'} />
+      {drill.hear ? <HearProbeView hear={drill.hear} /> : <QuotedCallsProbe prompt={drill.prompt} />}
       {drill.multi && !done && <p className="-mt-2 mb-3 text-sm text-muted">Alles Zutreffende ankreuzen, dann prüfen.</p>}
       <div className="grid gap-2">
         {drill.options.map((o, i) => {
@@ -301,17 +382,20 @@ function Build({ drill, onAnswered }: { drill: BuildDrill; onAnswered: Answer })
 
   return (
     <div>
-      <Prompt text={drill.prompt} kind="Funkspruch-Baukasten" />
-      {drill.exchange.context && <p className="mb-3 text-sm text-muted italic">{drill.exchange.context}</p>}
-      {before.length > 0 && !checked && (
-        <div className="mb-3 space-y-2 rounded-lg border border-line bg-panel px-3 py-2">
-          {before.map((t, i) => (
-            <TransmissionLine key={i} t={t} />
-          ))}
+      <RadioTaskHeader kind="Funkspruch-Baukasten" drill={drill} />
+      {/* Eigenständige Übung: was vorher auf der Frequenz kam. Im Szenario steht das im Funk-Log. */}
+      {drill.self && !checked && (
+        <div className="mb-3">
+          <RadioPanel exchange={drill.exchange} neutral>
+            {before.length === 0 && <p className="text-sm text-muted">Frei – niemand spricht.</p>}
+            {before.map((t, i) => (
+              <TransmissionLine key={i} t={t} />
+            ))}
+          </RadioPanel>
         </div>
       )}
       <div className="min-h-14 rounded-lg border border-dashed border-phosphor-dim/60 bg-black/20 p-2">
-        <div className="mb-1 font-mono text-[11px] tracking-wider text-amber-hud uppercase">Du ▸ {drill.exchange.freq ?? ''}</div>
+        <div className="mb-1 font-mono text-[11px] tracking-wider text-amber-hud uppercase">Du ▸</div>
         <div className="flex flex-wrap gap-1.5">
           {picked.length === 0 && <span className="px-1 py-1 text-sm text-muted">Tippe unten die Bausteine in der richtigen Reihenfolge an …</span>}
           {picked.map((k, pos) => {
@@ -481,45 +565,82 @@ function Anatomy({ drill, onAnswered }: { drill: AnatomyDrill; onAnswered: Answe
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Freitext: eine Funk-Wendung, Zahl oder Antwort eintippen – oder sprechen (wie bei den Funksprüchen). Gesprochen
+ * gelten die Regeln der Erkennung (`matchSpoken`); das Transkript steht danach im Feld. Getippt zählen Ziffern nur,
+ * wo die Antwort selbst Ziffern hat (`matchTyped`) – steht sie in Worten, ist die Funk-Form gefragt.
+ */
 function Input({ drill, onAnswered }: { drill: InputDrill; onAnswered: Answer }) {
   const [text, setText] = useState('')
   const [checked, setChecked] = useState(false)
+  const [spoken, setSpoken] = useState(false)
   const [showHint, setShowHint] = useState(false)
-  const match = matchAny(text, drill.accept)
+  const speak = useSpeakMode()
+  const inputRef = useRef<HTMLInputElement>(null)
+  useTypeToFocus(inputRef, speak && !checked)
+  // Getippt: Zahlen in Worten, außer in Spur C oder wo die Antwort selbst Ziffern zulässt (Rechen- und Einstell-Aufgaben)
+  const digitsOk = typedDigitsFor({ drillId: drill.id })
+  const words = !digitsOk && typedNeedsWords(drill.accept)
+  const check = (t: string, bySpeech: boolean) => (bySpeech ? matchSpoken(t, drill.accept) : digitsOk ? matchAny(t, drill.accept) : matchTyped(t, drill.accept))
+  const match = check(text, spoken)
   const correct = match !== null
-  const submit = () => {
-    if (!text.trim() || checked) return
+  // Gesprochen steht im Feld das Transkript mit Zahlen in Worten; gewertet wird das Transkript selbst
+  const shown = spoken ? transcriptInWords(text, drill.accept) : text
+  const commit = (t: string, bySpeech: boolean) => {
+    if (!t.trim() || checked) return
+    const ok = check(t, bySpeech) !== null
+    setText(t)
+    setSpoken(bySpeech)
     setChecked(true)
-    // Getippte Funk-Wendung: zählt für Abzeichen wie „Mikrofon offen“ (genau getroffen = sauber)
-    useApp.getState().track({ kind: 'call', correct, clean: correct })
-    onAnswered(correct)
+    // Funk-Wendung: zählt für Abzeichen wie „Mikrofon offen“ (genau getroffen = sauber)
+    useApp.getState().track({ kind: 'call', correct: ok, clean: ok })
+    onAnswered(ok)
   }
   return (
     <div>
       <Prompt text={drill.prompt} kind="Freitext" />
+      {drill.hear ? <HearProbeView hear={drill.hear} /> : <QuotedCallsProbe prompt={drill.prompt} />}
+      {!checked && (
+        <>
+          <SpeakToggle className="mb-2" />
+          {speak && (
+            <div className="mb-2">
+              <SpeakPanel
+                blind={false}
+                hintContext={hintContextForDrill(drill.id)}
+                display={(t) => transcriptInWords(t, drill.accept)}
+                judge={(t) => check(t, true) !== null}
+                onCommit={(t) => commit(t, true)}
+              />
+            </div>
+          )}
+        </>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          submit()
+          commit(text, false)
         }}
         className="flex flex-col gap-2 sm:flex-row"
       >
         <input
-          autoFocus
-          value={text}
+          ref={inputRef}
+          autoFocus={!speak}
+          value={shown}
           disabled={checked}
           onChange={(e) => setText(e.target.value)}
-          placeholder={drill.placeholder ?? 'Funkspruch eintippen …'}
+          placeholder={drill.placeholder ?? (speak ? '… oder tippen' : 'Funkspruch eintippen …')}
           spellCheck={false}
           autoComplete="off"
           className="flex-1 rounded-lg border border-line bg-black/30 px-3 py-2 font-mono text-text outline-none focus:border-phosphor"
         />
         {!checked && (
-          <Btn onClick={submit} disabled={!text.trim()}>
+          <Btn onClick={() => commit(text, false)} disabled={!text.trim()}>
             Funken
           </Btn>
         )}
       </form>
+      {!checked && drill.accept.some(containsNumber) && <TypedNumbersNote digits={!words} className="mt-1.5" />}
       {drill.hint && !checked && (
         <button onClick={() => setShowHint(true)} className="mt-2 text-sm text-muted hover:text-text">
           {showHint ? `Hinweis: ${drill.hint}` : 'Hinweis anzeigen'}
@@ -528,7 +649,21 @@ function Input({ drill, onAnswered }: { drill: InputDrill; onAnswered: Answer })
       {checked && (
         // Sagt die Erklärung nur die Lösung („Richtig ist: …“), steht sie nach einer falschen Antwort schon unter „Erwartet“
         <Feedback correct={correct} explain={!correct && restatesSolution(drill.explain, drill.accept.slice(0, 1)) ? undefined : drill.explain}>
-          {correct ? <SpellingNote fixes={match} /> : <InputDiff got={text} expected={drill.accept[0]} />}
+          {correct ? (
+            <>
+              <SpellingNote fixes={match} spoken={spoken} />
+              {spoken && shown !== text && <SpokenNumbersNote className="mt-1" />}
+            </>
+          ) : (
+            <>
+              {/* Nur die Schreibweise der Zahlen war falsch */}
+              {!spoken && matchAny(text, drill.accept) && (
+                <p className="mt-1 text-sm text-amber-hud">Der Wert stimmt – getippt zählt aber nur die Funk-Form in Worten.</p>
+              )}
+              <InputDiff got={shown} expected={drill.accept[0]} spoken={spoken} />
+              {spoken && shown !== text && <SpokenNumbersNote className="mt-1" />}
+            </>
+          )}
         </Feedback>
       )}
     </div>
@@ -536,7 +671,7 @@ function Input({ drill, onAnswered }: { drill: InputDrill; onAnswered: Answer })
 }
 
 /** Eigene Eingabe und erwartete Antwort – abweichende Wörter der Antwort sind markiert. */
-function InputDiff({ got, expected }: { got: string; expected: string }) {
+function InputDiff({ got, expected, spoken = false }: { got: string; expected: string; spoken?: boolean }) {
   const have = normalizeTokens(got)
   const words = expected.split(/\s+/)
   const missing = words.map((w) => {
@@ -551,8 +686,8 @@ function InputDiff({ got, expected }: { got: string; expected: string }) {
   return (
     <div className="mt-1 space-y-0.5 text-sm">
       <p>
-        <span className="text-muted">Du: </span>
-        <span className="font-mono">„{got}“</span>
+        <span className="text-muted">{spoken ? 'Erkannt: ' : 'Du: '}</span>
+        <span lang="en" className="font-mono">„{got}“</span>
       </p>
       <p>
         <span className="text-muted">Erwartet: </span>
@@ -575,12 +710,21 @@ function Cloze({ drill, onAnswered }: { drill: ClozeDrill; onAnswered: Answer })
   const t = drill.exchange.transmissions[drill.transmission]
   const [values, setValues] = useState<Record<number, string>>({})
   const [checked, setChecked] = useState(false)
-  // Neben dem Segmenttext gelten auch seine gleichwertigen Formulierungen (`alt`), wie bei der Funkspruch-Bewertung
-  const matchOf = (i: number) => matchAny(values[i] ?? '', segmentAnswers(t.segments[i]))
+  // Neben dem Segmenttext gelten auch seine gleichwertigen Formulierungen (`alt`), wie bei der Funkspruch-Bewertung.
+  // Zahlen in Worten zählen getippt nur in Worten (`matchTyped`) – außer in Spur C
+  const digitsOk = typedDigitsFor({ drillId: drill.id })
+  const matchOf = (i: number) => (digitsOk ? matchAny : matchTyped)(values[i] ?? '', segmentAnswers(t.segments[i]))
+  const blankAnswers = drill.blanks.map((b) => segmentAnswers(t.segments[b]))
+  const numbers = blankAnswers.some((answers) => answers.some(containsNumber))
+  const words = !digitsOk && blankAnswers.some(typedNeedsWords)
+  /** Lücke falsch, aber nur weil eine Zahl in Ziffern statt in Worten steht. */
+  const digitsOnly = (i: number) => !ok(i) && matchAny(values[i] ?? '', segmentAnswers(t.segments[i])) !== null
   const ok = (i: number) => matchOf(i) !== null
   const allFilled = drill.blanks.every((b) => (values[b] ?? '').trim())
   const correct = drill.blanks.every(ok)
   const before = drill.exchange.transmissions.slice(0, drill.transmission)
+  // Alle Lücken gleich breit, damit die Breite nichts über die Antwort verrät
+  const blankWidth = Math.max(16, ...drill.blanks.map((b) => (t.segments[b]?.text.length ?? 0) + 2))
   const submit = () => {
     if (!allFilled || checked) return
     setChecked(true)
@@ -588,8 +732,9 @@ function Cloze({ drill, onAnswered }: { drill: ClozeDrill; onAnswered: Answer })
   }
   return (
     <div>
-      <Prompt text={drill.prompt} kind="Lückentext" />
-      <RadioPanel exchange={drill.exchange}>
+      <RadioTaskHeader kind="Lückentext" drill={drill} />
+      <p className="-mt-2 mb-3 text-sm text-muted">Jede Lücke ist ein ganzer Teil des Funkspruchs, oft mehrere Wörter.</p>
+      <RadioPanel exchange={drill.exchange} neutral>
         {before.map((bt, i) => (
           <TransmissionLine key={i} t={bt} />
         ))}
@@ -621,10 +766,12 @@ function Cloze({ drill, onAnswered }: { drill: ClozeDrill; onAnswered: Answer })
                   disabled={checked}
                   value={values[i] ?? ''}
                   onChange={(e) => setValues({ ...values, [i]: e.target.value })}
-                  placeholder={roleInfo(seg.role).label}
+                  // Neutral: Rolle oder Länge würden die Lösung verraten („Zahlenwert“, wo „runway two seven“ gefragt ist)
+                  placeholder="…"
+                  aria-label={`Lücke ${drill.blanks.indexOf(i) + 1}`}
                   spellCheck={false}
                   autoComplete="off"
-                  style={{ width: `${Math.max(8, seg.text.length + 2)}ch` }}
+                  style={{ width: `${blankWidth}ch` }}
                   className={`rounded-md border bg-black/30 px-2 py-1 font-mono text-[0.95rem] outline-none ${verdict}`}
                 />
               )
@@ -633,6 +780,7 @@ function Cloze({ drill, onAnswered }: { drill: ClozeDrill; onAnswered: Answer })
           </div>
         </form>
       </RadioPanel>
+      {!checked && numbers && <TypedNumbersNote digits={!words} className="mt-2" />}
       {!checked && (
         <div className="mt-4">
           <Btn disabled={!allFilled} onClick={submit}>
@@ -643,6 +791,9 @@ function Cloze({ drill, onAnswered }: { drill: ClozeDrill; onAnswered: Answer })
       {checked && (
         <Feedback correct={correct} explain={drill.explain}>
           {correct && <SpellingNote fixes={drill.blanks.flatMap((b) => matchOf(b) ?? [])} />}
+          {!correct && drill.blanks.some(digitsOnly) && (
+            <p className="mt-1 text-sm text-amber-hud">Der Wert stimmt – getippt zählen Zahlen aber nur in Worten, so wie du sie sprichst.</p>
+          )}
           {!correct && (
             <p className="mt-1 text-sm">
               Richtig: <span className="font-mono">{t.segments.map((s) => s.text).join(', ')}</span>
@@ -668,7 +819,31 @@ function SequenceItemView({ item, n }: { item: SequenceItem; n?: number }) {
   )
 }
 
+/** ▶ für einen Eintrag der Reihenfolge, der eine Übertragung ist (neben dem Eintrag, nicht darin). */
+function SequencePlay({ t }: { t: ResolvedTransmission }) {
+  const line = useLineAudio(t)
+  if (!line) return null
+  return (
+    <button
+      type="button"
+      onClick={line.state === 'idle' ? line.play : line.stop}
+      onMouseEnter={line.warm}
+      title={line.state === 'idle' ? 'Anhören' : 'Stopp'}
+      aria-label={line.state === 'idle' ? `Funkspruch von ${line.speaker} anhören` : 'Wiedergabe stoppen'}
+      className="shrink-0 rounded-md border border-line bg-panel-2 px-2.5 text-phosphor hover:border-phosphor-dim"
+    >
+      {line.state === 'idle' ? '▶' : line.state === 'preparing' ? '…' : '■'}
+    </button>
+  )
+}
+
+/** Reihenfolge; stammen die Einträge aus einem Funkspruch, lassen sie sich anhören. */
 function Sequence({ drill, onAnswered }: { drill: SequenceDrill; onAnswered: Answer }) {
+  const body = <SequenceBody drill={drill} onAnswered={onAnswered} />
+  return drill.exchange ? <ExchangeAudio transmissions={drill.exchange.transmissions}>{body}</ExchangeAudio> : body
+}
+
+function SequenceBody({ drill, onAnswered }: { drill: SequenceDrill; onAnswered: Answer }) {
   const [order, setOrder] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const byKey = (k: string) => drill.items.find((i) => i.key === k)!
@@ -682,27 +857,31 @@ function Sequence({ drill, onAnswered }: { drill: SequenceDrill; onAnswered: Ans
         {order.map((k, i) => {
           const verdict = checked ? (drill.solution[i] === k ? 'border-emerald-400' : 'border-red-400') : 'border-line'
           return (
-            <button
-              key={k}
-              disabled={checked}
-              onClick={() => setOrder(order.filter((o) => o !== k))}
-              className={`block w-full rounded-md border bg-panel-2 px-3 py-2 ${verdict}`}
-            >
-              <SequenceItemView item={byKey(k)} n={i + 1} />
-            </button>
+            <div key={k} className="flex items-stretch gap-1.5">
+              <button
+                disabled={checked}
+                onClick={() => setOrder(order.filter((o) => o !== k))}
+                className={`block min-w-0 flex-1 rounded-md border bg-panel-2 px-3 py-2 ${verdict}`}
+              >
+                <SequenceItemView item={byKey(k)} n={i + 1} />
+              </button>
+              {byKey(k).t && <SequencePlay t={byKey(k).t!} />}
+            </div>
           )
         })}
       </div>
       {!checked && (
         <div className="mt-3 space-y-1.5">
           {pool.map((it) => (
-            <button
-              key={it.key}
-              onClick={() => setOrder([...order, it.key])}
-              className="block w-full rounded-md border border-line bg-panel-2 px-3 py-2 hover:border-phosphor-dim"
-            >
-              <SequenceItemView item={it} />
-            </button>
+            <div key={it.key} className="flex items-stretch gap-1.5">
+              <button
+                onClick={() => setOrder([...order, it.key])}
+                className="block min-w-0 flex-1 rounded-md border border-line bg-panel-2 px-3 py-2 hover:border-phosphor-dim"
+              >
+                <SequenceItemView item={it} />
+              </button>
+              {it.t && <SequencePlay t={it.t} />}
+            </div>
           ))}
         </div>
       )}
@@ -758,6 +937,7 @@ function Form({ drill, onAnswered }: { drill: FormDrill; onAnswered: Answer }) {
   return (
     <div>
       <Prompt text={drill.prompt} kind="Mitschreiben" />
+      {!drill.exchange && <QuotedCallsProbe prompt={drill.prompt} />}
       {drill.chart && (
         <div className="mb-3">
           <Chart data={drill.chart} />
@@ -825,12 +1005,9 @@ function CallDrillView({ drill, onAnswered }: { drill: CallDrill; onAnswered: An
   const expected = drill.transmission !== null ? drill.exchange.transmissions[drill.transmission] : undefined
   return (
     <div>
-      <Prompt text={drill.prompt} kind={drill.expect === 'silence' ? 'Funkdisziplin' : 'Funkspruch'} />
-      <p className="-mt-2 mb-3 text-sm text-muted">
-        Du bist <span className="font-mono text-amber-hud">{drill.self}</span>.
-      </p>
-      <RadioPanel exchange={drill.exchange} listen>
-        {heard.length === 0 && <p className="text-sm text-muted">Die Frequenz ist frei.</p>}
+      <RadioTaskHeader kind={drill.expect === 'silence' ? 'Funkdisziplin' : 'Funkspruch'} drill={drill} />
+      <RadioPanel exchange={drill.exchange} listen neutral>
+        {heard.length === 0 && <p className="text-sm text-muted">Frei – niemand spricht.</p>}
         {heard.map(({ t, i }) => (
           <TransmissionLine key={i} t={t} />
         ))}
@@ -847,6 +1024,7 @@ function CallDrillView({ drill, onAnswered }: { drill: CallDrill; onAnswered: An
           hint={drill.hint}
           explain={drill.explain}
           hintContext={hintContextForExchange(drill.exchange)}
+          typedDigits={typedDigitsFor({ drillId: drill.id })}
           onDone={(r) => {
             setDone(true)
             onAnswered(r.correct)

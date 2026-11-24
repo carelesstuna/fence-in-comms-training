@@ -25,11 +25,13 @@ import { TTS_DOWNLOAD_MB } from '../../platform/tts-config'
 import {
   castKeyFor,
   ExchangeAudioContext,
+  waitGap,
   type ExchangeAudioValue,
   type LineAudio,
 } from './exchange-audio'
 
 let nextPanel = 1
+
 
 export function ExchangeAudio({
   transmissions,
@@ -105,20 +107,34 @@ export function ExchangeAudio({
   const seen = useRef(new Set<number>())
   const queue = useRef<number[]>([])
   const running = useRef(false)
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
   const runQueue = useCallback(async () => {
     if (running.current) return
     running.current = true
     try {
+      let played = false
       while (queue.current.length) {
         const i = queue.current.shift()!
         if (!audioRef.current.available) {
           reveal(i)
           continue
         }
+        // Zwischen zwei Funksprüchen eine kurze Pause wie im echten Funk
+        if (played && !(await waitGap(() => !mounted.current))) {
+          queue.current = []
+          break
+        }
         if (!(await playLine(i))) {
           queue.current = []
           break
         }
+        played = true
       }
     } finally {
       running.current = false
@@ -288,7 +304,12 @@ export function PlayAllButton({ className = '' }: { className?: string }) {
     if (!audio.available) return ctx.askSetup()
     stopRef.current = false
     setRunning(true)
+    let first = true
     for (const i of [...ctx.registered].sort((a, b) => a - b)) {
+      if (ctx.transmissions[i]?.skip) continue
+      // Kurze Pause zwischen den Funksprüchen, wie im echten Funk
+      if (!first && !(await waitGap(() => stopRef.current))) break
+      first = false
       if (stopRef.current || !(await ctx.playLine(i))) break
     }
     setRunning(false)

@@ -64,15 +64,18 @@ modules:
   - id: m2
     code: "2"
     title: Funkgeräte & Comm Plan
-    subtitle: UHF/VHF/FM, Presets, „push“, Guard, Funkdisziplin, SRS und IVC, Karten und Frequenzquellen
+    subtitle: UHF/VHF/FM, Presets, „push“, Guard, Funkdisziplin, SRS und IVC, Karten, Bullseye und Frequenzquellen
     group: core
     status: available
     description: >-
       Welche Funkgeräte du im Cockpit hast, wie Kanäle und Comm Plan funktionieren, wofür Guard da ist,
       wie man auf vollen Frequenzen diszipliniert funkt und wie das Ganze in SRS bzw. im BMS-Sprechfunk IVC aussieht. Dazu: welche
-      Frequenz wann, wie man Platz- und Anflugkarten und die Karte der eigenen Sim liest – und woher
-      Frequenzen und Verfahren in DCS, BMS und IL-2 kommen.
-    lessons: [m2-l1, m2-l2, m2-l3, m2-l4, m2-l5, m2-l6, m2-l7, m2-l8, m2-l9]
+      Frequenz wann, wie man Platz- und Anflugkarten und die Karte der eigenen Sim liest, wie man Positionen
+      vom Bullseye angibt und dabei die Missweisung einrechnet – und woher Frequenzen und Verfahren in DCS, BMS
+      und IL-2 kommen.
+    # m2-l10 (Bullseye) steht an Position 9 vor den Platzinfos; die behielten ihre ID m2-l9, damit Fortschritt und
+    # Verweise gültig bleiben.
+    lessons: [m2-l1, m2-l2, m2-l3, m2-l4, m2-l5, m2-l6, m2-l7, m2-l8, m2-l10, m2-l9]
     placement:
       drills:
         - m2-l1-match-bands
@@ -87,6 +90,7 @@ modules:
         - m2-l5-no-answer
         - m2-l6-sequence-plan
         - m2-l7-strip-order
+        - m2-l10-ruler-variation
         # nur mit BMS im Profil (sims: [bms]), sonst übersprungen
         - m2-l9-bms-tower
       passScore: 0.8
@@ -221,6 +225,8 @@ modules:
       Luftnahunterstützung mit JTAC – Check-in auf fox mike, 9-Line mitschreiben und zurücklesen, Zielansprache,
       Laser und Angriff. Schwerpunkt ist die A-10C, so wie heute in DCS und über SRS gefunkt wird.
     lessons: [track-c-l1, track-c-l2, track-c-l3, track-c-l4, track-c-l5, track-c-l6, track-c-l7, track-c-l8]
+    # Getippt dürfen Zahlen hier in Ziffern stehen: Grids und Höhen sind lang, die Funk-Form sitzt aus den Kernmodulen.
+    typedDigits: true
 
   - id: track-d
     code: D

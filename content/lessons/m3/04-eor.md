@@ -59,8 +59,6 @@ Quick Check und Arming oder De-Arming laufen (AFMAN 11-2F-16 V3, Abs. 3.4, T-1).
 dazu: Waffenschalter **safe**, und keine UFC- oder HUD-Eingaben, solange Personal unter dem Flugzeug ist.
 Die Crew arbeitet an Waffen, Sicherungsstiften und Schaltern. Was du jetzt bewegst, kann sie gefährden.
 
-::drill{id=m3-l4-hands}
-
 ---
 
 ::hangar{id=haende-sichtbar}
@@ -80,8 +78,6 @@ Die Crew arbeitet an Waffen, Sicherungsstiften und Schaltern. Was du jetzt beweg
 Zwei weitere belegte Regeln aus AFMAN 11-2F-16 V3 (Abs. 3.4.1 und 3.4.2): Du rollst **nicht vor einem
 Flugzeug vorbei, das mit nach vorn feuernden Waffen scharf gemacht wird**, und die Flugteilnehmer
 **prüfen sich gegenseitig** auf richtige Konfiguration und Auffälligkeiten.
-
-::drill{id=m3-l4-order}
 
 ---
 
@@ -110,7 +106,7 @@ Nach der Landung läuft es umgekehrt: Am EOR wird entwaffnet (De-Arm), mit dense
 :::
 
 :::sim{sim=bms}
-Falcon BMS hat seit Version 4.37 EOR-Karten und eine **gelbe Fläche** am Platz, den Arm-/De-Arm-Bereich.
+Falcon BMS hat EOR-Karten und eine **gelbe Fläche** am Platz, den Arm-/De-Arm-Bereich.
 Einen Funkablauf für das Scharfmachen gibt es dort nicht: Du rollst in die Fläche, die Bodencrew
 erledigt es, danach geht es zum Tower. Die Regel mit den Händen gilt trotzdem.
 :::

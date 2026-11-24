@@ -519,7 +519,7 @@ describe('Store lädt gespeicherte Stände', () => {
       ...v4,
       progress: { ...v4.progress, hangarSeen: 7, reviews: { a: { ...card, due: 'bald' } } },
     }
-    const s = await rehydrate(JSON.stringify({ state: broken, version: 4 }))
+    const s = await rehydrate(JSON.stringify({ state: broken, version: STORE_VERSION }))
     expect(s.progress.hangarSeen).toEqual([])
     expect(s.progress.reviews).toEqual({})
     expect(s.progress.lessons).toEqual(v4.progress.lessons)

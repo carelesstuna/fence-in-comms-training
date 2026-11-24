@@ -121,3 +121,19 @@ export function castKeyFor(x: object): string {
   }
   return k
 }
+
+/**
+ * Pause zwischen zwei Funksprüchen, wenn mehrere nacheinander laufen: Im echten Funk antwortet niemand im selben
+ * Augenblick – erst hören, kurz überlegen, dann die Taste drücken. Leicht zufällig zwischen 1,0 und 1,8 Sekunden.
+ */
+export const GAP_SECONDS: readonly [number, number] = [1.0, 1.8]
+
+/** Wartet die Pause ab; bricht früher ab (false), sobald `stopped()` wahr wird. */
+export async function waitGap(stopped: () => boolean, seconds = GAP_SECONDS[0] + Math.random() * (GAP_SECONDS[1] - GAP_SECONDS[0])): Promise<boolean> {
+  const end = Date.now() + seconds * 1000
+  while (Date.now() < end) {
+    if (stopped()) return false
+    await new Promise((r) => setTimeout(r, 50))
+  }
+  return !stopped()
+}

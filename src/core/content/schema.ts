@@ -29,6 +29,10 @@ export const ERAS = ['ww2', 'cold-war', 'modern'] as const
 export const eraSchema = z.enum(ERAS)
 export type Era = z.infer<typeof eraSchema>
 
+/** Feste Skizzen für Leseseiten (::sketch{kind=…}), gezeichnet in src/components/BullseyeSketch.tsx. */
+export const SKETCHES = ['bullseye', 'from-to', 'variation'] as const
+export type SketchKind = (typeof SKETCHES)[number]
+
 /**
  * Phraseologie einer Karte (E3-12): `faa` = US-Form („altimeter“ in inHg, „descend and maintain“, Sicht in Meilen),
  * `icao` = ICAO-Form („QNH“ in hPa, „descend to“, Sicht in Kilometern). Würfel und Funksprüche folgen dem Platz, wenn
@@ -130,6 +134,11 @@ export const NUMBER_KINDS = [
   'lasercode',
   /** Seemeilen mit einer Nachkommastelle (Line 3): 8.5 → „eight point five“. */
   'nm',
+  /**
+   * Entfernung in ganzen Seemeilen wie in Bullseye und BRAA (ATP 3-52.4): 25 → „twenty-five“. Feld `digits` ist die
+   * ziffernweise Form („two five“), damit Antworten beide Sprechweisen annehmen können.
+   */
+  'distance',
   /** Meter als ganze Zahl (Line 8, Talk-on): 1200 → „one thousand two hundred“. */
   'meters',
   /** Himmelsrichtung der 8er-Rose („south“), Unterfeld `opposite`. */
@@ -367,6 +376,21 @@ export const transmissionSchema = z
      * Wird beim Sprecher angezeigt; später wählt die Audio-Kette danach den Klang.
      */
     radio: z.enum(RADIOS).optional(),
+    /**
+     * Lesbarkeit beim Empfänger, 1 (unlesbar) bis 5 (einwandfrei), wie auf der ICAO-Skala. Ohne Angabe würfelt die
+     * Wiedergabe 4 oder 5. Als Text mit Platzhalter („{rd}“), wenn die Übung sie würfelt (Zahl oder one … five).
+     */
+    readability: z.union([z.number().int().min(1).max(5), z.string()]).optional(),
+    /** Störungen (Knacken, Aussetzer, Schwund): none, light, heavy. Ohne Angabe folgt sie der Lesbarkeit. */
+    interference: z.enum(['none', 'light', 'heavy']).optional(),
+    /** Sprechweise: lines = Teil für Teil mit Pause, zum Mitschreiben (9-Line, Readback dazu). */
+    pace: z.enum(['lines']).optional(),
+    /**
+     * Überlagerung: Diese Übertragung ist das, was bei Dritten ankommt, wenn die zwei genannten Übertragungen (Indizes)
+     * gleichzeitig senden – beide Stimmen verstümmelt unter einem lauten Pfeifton. Die Segmente beschreiben das Geräusch
+     * in eckigen Klammern, z. B. „[Pfeifton]“.
+     */
+    mix: z.tuple([z.number().int().nonnegative(), z.number().int().nonnegative()]).optional(),
     segments: z.array(segmentSchema).min(1),
     note: z.string().optional(),
     /** Nur, wenn dieser Wert gesetzt ist (wie `when` am Segment). */
@@ -379,8 +403,15 @@ export const exchangeSchema = z
   .object({
     id,
     title: z.string(),
+    /** Erklärung zum Funkspruch für Leseseiten. In Übungen erscheint sie nicht – dort steht die Lage der Übung. */
     context: z.string().optional(),
+    /**
+     * Funkgerät, auf dem der Austausch läuft: Station und Frequenz, z. B. "Ground · {airfield.gnd} {airfield.gnd.band}".
+     * Steht in Übungen in der Rahmenleiste unter „Funk“.
+     */
     freq: z.string().optional(),
+    /** Ort für die Rahmenleiste: Flugplatz oder kurz, wo du bist (z. B. "{airfield.name}", "Unterwegs zur CAP"). */
+    place: z.string().optional(),
     layer: layerSchema.default('core'),
     ...profileFilter,
     /** Stationen, aus deren Sicht der Austausch gespielt werden kann (z. B. [lead, two]). */
@@ -414,6 +445,49 @@ const drillBase = {
   callsignPool: z.string().optional(),
 }
 
+/**
+ * Rahmen und Lage für Übungen, in denen du selbst funkst (call, build, cloze). Oben steht die Rahmenleiste (Rufzeichen,
+ * Ort, Funk), darunter die Lage (`situation`) und der Auftrag (`prompt`).
+ */
+const radioTask = {
+  /** Lage: Zustand des Flugzeugs, genaue Position, was du weißt (z. B. ATIS gehört). Ohne Rufzeichen – das steht im Rahmen. */
+  situation: z.string().optional(),
+  /** Ort, falls er vom Funkspruch abweicht (sonst gilt `place` des Funkspruchs). */
+  place: z.string().optional(),
+  /** Funk, falls er vom Funkspruch abweicht (sonst gilt `freq` des Funkspruchs). */
+  freq: z.string().optional(),
+  /** Rufzeichen in der Rahmenleiste, wenn du jemand anderes spielst (Rollentausch, z. B. "{jtac}"). */
+  self: z.string().optional(),
+}
+
+/**
+ * Hörprobe für Auswahl- und Freitext-Übungen: Eine Übertragung aus `call` steht über der Frage und lässt sich abspielen
+ * (z. B. der Ruf, dessen Lesbarkeit du melden sollst). Die Variablen der Übung gelten auch im Funkspruch.
+ */
+const hearProbe = {
+  call: id.optional(),
+  /** Index der Übertragung (Standard 0). */
+  transmission: z.number().int().nonnegative().optional(),
+  /** Ersatz ohne Sprachausgabe: was du sonst gehört hättest (z. B. „Du verstehst ihn nur mit Mühe.“). */
+  noAudio: z.string().optional(),
+}
+
+/** Quelle einer Merk-Übung: was du hörst und was du danach zurückliest. */
+const memorySource = z
+  .object({
+    /** Funkspruch mit dem, was du hörst. */
+    call: id,
+    /** Übertragung(en), die du hörst – ein Index oder eine Liste (z. B. die drei Teile des 9-Line). */
+    heard: z.union([z.number().int().nonnegative(), z.array(z.number().int().nonnegative()).min(1)]),
+    /** Funkspruch mit deinem Readback, falls es ein anderer ist (die Variablen gelten für beide). */
+    answerCall: id.optional(),
+    /** Übertragung mit deinem Readback; Standard: die erste eigene nach dem Gehörten (bzw. im answerCall). */
+    answer: z.number().int().nonnegative().optional(),
+    /** Lage für diese Quelle (sonst die der Übung). */
+    situation: z.string().optional(),
+  })
+  .strict()
+
 export const GENERATORS = [
   'phonetic-letter-to-word',
   'phonetic-word-to-letter',
@@ -439,6 +513,7 @@ export const drillSchema = z.discriminatedUnion('type', [
       ...drillBase,
       type: z.literal('choice'),
       prompt: z.string(),
+      ...hearProbe,
       options: z.array(z.string()).min(2),
       /** Index der richtigen Option (vor dem Mischen) – oder mehrere Indizes für Mehrfachauswahl. */
       answer: z.union([z.number().int().nonnegative(), z.array(z.number().int().nonnegative()).min(1)]),
@@ -457,6 +532,7 @@ export const drillSchema = z.discriminatedUnion('type', [
     .object({
       ...drillBase,
       type: z.literal('build'),
+      ...radioTask,
       call: id,
       /** Perspektive (Station), aus der der Funkspruch gespielt wird. */
       as: z.string().optional(),
@@ -482,6 +558,7 @@ export const drillSchema = z.discriminatedUnion('type', [
       ...drillBase,
       type: z.literal('input'),
       prompt: z.string(),
+      ...hearProbe,
       accept: z.array(z.string()).min(1),
       hint: z.string().optional(),
       placeholder: z.string().optional(),
@@ -498,8 +575,26 @@ export const drillSchema = z.discriminatedUnion('type', [
   z
     .object({
       ...drillBase,
+      /**
+       * Merk-Übung zum Readback: Die Gegenstelle spricht, der Text erscheint Teil für Teil und verschwindet je nach Stufe
+       * wieder (FIFO). Danach liest du aus dem Kopf oder vom Kneeboard zurück. Acht Stufen: Text bleibt, verschwindet
+       * langsam, schnell, nur hören – jeweils mit wenig (`few`) und mit vielen Angaben (`many`).
+       */
+      type: z.literal('memory'),
+      prompt: z.string(),
+      ...radioTask,
+      few: memorySource,
+      many: memorySource,
+      /** Stufe, mit der die Übung beginnt (1–8); danach gilt die zuletzt erreichte. */
+      level: z.number().int().min(1).max(8).default(1),
+    })
+    .strict(),
+  z
+    .object({
+      ...drillBase,
       /** Lückentext: einzelne Segmente einer Übertragung werden zu Eingabefeldern. */
       type: z.literal('cloze'),
+      ...radioTask,
       call: id,
       transmission: z.number().int().nonnegative().optional(),
       as: z.string().optional(),
@@ -514,6 +609,7 @@ export const drillSchema = z.discriminatedUnion('type', [
        * expect: silence = die richtige Antwort ist, nichts zu sagen (z. B. nach „push“).
        */
       type: z.literal('call'),
+      ...radioTask,
       call: id,
       transmission: z.number().int().nonnegative().optional(),
       as: z.string().optional(),
@@ -675,9 +771,13 @@ export const scenarioStepSchema = z
       })
       .strict()
       .optional(),
-    /** Was gerade passiert (Markdown, Platzhalter erlaubt). */
+    /** Lage: was gerade passiert und was du weißt (Markdown, Platzhalter erlaubt). */
     situation: z.string().optional(),
-    /** Anzeige des aktiven Funkgeräts, z. B. "{cp.ground.freq} · Ground". */
+    /** Auftrag: was du in diesem Schritt tun sollst, ein Satz (z. B. „Melde dich beim AWACS an.“). */
+    task: z.string().optional(),
+    /** Ort ab diesem Schritt (Rahmenleiste), z. B. "Unterwegs zur CAP". Gilt, bis ein Schritt einen neuen nennt. */
+    place: z.string().optional(),
+    /** Anzeige des aktiven Funkgeräts ohne Einstellen, „Station · Frequenz“, z. B. "Crew Chief · Intercom". */
     freq: z.string().optional(),
     pos: z.enum(SKETCH_POSITIONS).optional(),
     /** Was du vor deinem Zug hörst. */
@@ -733,6 +833,8 @@ export const scenarioSchema = z
     as: z.string().optional(),
     /** Eigenes Rufzeichen aus diesem Pool (C-F5), z. B. attack. */
     callsignPool: z.string().optional(),
+    /** Ort zu Beginn (Rahmenleiste), z. B. "{af.name}". Schritte können ihn mit `place` ändern. */
+    place: z.string().optional(),
     /** Platzskizze: Flugplatz-Variable und optional Wetter-Variable (Wind-Pfeil, aktive Runway). */
     sketch: z.object({ airfield: z.string(), weather: z.string().optional() }).strict().optional(),
     /** Kneeboard/Comm Card: vor dem Start als Briefing, danach jederzeit aufklappbar. */
@@ -815,6 +917,11 @@ export const moduleSchema = z
     description: z.string(),
     aircraft: z.array(aircraftSchema).default([]),
     lessons: z.array(id).default([]),
+    /**
+     * Zahlen dürfen getippt auch in Ziffern stehen (Spur C: Grids, Höhen, Laser-Codes). Sonst gilt beim Tippen: Zahlen
+     * in Worten, so wie man sie spricht. Gesprochen gelten immer beide Formen.
+     */
+    typedDigits: z.boolean().default(false),
     placement: z
       .object({
         drills: z.array(id).min(3),

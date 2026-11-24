@@ -20,6 +20,8 @@
   context: >-
     Dein Flight fliegt genau so, wie es im Einsatzbefehl steht. Dann genügt die Kurzform: Missionsnummer,
     „as fragged“ und die Bitte um einen Alpha Check vom Bullseye. Das Muster steht in der ATP 3-52.4.
+  freq: "{awacs} · AWACS"
+  place: Unterwegs ins Einsatzgebiet
   vars:
     awacs: { pool: callsigns.awacs }
     mn: { int: [1000, 9999] }
@@ -83,6 +85,8 @@
     Dein Flight weicht vom Plan ab. Das sagst du gleich im Check-in: erst „with exceptions“ und der Alpha
     Check, dann nennst du die Abweichung. Welche Arten von Abweichung gemeldet werden müssen, steht in der
     ATP 3-52.4; die genaue Wortwahl legt das Briefing fest.
+  freq: "{awacs} · AWACS"
+  place: Unterwegs ins Einsatzgebiet
   vars:
     awacs: { pool: callsigns.awacs }
     mn: { int: [1000, 9999] }
@@ -130,6 +134,8 @@
     Dein Flight kommt in das Gebiet des AWACS und meldet sich so an, wie es in Sim-Staffeln üblich ist: wer,
     wie viele, wo, wie hoch und wozu – ohne Missionsnummer. Die ATP 3-52.4 kennt dafür das Format mit
     Missionsnummer (siehe „as fragged“); im Briefing kann ein eigenes Muster festgelegt sein.
+  freq: "{awacs} · AWACS"
+  place: Unterwegs zur CAP
   vars:
     awacs: { pool: callsigns.awacs }
     ac: { pool: aircraft, where: { role: multirole, era: modern } }
@@ -200,6 +206,8 @@
   context: >-
     Ein anderer Flight kommt beim AWACS nicht durch, du hörst ihn aber. Du gibst seine Meldung weiter – mit
     „relay“ und seinem Rufzeichen, nicht mit deinem.
+  freq: "{awacs} · AWACS"
+  place: In der Luft
   vars:
     awacs: { pool: callsigns.awacs }
     oth: { pool: callsigns.fighter }
@@ -229,6 +237,8 @@
   context: >-
     Bingo – Zeit für den Heimweg. Du meldest dich beim AWACS ab und lässt dir Peilung und Entfernung
     nach Hause geben.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pb: { number: bearing }
@@ -272,6 +282,8 @@
   context: >-
     Du willst prüfen, ob dein Navigationssystem stimmt. Der AWACS nennt dir deine Position – bezogen auf
     den Bullseye. Beim Check-in gehört diese Frage fest dazu.
+  freq: "{awacs} · AWACS"
+  place: Unterwegs ins Einsatzgebiet
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 1 }
@@ -313,6 +325,8 @@
   context: >-
     Der AWACS gibt ein Lagebild mit einer einzigen Gruppe. Es gilt für alle auf der Frequenz – deshalb
     nennt er nur sein eigenes Rufzeichen. Das Wort „picture“ sagt nur, wer danach fragt.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 1 }
@@ -348,6 +362,8 @@
   context: >-
     Du willst wissen, was dir am nächsten ist. Die Antwort kommt in BRAA – gerechnet von dir aus. Mit der
     Frage greifst du nichts an und übernimmst keine Gruppe als Ziel: Bogey dope bedeutet kein Targeting.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2 }
@@ -392,6 +408,8 @@
   context: >-
     Du hast ein Picture mit benannten Gruppen gehört und willst wissen, wo eine bestimmte Gruppe von dir aus
     liegt. Du hängst ihren Namen an „bogey dope“.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2 }
@@ -428,6 +446,8 @@
   title: Bogey Dope – nichts da
   layer: community
   context: Du fragst nach der nächsten Gruppe, aber der AWACS sieht nichts.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
   transmissions:
@@ -455,6 +475,8 @@
     Der AWACS ruft dich, ohne dass du gefragt hast. Eine Gruppe, die noch kein Jäger als Ziel übernommen hat,
     kommt in deine Bedrohungsreichweite – der AWACS warnt spätestens, wenn sie erreicht ist. Als Standard nennt die
     ATP 3-52.4 dafür 35 NM, unabhängig vom Aspekt; im Briefing kann etwas anderes stehen.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 1 }
@@ -489,6 +511,8 @@
   context: >-
     Die Warnung gilt mehreren Jägern, oder der AWACS kennt deine Position nicht genau. Dann gibt er sie im
     Bullseye-Format – so passt sie für jeden auf der Frequenz.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2 }
@@ -520,6 +544,8 @@
     Du bittest um das Lagebild, bevor dein Flight „commit“ gegangen ist. Der AWACS nennt die Gesamtzahl der
     Gruppen und dann je Gruppe Position, Höhe, Track und Identität – ohne Label und ohne Gruppennamen. Die
     ATP 3-52.4 nutzt diese Form vor dem Commit und bei höchstens drei Gruppen.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2, labelled: false }
@@ -561,6 +587,8 @@
   context: >-
     Dein Flight ist „commit“ gegangen, und die Formation der Gegner ist erkennbar. Jetzt nennt der AWACS
     erst Anzahl, Label und Abstand der Gruppen, dann die Gruppen selbst – die vorderen mit Bullseye.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2 }
@@ -604,6 +632,8 @@
   title: Picture mit drei Gruppen (Label)
   context: >-
     Drei Gruppen. Das Label sagt, wie sie zueinander stehen – wall, ladder, vic oder champagne.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 3 }
@@ -632,6 +662,8 @@
   context: >-
     Eine Gruppe wurde vor Kurzem noch geführt, dann 30 Sekunden lang von keinem Sensor aktualisiert. Fragst du
     innerhalb einer Minute nach dem Picture, nennt der AWACS die letzte bekannte Position.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 1 }
@@ -669,6 +701,8 @@
   context: >-
     Dein Radar zeigt eine Gruppe. Du nennst ihre Position und Höhe, der AWACS sagt dir, wer das ist. „declare“
     steht in der ATP 3-52.4 vorn.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 1, id: mixed }
@@ -720,6 +754,8 @@
   context: >-
     Der AWACS hat dir das Picture mit benannten Gruppen gegeben. Jetzt genügt der Gruppenname, um nach der
     Identität zu fragen – die Position brauchst du nicht mehr.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2, id: mixed }
@@ -752,6 +788,8 @@
   context: >-
     Der AWACS schickt dich auf deine CAP-Station. Das genaue Wort dafür ist CAP mit dem Punkt; viele Controller und
     Sim-Server sagen ANCHOR – beides heißt hier: dort kreisen und den Luftraum sichern.
+  freq: "{awacs} · AWACS"
+  place: Unterwegs zur CAP
   vars:
     awacs: { pool: callsigns.awacs }
     stn: { oneOf: [CAP, anchor] }

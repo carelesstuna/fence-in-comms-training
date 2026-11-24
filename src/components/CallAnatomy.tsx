@@ -119,6 +119,8 @@ export function TransmissionLine({
             />
           ))
         )}
+        {/* Regieanweisung zur Übertragung („Auf der neuen Frequenz.“, „Lesbarkeit 3“) – nur auf Leseseiten */}
+        {!neutral && t.note && !line?.hidden && <span className="basis-full text-xs text-muted italic">{t.note}</span>}
       </div>
     </div>
   )
@@ -168,19 +170,33 @@ export function RoleLegend({ exchange }: { exchange: ResolvedExchange }) {
  * Funkspruch im Kasten. Sichtbare Zeilen lassen sich abspielen; mit `listen` ist es eine Hörübung:
  * Der Text der Gegenstellen erscheint erst nach dem Hören (ohne Ton oder mit „Text immer zeigen“ sofort).
  */
-export function RadioPanel({ exchange, listen = false, children }: { exchange: ResolvedExchange; listen?: boolean; children: React.ReactNode }) {
+/**
+ * Funkspruch im Kasten. `neutral` (in Übungen): nur, was auf der Frequenz zu hören ist – ohne Titel, Frequenz und
+ * Erklärung; Rufzeichen, Ort und Funk stehen dort in der Rahmenleiste, die Lage darunter.
+ */
+export function RadioPanel({
+  exchange,
+  listen = false,
+  neutral = false,
+  children,
+}: {
+  exchange: ResolvedExchange
+  listen?: boolean
+  neutral?: boolean
+  children: React.ReactNode
+}) {
   return (
     <ExchangeAudio transmissions={exchange.transmissions} listen={listen}>
       <div className="scanlines overflow-hidden rounded-xl border border-line bg-panel">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-panel-2 px-4 py-2">
-          <span className="text-sm font-semibold text-text">{exchange.title}</span>
+          <span className="text-sm font-semibold text-text">{neutral ? 'Auf der Frequenz' : exchange.title}</span>
           <span className="flex items-center gap-2">
             <PlayAllButton />
-            {exchange.freq && <span className="font-mono text-xs text-phosphor">◉ {exchange.freq}</span>}
+            {!neutral && exchange.freq && <span className="font-mono text-xs text-phosphor">◉ {exchange.freq}</span>}
           </span>
         </div>
         <div className="space-y-3 px-4 py-3">
-          {exchange.context && <p className="text-sm text-muted italic">{exchange.context}</p>}
+          {!neutral && exchange.context && <p className="text-sm text-muted italic">{exchange.context}</p>}
           {children}
         </div>
       </div>

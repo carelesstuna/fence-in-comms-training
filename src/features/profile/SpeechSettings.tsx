@@ -30,7 +30,7 @@ export function SpeechSettings() {
   const s = useApp((st) => st.profile.speech)
   const set = setSpeech
   const speech = useSpeech()
-  const micList = useMicList()
+  const micList = useMicList(s.input === 'speak')
   const [pickKey, setPickKey] = useState(false)
   const [testing, setTesting] = useState(false)
 
@@ -56,6 +56,11 @@ export function SpeechSettings() {
         </p>
       </div>
 
+      <p className="text-xs text-muted">
+        Bekannte Grenze: Die Erkennung schreibt Zahlen als Ziffern. Ob du „three five zero“ oder „three hundred fifty“ sagst, kann
+        die App deshalb nicht unterscheiden – beides zählt. Sprich trotzdem Ziffer für Ziffer, so wie im Funk.
+      </p>
+
       <div className="flex flex-wrap gap-4 text-sm">
         <label className="flex items-center gap-2">
           <input type="radio" name="speech-input" checked={s.input === 'type'} onChange={() => set({ input: 'type' })} />
@@ -67,7 +72,7 @@ export function SpeechSettings() {
         </label>
       </div>
 
-      <div className="grid gap-3 text-sm sm:grid-cols-[10rem_1fr] sm:items-center">
+      <div className="grid gap-3 text-sm sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center">
         <span className="text-muted">Sprechtaste</span>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded border border-line bg-black/30 px-2 py-0.5 font-mono">{keyLabel(s.pttKey)}</span>
@@ -149,15 +154,22 @@ export function SpeechSettings() {
   )
 }
 
-/** Mikrofon wählen (samt „Alle Mikrofone anzeigen“ vor der ersten Freigabe) und die Browser-Filter. */
+/**
+ * Mikrofon wählen und die Browser-Filter. Die Namen der Mikrofone holt `useMicList(true)` beim Öffnen selbst; nur wenn
+ * das scheitert (Freigabe abgelehnt), gibt es „Erneut versuchen“.
+ */
 export function MicField({ settings: s, list }: { settings: Settings; list: MicListState }) {
   const { mics, revealing, error: micError, reveal } = list
   const set = setSpeech
   const savedMissing = !!s.micId && !!mics && !mics.devices.some((d) => d.deviceId === s.micId)
   return (
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-center gap-3">
-        <select value={s.micId} onChange={(e) => set({ micId: e.target.value })} className="max-w-full rounded-md border border-line bg-black/30 px-2 py-1">
+    <div className="min-w-0 space-y-1">
+      <div className="flex min-w-0 flex-wrap items-center gap-3">
+        <select
+          value={s.micId}
+          onChange={(e) => set({ micId: e.target.value })}
+          className="w-full min-w-0 truncate rounded-md border border-line bg-black/30 px-2 py-1 sm:w-auto sm:max-w-md"
+        >
           <option value="">{mics?.defaultLabel ? `Standardmikrofon (${mics.defaultLabel})` : 'Standardmikrofon'}</option>
           {savedMissing && <option value={s.micId}>{mics?.named ? 'Gewähltes Mikrofon fehlt – es nimmt das Standardmikrofon' : 'Gewähltes Mikrofon'}</option>}
           {mics?.devices.map((d) => (
@@ -166,20 +178,20 @@ export function MicField({ settings: s, list }: { settings: Settings; list: MicL
             </option>
           ))}
         </select>
-        {mics && !mics.named && (
-          <button className="rounded-md border border-line px-2.5 py-1 hover:border-phosphor disabled:opacity-50" disabled={revealing} onClick={reveal}>
-            {revealing ? 'Suche Mikrofone …' : 'Alle Mikrofone anzeigen'}
-          </button>
-        )}
+        {revealing && <span className="text-xs text-muted">Suche Mikrofone …</span>}
         <label className="flex items-center gap-2" title="Echo- und Rauschunterdrückung sowie automatische Lautstärke des Browsers. Für die Erkennung meist besser aus.">
           <input type="checkbox" checked={s.micFilters} onChange={(e) => set({ micFilters: e.target.checked })} />
           Browser-Filter
         </label>
       </div>
-      {mics && !mics.named && !micError && (
-        <p className="text-xs text-muted">Die Namen der Mikrofone gibt es erst nach der Freigabe. Dafür geht das Mikrofon einmal kurz an.</p>
+      {micError && !mics?.named && (
+        <p className="text-red-300">
+          {micError}{' '}
+          <button className="underline hover:text-text" onClick={reveal}>
+            Erneut versuchen
+          </button>
+        </p>
       )}
-      {micError && !mics?.named && <p className="text-red-300">{micError}</p>}
     </div>
   )
 }

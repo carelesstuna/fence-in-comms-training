@@ -17,6 +17,7 @@ import { isTauri, useSpeech } from '../../platform/speech-context'
 import { usePushToTalk } from '../../platform/usePushToTalk'
 import { squelch } from '../../platform/squelch'
 import { LevelMeter, PttButton } from './SpeechParts'
+import { SpokenNumbersNote } from '../TypedNumbersNote'
 import { ModelDownload, ModelLoaded } from './ModelDownload'
 import { whisperModel } from '../../platform/whisper-config'
 
@@ -25,11 +26,14 @@ const CAN_PRESS: readonly SpeechPhase[] = ['ready', 'review', 'discarded', 'erro
 export function SpeakPanel({
   blind,
   hintContext,
+  display,
   judge,
   onCommit,
 }: {
   blind: boolean
   hintContext?: HintContext
+  /** Transkript zum Anzeigen, z. B. Zahlen in Worten (`transcriptInWords`); gewertet wird das Transkript selbst. */
+  display?: (text: string) => string
   /** Wäre dieses Transkript richtig? (Nur ohne `blind` genutzt.) */
   judge: (text: string) => boolean
   /** Transkript werten; `rejected`: verworfene Versuche davor. */
@@ -180,8 +184,9 @@ export function SpeakPanel({
           <div>
             <span className="text-muted">{blind ? 'So wird gesendet: ' : 'Erkannt: '}</span>
             <span lang="en" className="font-mono">
-              „{transcript}“
+              „{display ? display(transcript) : transcript}“
             </span>
+            {display && display(transcript) !== transcript && <SpokenNumbersNote className="mt-0.5" />}
           </div>
           {!blind && <div className="text-amber-hud">Laut Bewertung nicht ganz richtig. Stimmt das Transkript?</div>}
           <div className="flex flex-wrap items-center gap-2">

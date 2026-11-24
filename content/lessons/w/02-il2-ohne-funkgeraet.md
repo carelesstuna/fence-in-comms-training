@@ -38,7 +38,7 @@ landen. Die KI antwortet mit Sprachbausteinen – und meldet Kontakte nach einem
 :::sim{sim=il2}
 **IL-2 Korea** hat ein neues Befehlsfenster mit deutlich mehr Befehlen. Die ganze Gruppe deiner
 KI-Flugzeuge, im IL-2-Sprachgebrauch eine Staffel („squadron“), lässt sich in Sektionen („sections“) teilen. Dazu kommen **Bodenradar-Posten**, die dich zum Ziel, zu einem Wegpunkt oder nach Hause
-führen, vor Bedrohungen warnen und deine Position bestätigen (siehe Modul 2, Lektion 9).
+führen, vor Bedrohungen warnen und deine Position bestätigen (siehe Modul 2, Lektion 10).
 :::
 
 ---
@@ -49,7 +49,7 @@ Für den Sprechfunk mit Menschen gibt es eine eigene **Community-Fassung von SRS
 Korea zugleich. Sie bringt **zwei Funkgeräte und ein Intercom** mit. Statt Frequenzen gibt es **Kanäle**,
 die der Server benennt.
 
-Welcher Kanal wofür ist, ist eine Absprache des Servers. Zwei Beispiele (Stand 2026):
+Welcher Kanal wofür ist, ist eine Absprache des Servers. Zwei Beispiele (Serverregeln ändern sich, maßgeblich ist die Serverinfo):
 
 | Server | Kanalplan |
 |---|---|

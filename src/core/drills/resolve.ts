@@ -19,7 +19,7 @@ import type { GeoPicture } from '../random/geo'
 import type { ChartData } from '../charts/chart'
 import { normalizeTokens } from '../phraseology/normalize'
 import { runGenerator } from './generators'
-import type { ResolvedDrill, ResolvedExchange, ResolvedScenario, ResolvedSegment, ResolvedTransmission, WhereMap } from './types'
+import type { HearProbe, MemorySet, RadioTaskFrame, ResolvedDrill, ResolvedExchange, ResolvedScenario, ResolvedSegment, ResolvedTransmission, WhereMap } from './types'
 import type { RadioStation } from '../scoring/tune'
 import { isFillerText, misplacedIssue, orderMatters } from '../scoring/score'
 import type { CasArea } from '../random/cas'
@@ -58,6 +58,17 @@ export function whenHolds(when: string | undefined, f: (s: string) => string): b
   return negate ? !set : set
 }
 
+const READ_WORDS: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5 }
+
+/** Lesbarkeit aus dem Inhalt: Zahl oder Text mit Platzhalter („{rd}“ → „3“ oder „three“). */
+export function readabilityOf(r: number | string | undefined, f: (s: string) => string): number | undefined {
+  if (r === undefined) return undefined
+  if (typeof r === 'number') return r
+  const t = f(r).trim().toLowerCase()
+  const n = READ_WORDS[t] ?? Number(t)
+  return Number.isInteger(n) && n >= 1 && n <= 5 ? n : undefined
+}
+
 function transmission(t: Transmission, f: (s: string) => string, station: string | undefined, usesStations: boolean, size: number): ResolvedTransmission {
   const pos = t.station ? FLIGHT_STATIONS[t.station as keyof typeof FLIGHT_STATIONS] : undefined
   return {
@@ -67,6 +78,10 @@ function transmission(t: Transmission, f: (s: string) => string, station: string
     skip: (pos !== undefined && pos > size) || !whenHolds(t.when, f),
     channel: t.channel,
     radio: t.radio,
+    readability: readabilityOf(t.readability, f),
+    interference: t.interference,
+    pace: t.pace,
+    mix: t.mix,
     note: t.note && f(t.note),
     segments: t.segments.filter((s) => whenHolds(s.when, f)).map((s) => ({
       text: f(s.text),
@@ -93,6 +108,7 @@ function applyVars(x: Exchange, vars: Record<string, Value>, station?: string, s
     title: f(x.title),
     context: x.context && f(x.context),
     freq: x.freq && f(x.freq),
+    place: x.place && f(x.place),
     layer: x.layer,
     transmissions: x.transmissions.map((t) => transmission(t, f, station, usesStations, size)),
   }
@@ -134,6 +150,62 @@ function withCall(drill: Drill & { call?: string; as?: string }, env: ResolveEnv
   return { x, vars, exchange: x ? applyVars(x, vars, station, e.self.size) : undefined, f: (t: string) => fillTemplate(t, vars) }
 }
 
+/**
+ * Quelle einer Merk-Übung auflösen: gehörter Funkspruch und Readback mit denselben Variablen (Übungs-Variablen
+ * überschreiben die der Funksprüche), damit der Readback zu dem passt, was man gehört hat.
+ */
+function memorySet(
+  drill: Extract<Drill, { type: 'memory' }>,
+  src: Extract<Drill, { type: 'memory' }>['few'],
+  env: ResolveEnv,
+): { set: MemorySet; vars: Record<string, Value> } {
+  const hx = env.content.exchanges.get(src.call)
+  const ax = src.answerCall ? env.content.exchanges.get(src.answerCall) : hx
+  if (!hx || !ax) throw new Error(`Funkspruch "${!hx ? src.call : src.answerCall}" fehlt`)
+  const e = envForPool(env, drill.callsignPool ?? hx.callsignPool ?? ax.callsignPool)
+  const vars = resolveVars({ ...hx.vars, ...(ax !== hx ? ax.vars : {}), ...drill.vars }, e)
+  const exchange = applyVars(hx, vars, undefined, e.self.size)
+  const answerExchange = ax === hx ? exchange : applyVars(ax, vars, undefined, e.self.size)
+  const heard = Array.isArray(src.heard) ? src.heard : [src.heard]
+  const last = Math.max(...heard)
+  const answer =
+    src.answer ??
+    (ax === hx
+      ? exchange.transmissions.findIndex((t, i) => i > last && t.you && !t.skip)
+      : answerExchange.transmissions.findIndex((t) => t.you && !t.skip))
+  const f = (t: string) => fillTemplate(t, vars)
+  const frame = radioFrame({ ...drill, situation: src.situation ?? drill.situation }, exchange, f, vars)
+  return {
+    set: { ...frame, self: frame.self ?? vars.callsign?.text, exchange, heard, answerExchange, answer },
+    vars,
+  }
+}
+
+/** Hörprobe einer Auswahl- oder Freitext-Übung (nur mit `call`). */
+function hearOf(
+  drill: { call?: string; transmission?: number; noAudio?: string },
+  exchange: ResolvedExchange | undefined,
+  f: (t: string) => string,
+): HearProbe | undefined {
+  if (!drill.call || !exchange) return undefined
+  return { exchange, transmission: drill.transmission ?? 0, noAudio: drill.noAudio && f(drill.noAudio) }
+}
+
+/** Rahmenleiste und Lage (call, build, cloze): Rufzeichen, Ort, Funk – Ort und Funk der Übung ersetzen die des Funkspruchs. */
+function radioFrame(
+  drill: { situation?: string; place?: string; freq?: string; self?: string },
+  x: ResolvedExchange,
+  f: (t: string) => string,
+  vars: Record<string, Value>,
+): RadioTaskFrame {
+  return {
+    self: drill.self ? f(drill.self) : vars.callsign?.text,
+    place: drill.place ? f(drill.place) : x.place,
+    freq: drill.freq ? f(drill.freq) : x.freq,
+    situation: drill.situation && f(drill.situation),
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Übungen
 // ---------------------------------------------------------------------------
@@ -142,7 +214,7 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
   const { rng } = env
   switch (drill.type) {
     case 'choice': {
-      const { f } = withCall(drill, env)
+      const { f, exchange } = withCall(drill, env)
       const order = drill.shuffle ? rng.shuffle(drill.options.map((_, i) => i)) : drill.options.map((_, i) => i)
       const answers = Array.isArray(drill.answer) ? drill.answer : [drill.answer]
       return {
@@ -153,6 +225,7 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
         options: order.map((i) => f(drill.options[i])),
         correct: answers.map((a) => order.indexOf(a)).sort((a, b) => a - b),
         multi: Array.isArray(drill.answer),
+        hear: hearOf(drill, exchange, f),
       }
     }
     case 'match': {
@@ -172,25 +245,42 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
     case 'build':
     case 'anatomy':
     case 'cloze': {
-      const { exchange, f } = withCall(drill, env)
+      const { exchange, f, vars } = withCall(drill, env)
       const transmission = defaultTransmission(exchange!, drill.transmission)
       const base = { id: drill.id, explain: drill.explain && f(drill.explain), exchange: exchange!, transmission }
+      const frame = drill.type === 'anatomy' ? {} : radioFrame(drill, exchange!, f, vars)
       if (drill.type === 'anatomy') return { ...base, kind: 'anatomy', prompt: f(drill.prompt), target: drill.target }
       if (drill.type === 'cloze') {
-        return { ...base, kind: 'cloze', prompt: f(drill.prompt ?? 'Fülle die Lücken im Funkspruch.'), blanks: [...drill.blanks].sort((a, b) => a - b) }
+        return { ...base, ...frame, kind: 'cloze', prompt: f(drill.prompt ?? 'Fülle die Lücken im Funkspruch.'), blanks: [...drill.blanks].sort((a, b) => a - b) }
       }
       const solution = exchange!.transmissions[transmission].segments.map((s) => s.text)
       const distractors = drill.distractors.map(f).filter((d) => !solution.some((s) => same(s, d)))
       const tiles = rng.shuffle([...solution, ...distractors]).map((text, i) => ({ key: `t${i}`, text }))
-      return { ...base, kind: 'build', prompt: f(drill.prompt ?? 'Bring die Bausteine in die richtige Reihenfolge.'), tiles, solution }
+      return { ...base, ...frame, kind: 'build', prompt: f(drill.prompt ?? 'Bring die Bausteine in die richtige Reihenfolge.'), tiles, solution }
+    }
+    case 'memory': {
+      const few = memorySet(drill, drill.few, env)
+      const many = memorySet(drill, drill.many, env)
+      const f = (t: string) => fillTemplate(t, few.vars)
+      return {
+        kind: 'memory',
+        id: drill.id,
+        prompt: f(drill.prompt),
+        explain: drill.explain && f(drill.explain),
+        few: few.set,
+        many: many.set,
+        level: drill.level,
+      }
     }
     case 'call': {
       const { exchange, f, vars } = withCall(drill, env)
-      const self = vars.callsign.text
       const x = exchange!
+      const base = radioFrame(drill, x, f, vars)
+      const frame = { ...base, self: base.self ?? vars.callsign.text }
       const visible = x.transmissions.filter((t) => !t.skip).length
       if (drill.expect === 'silence') {
         return {
+          ...frame,
           kind: 'call',
           id: drill.id,
           prompt: f(drill.prompt ?? 'Was funkst du jetzt?'),
@@ -200,11 +290,11 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
           heard: drill.show ?? x.transmissions.length,
           expect: 'silence',
           hint: drill.hint && f(drill.hint),
-          self,
         }
       }
       const t = defaultTransmission(x, drill.transmission)
       return {
+        ...frame,
         kind: 'call',
         id: drill.id,
         prompt: f(drill.prompt ?? 'Du bist dran. Was funkst du?'),
@@ -214,7 +304,6 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
         heard: Math.min(drill.show ?? t, visible),
         expect: 'call',
         hint: drill.hint && f(drill.hint),
-        self,
       }
     }
     case 'plot': {
@@ -251,7 +340,7 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
             .filter((ti) => !exchange.transmissions[ti].skip)
             .map((ti) => {
               const t = exchange.transmissions[ti]
-              return { key: `s${ti}`, label: t.segments.map((s) => s.text).join(', '), speaker: t.you ? 'Du' : t.speaker }
+              return { key: `s${ti}`, label: t.segments.map((s) => s.text).join(', '), speaker: t.you ? 'Du' : t.speaker, t }
             })
         : (drill.items ?? []).map((text, i) => ({ key: `s${i}`, label: f(text) }))
       return {
@@ -259,6 +348,7 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
         id: drill.id,
         prompt: f(drill.prompt),
         explain: drill.explain && f(drill.explain),
+        exchange,
         items: rng.shuffle(items),
         solution: items.map((i) => i.key),
       }
@@ -278,12 +368,13 @@ export function resolveDrill(drill: Drill, env: ResolveEnv): ResolvedDrill {
       }
     }
     case 'input': {
-      const { f } = withCall(drill, env)
+      const { f, exchange } = withCall(drill, env)
       return {
         kind: 'input',
         id: drill.id,
         prompt: f(drill.prompt),
         explain: drill.explain && f(drill.explain),
+        hear: hearOf(drill, exchange, f),
         accept: drill.accept.map(f),
         hint: drill.hint && f(drill.hint),
         placeholder: drill.placeholder && f(drill.placeholder),
@@ -369,7 +460,10 @@ export function resolveScenario(sc: Scenario, env: ResolveEnv): ResolvedScenario
   const tr = (t: Transmission) => transmission(t, f, sc.as, false, size)
   const visible = (list: Transmission[]) => list.map(tr).filter((t) => !t.skip)
 
+  // Ort fortschreiben: Ein Schritt mit `place` gilt, bis ein späterer einen neuen nennt
+  let place = sc.place && f(sc.place)
   const steps = sc.steps.map((st) => {
+    if (st.place) place = f(st.place)
     const you = st.you
       ? (() => {
           const t = { ...tr(st.you.transmission), you: true }
@@ -392,6 +486,8 @@ export function resolveScenario(sc: Scenario, env: ResolveEnv): ResolvedScenario
           }
         : undefined,
       situation: st.situation && f(st.situation),
+      task: st.task && f(st.task),
+      place,
       freq: st.freq && f(st.freq),
       pos: st.pos,
       hear: visible(st.hear),

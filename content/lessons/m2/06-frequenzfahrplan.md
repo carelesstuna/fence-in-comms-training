@@ -7,8 +7,8 @@ summary: Woher die Frequenzen kommen, welche Quelle bei Widerspruch gilt, in wel
 minutes: 8
 xp: 80
 sources:
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 8–16 – Ablauf und Comm Plan, Antwort auf falscher Frequenz"
-  - title: "Falcon BMS 4.38 Technical Manual (im BMS-Ordner Docs), S. 51, 56–57 – falsche Frequenz, zwei Funkgeräte"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 8–16 – Ablauf und Comm Plan, Antwort auf falscher Frequenz"
+  - title: "Falcon BMS 4.38 Technical Manual (liegt BMS bei, im Installationsordner unter Docs), S. 51, 56–57 – falsche Frequenz, zwei Funkgeräte"
   - title: "DCS A-10C II Flight Manual (liegt DCS bei), S. 791–792 – Aufteilung der Funkgeräte"
   - title: "FAA Aeronautical Information Manual – Kapitel 4-2 (Radio Communications Phraseology and Techniques)"
 ---

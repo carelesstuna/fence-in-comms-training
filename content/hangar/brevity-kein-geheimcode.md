@@ -11,8 +11,8 @@ sources:
 ---
 
 Brevity heißt **Kürze** – nicht Geheimhaltung. Die Wörter stehen in einem Handbuch, das jeder lesen
-kann: der **ATP 1-02.1 „Multi-Service Brevity Codes“** der US-Streitkräfte. Die aktuelle Ausgabe ist
-vom April 2025. Die NATO hat mit **APP-7** eine eigene, eng verwandte Sammlung – ähnlich, aber nicht
+kann: der **ATP 1-02.1 „Multi-Service Brevity Codes“** der US-Streitkräfte. Sie wird alle paar Jahre
+neu aufgelegt. Die NATO hat mit **APP-7** eine eigene, eng verwandte Sammlung – ähnlich, aber nicht
 in jedem Wort gleich.
 
 Wenn jeder nachlesen kann, was „push Strike“ heißt – warum sagt man dann nicht einfach „wechselt auf

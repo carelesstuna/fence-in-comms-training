@@ -23,7 +23,8 @@
 - id: m5-l1-build-checkin
   type: build
   call: m5-awacs-checkin-fragged
-  prompt: Bau deinen Check-in **as fragged** beim AWACS **{awacs}**. Deine Missionsnummer ist **{mn}**.
+  situation: Alles läuft genau wie im Einsatzbefehl geplant. Die Missionsnummer ist **{mn}**.
+  prompt: Bau deinen Check-in beim AWACS.
   distractors: [request startup, "information Bravo", checking in with exceptions, over]
   explain: >-
     Wen – wer – Missionsnummer – as fragged – Alpha Check. Begriffe aus dem Funk mit dem Tower haben hier nichts
@@ -39,9 +40,8 @@
 - id: m5-l1-call-checkin
   type: call
   call: m5-awacs-checkin-fragged
-  prompt: >-
-    Dein Flight fliegt genau nach Einsatzbefehl, die Missionsnummer ist **{mn}**. Melde dich beim AWACS
-    **{awacs}** an und bitte um einen Alpha Check vom Bullseye.
+  situation: Ihr fliegt genau nach Einsatzbefehl, die Missionsnummer ist **{mn}**.
+  prompt: Melde dich beim AWACS an und lass dir deine Position bestätigen.
   hint: Adressat – Rufzeichen – mission number … – checking in as fragged – request alpha check bullseye
   explain: >-
     Mit der Missionsnummer weiß der AWACS, wer du bist und was du vorhast. Anzahl, Typ und Beladung nennst du nur,
@@ -67,9 +67,8 @@
 - id: m5-l1-call-exceptions
   type: call
   call: m5-awacs-checkin-exceptions
-  prompt: >-
-    Dein Flight hat eine Abweichung vom Plan (**{exc}**). Missionsnummer **{mn}**. Melde dich beim AWACS
-    **{awacs}** an – die Abweichung selbst kommt erst im nächsten Funkspruch.
+  situation: Ihr weicht vom Einsatzbefehl ab (**{exc}**), die Missionsnummer ist **{mn}**.
+  prompt: Melde dich beim AWACS an – die Abweichung selbst nennst du erst im nächsten Funkspruch.
   hint: Adressat – Rufzeichen – mission number … – checking in with exceptions – request alpha check bullseye
   explain: >-
     Erst „with exceptions“ und der Alpha Check. Antwortet der AWACS mit „continue with check in“, nennst du die
@@ -79,10 +78,10 @@
   type: call
   call: m5-awacs-checkin
   layer: community
-  prompt: >-
-    Du führst einen **{flightSize}-ship**, etwa **{pdist} Meilen „{pcard}“ von {af.name}**, auf
-    **angels {ang}**. Laut Missionsbriefing fliegst du CAP, ein Format mit Missionsnummer ist nicht
-    vorgeschrieben. Melde dich beim AWACS **{awacs}** an.
+  situation: >-
+    Dein Flight (**{flightSize}** Flugzeuge) ist etwa **{pdist} Meilen „{pcard}“ von {af.name}**, auf
+    **{ang}.000 Fuß**. Laut Missionsbriefing fliegt ihr CAP; ein Format mit Missionsnummer ist nicht vorgeschrieben.
+  prompt: Melde dich beim AWACS an.
   hint: Adressat – Rufzeichen – flight of … – Position – angels – checking in for CAP
   explain: Die Sim-Kurzform. Die Playtime kannst du anhängen, sie ist aber kein Muss.
 
@@ -138,7 +137,8 @@
 - id: m5-l1-call-checkout
   type: call
   call: m5-awacs-checkout
-  prompt: Bingo. Melde dich beim AWACS **{awacs}** ab und lass dir den Weg nach Hause geben.
+  situation: Dein Treibstoff reicht nur noch für den Heimweg – Zeit, die Station zu verlassen.
+  prompt: Melde dich beim AWACS ab und lass dir den Weg nach Hause geben.
   hint: Adressat – Rufzeichen – RTB – request pigeons
   explain: Mit RTB weiß der AWACS, dass du die Station verlässt. PIGEONS liefert dir Kurs und Entfernung nach Hause.
 
@@ -184,7 +184,9 @@
 - id: m5-l2-build-group
   type: build
   call: m5-single-group
-  prompt: Bau die Gruppenmeldung des AWACS in der richtigen Reihenfolge.
+  self: "{awacs}"
+  situation: Rollentausch – du bist der AWACS und siehst genau eine Gruppe.
+  prompt: Bau deine Gruppenmeldung an alle auf der Frequenz.
   distractors: ["angels two five", BRAA, picture, over]
   explain: >-
     Rufzeichen des AWACS – single group – Bullseye – Höhe – Track – Identität. Das Wort „picture“ gehört nur in
@@ -193,7 +195,8 @@
 - id: m5-l2-alpha-call
   type: call
   call: m5-alpha-check
-  prompt: Du willst prüfen, ob dein Navigationssystem stimmt. Frag den AWACS **{awacs}**.
+  situation: Vor dem Einsatz willst du prüfen, ob dein Navigationssystem die richtige Position anzeigt.
+  prompt: Lass dir vom AWACS deine Position bestätigen.
   hint: Adressat – Rufzeichen – request alpha check bullseye
   explain: >-
     Die Antwort nennt deine Position vom Bullseye aus. Stimmt sie mit deinem Bullseye-Cursor überein (laut
@@ -244,16 +247,16 @@
 - id: m5-l3-call-bogey
   type: call
   call: m5-bogey-dope
-  prompt: Du willst von **{awacs}** wissen, was dir am nächsten ist. Was funkst du?
+  situation: Dein eigenes Radar zeigt noch nichts, der AWACS hat aber mehrere Gruppen im Lagebild.
+  prompt: Frag den AWACS, wo die Gruppe steht, die dir am nächsten ist.
   hint: Adressat – Rufzeichen – Brevity
   explain: Drei Teile – mehr braucht es nicht.
 
 - id: m5-l3-call-bogey-group
   type: call
   call: m5-bogey-dope-group
-  prompt: >-
-    Du hast von **{awacs}** ein Picture mit zwei Gruppen ({pic.label}) gehört. Jetzt willst du wissen, wo die
-    **{pic.g1.name}** von dir aus liegt. Was funkst du?
+  situation: Der AWACS hat eben ein Picture mit zwei Gruppen gegeben ({pic.label}).
+  prompt: Frag den AWACS, wo die **{pic.g1.name}** von dir aus liegt.
   hint: Adressat – Rufzeichen – bogey dope – Gruppenname
   explain: >-
     Mit dem Gruppennamen bekommst du das BRAA zu genau dieser Gruppe statt zur nächsten. Targeting ist das
@@ -362,7 +365,8 @@
 - id: m5-l3-threat-ack
   type: call
   call: m5-threat
-  prompt: Der AWACS ruft dich ungefragt. Was antwortest du?
+  situation: Du hast nichts gefragt – der AWACS ruft dich von sich aus.
+  prompt: Antworte dem AWACS.
   explain: Nur dein Rufzeichen. Was du dann tust – abdrehen oder angreifen –, ist Thema der später geplanten Spur Luftkampf.
 
 - id: m5-l3-threat-bulls
@@ -383,7 +387,9 @@
 - id: m5-l4-call-picture
   type: call
   call: m5-picture-core
-  prompt: Du willst das Lagebild. Frag den AWACS **{awacs}**.
+  situation: >-
+    Dein Flight ist noch nicht „commit“ gegangen, und du hast noch keinen Überblick über die Gruppen im Gebiet.
+  prompt: Bitte den AWACS um das Lagebild.
   hint: Adressat – Rufzeichen – Anfrage
   explain: Auf vollen Frequenzen sparsam damit umgehen – die Antwort ist lang. Das Wort „picture“ sagt nur der, der fragt.
 
@@ -623,25 +629,26 @@
 - id: m5-l5-call-declare
   type: call
   call: m5-declare
-  prompt: >-
-    Dein Radar zeigt eine Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}**. Frag den AWACS
-    **{awacs}**, wer das ist.
+  situation: >-
+    Dein Radar zeigt eine Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}**. Wer das ist, weißt du nicht.
+  prompt: Frag den AWACS, wer das ist.
   hint: Adressat – Rufzeichen – declare – bullseye … – Höhe (bullseye 045/60 oder 045, 60 – beides geht)
   explain: Die Position im Bullseye-Format und die Höhe – damit findet der AWACS die Gruppe auf seinem Schirm. „declare“ steht vorn.
 
 - id: m5-l5-build-declare
   type: build
   call: m5-declare
-  prompt: Bau die declare-Anfrage für die Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}**.
+  situation: >-
+    Dein Radar zeigt eine Gruppe bei **bullseye {pic.g1.bulls}**, **{pic.g1.alt}**. Wer das ist, weißt du nicht.
+  prompt: Bau deine Frage an den AWACS nach der Identität dieser Gruppe.
   distractors: ["angels {pic.g1.angels|spoken}", bogey dope, "BRAA"]
   explain: Bullseye-Format und „thousand“ – nicht „angels“, die Gruppe ist ja (noch) kein Freund.
 
 - id: m5-l5-call-declare-group
   type: call
   call: m5-declare-group
-  prompt: >-
-    Du hast von **{awacs}** ein Picture mit zwei benannten Gruppen ({pic.label}) gehört. Frag nach der Identität
-    der **{pic.g1.name}**.
+  situation: Der AWACS hat dir ein Picture mit zwei benannten Gruppen gegeben ({pic.label}).
+  prompt: Frag den AWACS nach der Identität der **{pic.g1.name}**.
   hint: Adressat – Rufzeichen – declare – Gruppenname
   explain: Nach einem Label genügt der Gruppenname – die Bullseye-Position brauchst du nicht mehr zu nennen.
 
@@ -719,5 +726,6 @@
 - id: m5-l6-call-anchor
   type: call
   call: m5-anchor
-  prompt: Der AWACS schickt dich auf deine CAP-Station. Was antwortest du?
+  situation: Du bist beim AWACS angemeldet. Jetzt weist er dir deine CAP-Station zu.
+  prompt: Antworte dem AWACS.
   explain: Wie bei allen Informationen vom AWACS – nur dein Rufzeichen.

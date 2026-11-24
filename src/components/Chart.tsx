@@ -2,8 +2,9 @@
  * Schematische Platzkarte (Airport Diagram) und Anflugkarte (Approach Chart) als SVG im Papier-Look.
  * Elemente sind antippbar (chart-tap): Frequenzen, Platzhöhe, TACAN, Runway-Enden, FAF, DA, MSA …
  */
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import type { ChartData, ChartFreq } from '../core/charts/chart'
+import { AIRPORT_VIEW, airportLayout, APPROACH_VIEW, chartZones, type Box, type ChartZone } from './chart-geometry'
 import { formatAltitude, formatFrequency, formatHeading } from '../core/phraseology/spoken'
 
 export type ChartMark = 'right' | 'wrong' | 'sel'
@@ -39,29 +40,96 @@ function Tap({ id, x, y, w, h, onTap, marks, children }: TapProps) {
   )
 }
 
-const freqText = (f: ChartFreq) => (f.mhz !== undefined ? formatFrequency(f.mhz) : '—')
+// ---------------------------------------------------------------------------
+// Erkunden (Leseseiten, ::chart{… annotate}): Bereiche der Karte mit Erklärung beim Überfahren
+// ---------------------------------------------------------------------------
 
-function runwayGeometry(pairs: string[], cx: number, cy: number, half: number) {
-  return pairs.map((pair) => {
-    const ends = pair.split('/') as [string, string]
-    const heading = Number(ends[0].replace(/[LRC]/, '')) * 10
-    const r = (heading * Math.PI) / 180
-    const d = { x: Math.sin(r), y: -Math.cos(r) }
-    const left = { x: d.y, y: -d.x }
-    const side = ends[0].match(/[LRC]$/)?.[0]
-    // "left" zeigt in Blickrichtung des ersten Bahnendes nach links: L liegt dort, R gegenüber
-    const off = side === 'L' ? 14 : side === 'R' ? -14 : 0
-    const c = { x: cx + left.x * off, y: cy + left.y * off }
-    return {
-      ends,
-      d,
-      left,
-      off,
-      a: { x: c.x - d.x * half, y: c.y - d.y * half },
-      b: { x: c.x + d.x * half, y: c.y + d.y * half },
-    }
-  })
+/** Farbe der Hotspots und der Hervorhebung. */
+export const HOTSPOT = '#1d4ed8'
+
+export interface ChartNote {
+  title: string
+  body: ReactNode
 }
+
+export interface ChartExplore {
+  notes: Record<string, ChartNote>
+  active?: string
+  pinned?: boolean
+  hover: (id: string) => void
+  leave: () => void
+  pick: (id: string) => void
+}
+
+/** Hotspots, Abdunkeln außerhalb des aktiven Bereichs und unsichtbare Flächen für Maus und Finger. */
+function ZoneLayer({ zones, explore, view }: { zones: ChartZone[]; explore: ChartExplore; view: Box }) {
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const active = zones.find((z) => z.id === explore.active)
+  return (
+    <g>
+      {active && (
+        <g pointerEvents="none">
+          <mask id={`spot${uid}`}>
+            <rect x={view.x} y={view.y} width={view.w} height={view.h} fill="white" />
+            <path d={active.d} fill="black" />
+          </mask>
+          <rect x={view.x} y={view.y} width={view.w} height={view.h} fill={INK} opacity={0.42} mask={`url(#spot${uid})`} />
+          <path d={active.d} fill="none" stroke={HOTSPOT} strokeWidth={1.8} strokeLinejoin="round" />
+        </g>
+      )}
+      {zones.map((z) => (
+        <g key={z.id} pointerEvents="none" aria-hidden="true">
+          {z.id !== explore.active && (
+            <circle cx={z.dot.x} cy={z.dot.y} r={4} fill="none" stroke={HOTSPOT} strokeWidth={1} className="motion-reduce:hidden">
+              <animate attributeName="r" values="4;9" dur="2.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.8;0" dur="2.2s" repeatCount="indefinite" />
+            </circle>
+          )}
+          <circle cx={z.dot.x} cy={z.dot.y} r={3.6} fill={HOTSPOT} stroke={PAPER} strokeWidth={1.2} />
+        </g>
+      ))}
+      {zones.map((z) => (
+        <path
+          key={z.id}
+          d={z.d}
+          fill="transparent"
+          className="cursor-help"
+          data-zone={z.id}
+          onMouseEnter={() => explore.hover(z.id)}
+          onMouseLeave={explore.leave}
+          onClick={() => explore.pick(z.id)}
+        />
+      ))}
+    </g>
+  )
+}
+
+/** Erklärkärtchen über der Karte, unter oder über dem aktiven Bereich. */
+function ZoneTip({ zone, note, view, pinned }: { zone: ChartZone; note: ChartNote; view: Box; pinned?: boolean }) {
+  const cx = ((zone.box.x + zone.box.w / 2 - view.x) / view.w) * 100
+  const top = ((zone.box.y - view.y) / view.h) * 100
+  const bottom = ((zone.box.y + zone.box.h - view.y) / view.h) * 100
+  const below = (top + bottom) / 2 < 50
+  return (
+    <div
+      role="status"
+      className="pointer-events-none absolute z-10 w-[min(330px,94%)] -translate-x-1/2 rounded-lg border border-line bg-panel/95 px-3.5 py-2.5 text-sm leading-snug text-muted shadow-xl shadow-black/40 backdrop-blur-sm"
+      style={{
+        left: `clamp(min(165px, 47%), ${cx}%, calc(100% - min(165px, 47%)))`,
+        ...(below ? { top: `calc(${bottom}% + 8px)` } : { bottom: `calc(${100 - top}% + 8px)` }),
+      }}
+    >
+      <div className="mb-1 flex items-center gap-2 font-semibold text-text">
+        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: HOTSPOT }} />
+        {note.title}
+        {pinned && <span className="ml-auto text-[11px] font-normal text-muted">angeheftet</span>}
+      </div>
+      {note.body}
+    </div>
+  )
+}
+
+const freqText = (f: ChartFreq) => (f.mhz !== undefined ? formatFrequency(f.mhz) : '—')
 
 function Footer({ data, y }: { data: ChartData; y: number }) {
   return (
@@ -75,17 +143,20 @@ function Footer({ data, y }: { data: ChartData; y: number }) {
 // Platzkarte
 // ---------------------------------------------------------------------------
 
-function AirportDiagram({ data, onTap, marks }: { data: ChartData; onTap?: (id: string) => void; marks?: Record<string, ChartMark> }) {
-  const rw = runwayGeometry(data.runways, 140, 175, 92)
-  const main = rw.find((r) => r.ends.includes(data.activeEnd ?? '')) ?? rw[0]
-  // Rollweg und Vorfeld rechts neben der äußersten parallelen Bahn (nicht unter einer anderen Bahn)
-  const outer = Math.min(...rw.filter((r) => r.d.x === main.d.x && r.d.y === main.d.y).map((r) => r.off))
-  const taxiOffset = 26 + (main.off - outer)
-  const t1 = { x: main.a.x + main.left.x * -taxiOffset, y: main.a.y + main.left.y * -taxiOffset }
-  const t2 = { x: main.b.x + main.left.x * -taxiOffset, y: main.b.y + main.left.y * -taxiOffset }
-  const apronOff = outer - 66
-  const apron = { x: 140 + main.left.x * apronOff, y: 175 + main.left.y * apronOff }
-  const shown = data.freqs.filter((f) => f.id !== 'departure' || f.mhz !== undefined)
+function AirportDiagram({
+  data,
+  onTap,
+  marks,
+  zones,
+  explore,
+}: {
+  data: ChartData
+  onTap?: (id: string) => void
+  marks?: Record<string, ChartMark>
+  zones?: ChartZone[]
+  explore?: ChartExplore
+}) {
+  const { rw, main, taxiOffset, t1, t2, apron, shown } = airportLayout(data)
   return (
     <svg viewBox="0 0 420 320" className="w-full rounded-lg" style={{ background: PAPER }} role="img" aria-label={`Platzkarte ${data.name}`}>
       <rect x={4} y={4} width={412} height={312} fill="none" stroke={INK} strokeWidth={1} />
@@ -186,6 +257,7 @@ function AirportDiagram({ data, onTap, marks }: { data: ChartData; onTap?: (id: 
         </g>
       ))}
       <Footer data={data} y={308} />
+      {zones && explore && <ZoneLayer zones={zones} explore={explore} view={AIRPORT_VIEW} />}
     </svg>
   )
 }
@@ -207,7 +279,19 @@ function wrap(text: string, max: number): string[] {
   return lines
 }
 
-function ApproachChart({ data, onTap, marks }: { data: ChartData; onTap?: (id: string) => void; marks?: Record<string, ChartMark> }) {
+function ApproachChart({
+  data,
+  onTap,
+  marks,
+  zones,
+  explore,
+}: {
+  data: ChartData
+  onTap?: (id: string) => void
+  marks?: Record<string, ChartMark>
+  zones?: ChartZone[]
+  explore?: ChartExplore
+}) {
   const ap = data.approach!
   const elev = data.elevationFt
   const order: ChartFreq['id'][] = ['atis', 'approach', 'tower', 'ground']
@@ -375,18 +459,38 @@ function ApproachChart({ data, onTap, marks }: { data: ChartData; onTap?: (id: s
         </marker>
       </defs>
       <Footer data={data} y={458} />
+      {zones && explore && <ZoneLayer zones={zones} explore={explore} view={APPROACH_VIEW} />}
     </svg>
   )
 }
 
-export function Chart({ data, onTap, marks }: { data: ChartData; onTap?: (id: string) => void; marks?: Record<string, ChartMark> }) {
+export function Chart({
+  data,
+  onTap,
+  marks,
+  explore,
+}: {
+  data: ChartData
+  onTap?: (id: string) => void
+  marks?: Record<string, ChartMark>
+  /** Leseseiten: Bereiche mit Erklärung beim Überfahren oder Antippen. */
+  explore?: ChartExplore
+}) {
+  const isApproach = data.kind === 'approach' && !!data.approach
+  const zones = explore ? chartZones(data).filter((z) => explore.notes[z.id]) : undefined
+  const active = zones?.find((z) => z.id === explore?.active)
   return (
     <div className="mx-auto w-full max-w-[560px]">
-      {data.kind === 'approach' && data.approach ? (
-        <ApproachChart data={data} onTap={onTap} marks={marks} />
-      ) : (
-        <AirportDiagram data={data} onTap={onTap} marks={marks} />
-      )}
+      <div className="relative">
+        {isApproach ? (
+          <ApproachChart data={data} onTap={onTap} marks={marks} zones={zones} explore={explore} />
+        ) : (
+          <AirportDiagram data={data} onTap={onTap} marks={marks} zones={zones} explore={explore} />
+        )}
+        {active && explore && (
+          <ZoneTip zone={active} note={explore.notes[active.id]} view={isApproach ? APPROACH_VIEW : AIRPORT_VIEW} pinned={explore.pinned} />
+        )}
+      </div>
       {data.elevationFt === undefined && (
         <p className="mt-1 text-xs text-muted">Platzhöhe fehlt in den Flugplatzdaten – Höhen sind als Höhe über Platz zu lesen.</p>
       )}

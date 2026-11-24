@@ -16,6 +16,8 @@
   context: >-
     Der Lead gibt eine Anweisung an den ganzen Flight. Jeder bestätigt mit seiner Nummer – in der
     festen Reihenfolge 2, 3, 4.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two, three, four]
   vars:
     directive: { oneOf: [fence in, fence out] }
@@ -60,6 +62,8 @@
   context: >-
     Der Lead schickt den Flight auf ein anderes Netz aus dem Comm Plan. Auf „push“ antwortet niemand:
     Die Bestätigung ist der Check auf der neuen Frequenz.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two, three, four]
   vars:
     # Kein „Package“: Das Glossar zeigt dazu das Brevity-Wort PACKAGE (Gruppen im Lagebild), nicht den Netznamen.
@@ -86,6 +90,8 @@
   context: >-
     Im Training geht etwas schief – oder jemand sieht eine Gefahr. Jeder im Flight darf „knock it off“
     rufen. Danach hört jede Übung sofort auf.
+  freq: Flight · UHF
+  place: Im Übungsgebiet
   perspective: [two, three, four]
   transmissions:
     - speaker: "{lead}"
@@ -192,6 +198,8 @@
   context: >-
     Zur gebrieften Push-Zeit verlässt der Flight den vereinbarten Punkt Richtung Einsatzgebiet. Der
     Lead meldet das – hier dem AWACS, der die Zeitlinie überwacht.
+  freq: "{awacs} · AWACS"
+  place: Am Push Point
   vars:
     awacs: { pool: callsigns.awacs }
   transmissions:
@@ -251,6 +259,8 @@
   layer: community
   context: >-
     Kurz vor dem Einsatzgebiet. Der Lead lässt den Flight die Cockpit-Schalter für den Einsatz setzen.
+  freq: Flight · UHF
+  place: Vor dem Einsatzgebiet
   perspective: [two, three, four]
   transmissions:
     - speaker: "{lead}"
@@ -281,16 +291,19 @@
   layer: community
   context: >-
     Der Flight überquert die Küstenlinie. Der Lead meldet es dem AWACS, der Buch führt, wer wo ist.
+  freq: "{awacs} · AWACS"
+  place: An der Küste
   vars:
     awacs: { pool: callsigns.awacs }
-    coast: { oneOf: [feet dry, feet wet] }
+    # Geschrieben die Lage (für die Übung), gesprochen das Brevity-Wort (für den Funkspruch)
+    coast: { oneOf: [{ text: über Land, spoken: feet dry }, { text: über Wasser, spoken: feet wet }] }
   transmissions:
     - speaker: "{callsign}"
       you: true
       segments:
         - { text: "{awacs}", role: addressee, note: Der AWACS. }
         - { text: "{flight|spoken}", role: callsign, critical: true, note: Für den ganzen Flight. }
-        - text: "{coast}"
+        - text: "{coast|spoken}"
           role: brevity
           critical: true
           note: >-
@@ -304,6 +317,8 @@
   context: >-
     Das Einsatzgebiet liegt hinter dem Flight. Erst die Schalter zurück, dann schaut jeder beim
     Nachbarn nach Schäden.
+  freq: Flight · UHF
+  place: Auf dem Rückflug
   perspective: [two, three, four]
   transmissions:
     - speaker: "{lead}"
@@ -377,6 +392,8 @@
   context: >-
     Laut Missionsbriefing meldet beim Ops Check jeder seinen Treibstoff in Tausend Pfund – und
     „tiger“, wenn er genug Sprit und Waffen hat, um einen Commit anzunehmen.
+  freq: Flight · UHF
+  place: Auf Station
   perspective: [two, three, four]
   vars:
     # Werte eines Flights liegen nah beieinander (AFMAN 11-2F-16 V3, Abs. 3.30.4.1: der Check soll gerade
@@ -403,7 +420,6 @@
         - text: "{f2|spoken}"
           role: value
           critical: true
-          alt: ["{f2}"]
           note: Treibstoff in Tausend Pfund – {f2} heißt {f2} × 1.000 lbs.
         - text: tiger
           role: brevity
@@ -422,13 +438,13 @@
       station: three
       segments:
         - { text: Three, role: callsign, critical: true }
-        - { text: "{f3|spoken}", role: value, critical: true, alt: ["{f3}"] }
+        - { text: "{f3|spoken}", role: value, critical: true }
         - { text: tiger, role: brevity }
     - speaker: "{four}"
       station: four
       segments:
         - { text: Four, role: callsign, critical: true }
-        - { text: "{f4|spoken}", role: value, critical: true, alt: ["{f4}"] }
+        - { text: "{f4|spoken}", role: value, critical: true }
         - { text: tiger, role: brevity }
 
 - id: m4-what-state
@@ -441,6 +457,8 @@
   context: >-
     Der AWACS will wissen, was dein Flight noch kann. Laut Missionsbriefing antwortest du als Lead für alle –
     mit den Werten des schwächsten Flugzeugs.
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     ma: { int: [0, 4] }
@@ -481,7 +499,6 @@
         - text: "{low|spoken}"
           role: value
           critical: true
-          alt: ["{low}"]
           note: >-
             Zum Schluss der Treibstoff in Tausend Pfund mit einer Nachkommastelle. Laut Missionsbriefing ist es der
             niedrigste Stand im Flight, nicht deiner – den kennst du aus dem letzten Ops Check. ⚠ Dass der Lead so für
@@ -492,6 +509,8 @@
   layer: community
   context: >-
     Ein Wingman spricht ungefragt nur, wenn der Lead etwas wissen muss. Treibstoff gehört dazu.
+  freq: Flight · UHF
+  place: Im Einsatzgebiet
   perspective: [two]
   transmissions:
     - speaker: "{two}"
@@ -528,6 +547,8 @@
   context: >-
     Ein Flugzeug im Flight erreicht Bingo. Der Lead schickt alle nach Hause – denn der niedrigste
     Stand bestimmt.
+  freq: Flight · UHF
+  place: Im Einsatzgebiet
   perspective: [lead]
   transmissions:
     - speaker: "{two}"
@@ -569,6 +590,8 @@
   layer: community
   context: >-
     Beim Kurswechsel hat Two den Lead aus den Augen verloren. Das muss der Lead sofort wissen.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two]
   vars:
     a2: { number: thousands, range: [12, 30] }
@@ -667,6 +690,8 @@
   layer: community
   context: >-
     Lead und Two sind getrennt. Der Lead will wissen, wo Two steckt.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two]
   vars:
     af: { pool: airfields }
@@ -690,7 +715,7 @@
           critical: true
           note: >-
             Über einen Bezugspunkt, den beide kennen, z. B. einen Flugplatz. Mit dem Bullseye geht das
-            noch einfacher – das kommt in Modul 5.
+            noch einfacher (Modul 2, Lektion 9).
         - text: "angels {a2|spoken}"
           role: value
           critical: true
@@ -707,6 +732,8 @@
     Der Flight fliegt in Wolken, und Two verliert den Anschluss zum Lead. Two geht auf Instrumente,
     dreht weg und informiert den Lead. Der Lead antwortet mit vier Angaben, damit Two weiß, wo er
     hin muss. Erst mit Freigabe schließt Two wieder an.
+  freq: Flight · UHF
+  place: In den Wolken
   perspective: [two, lead]
   vars:
     # Gesprochen die volle Form, geschrieben die kurze – beide zählen beim Tippen
@@ -783,6 +810,8 @@
   context: >-
     Der Flight hat sich in einer Kurve aus den Augen verloren – beide Seiten sind blind. Beide melden die
     Höhe, dann ordnet der Lead die Höhenstaffelung an. Die Höhen liegen mindestens 1.000 Fuß auseinander.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two, lead]
   vars:
     a1: { number: thousands, range: [12, 24] }

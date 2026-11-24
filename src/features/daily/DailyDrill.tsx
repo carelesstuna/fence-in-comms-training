@@ -21,6 +21,7 @@ import {
 import { useApp } from '../../state/store'
 import { content, makeRun, RunContext } from '../../ui/run'
 import { DrillView } from '../../components/Drills'
+import { RefTag } from '../../components/RefTag'
 import { RankBar } from '../../components/Layout'
 import { ScoreRing, StepFooter, StepHeader } from '../lesson/Stepper'
 
@@ -210,6 +211,7 @@ function DailyRun({ free }: { free: boolean }) {
       <div key={`${seed}-${step}`} className="rounded-xl border border-line bg-panel p-5">
         {drill ? <DrillView drill={drill} onAnswered={onAnswered} /> : <p className="text-muted">Übung „{item.id}“ gibt es nicht mehr.</p>}
       </div>
+      <RefTag parts={[free ? 'Freies Training' : 'Funk-Drill', `${step + 1}/${queue.length}`, item.id]} seed={seed} />
       <StepFooter
         canBack={false}
         canNext={answered || !drill}

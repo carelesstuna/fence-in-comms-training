@@ -101,7 +101,8 @@ Text …
 | Baustein | Wirkung |
 |---|---|
 | `::call{id=…}` | Interaktiver Funkspruch mit farbigen, antippbaren Teilen. Gewürfelt, mit Knopf „neu würfeln“. Mit `as=two` aus Sicht einer Station. |
-| `::chart{kind=approach airfield=batumi freqs=real}` | Schematische Platz- oder Anflugkarte. `airfield` und `freqs` sind optional (ohne `airfield` wird gewürfelt). |
+| `::chart{kind=approach airfield=batumi freqs=real}` | Schematische Platz- oder Anflugkarte. `airfield` und `freqs` sind optional (ohne `airfield` wird gewürfelt). Mit `annotate` lässt sich die Karte erkunden: blaue Punkte, Erklärung beim Überfahren oder Antippen. |
+| `::sketch{kind=bullseye}` | Feste Skizze mit Bildunterschrift: `bullseye` (eine Meldung für alle), `from-to` (vom Bullseye und Gegenkurs zurück), `variation` (Missweisung Ost und West). Neue Skizzen kommen in `src/components/BullseyeSketch.tsx` und `SKETCHES` in `schema.ts`. |
 | `:::sim{sim=dcs}` … `:::` | Sim-Kasten. Wird nur gezeigt, wenn die Sim im Profil gewählt ist. Erlaubt: `dcs`, `bms`, `il2`, `srs` |
 | `:::aircraft{aircraft=f14}` … `:::` | Flugzeug-Kasten. IDs aus `pools/aircraft.yaml`; mehrere mit Komma (`aircraft=p51,p47`), dann gilt der Kasten für jedes dieser Muster |
 | `:::era{era=ww2}` … `:::` | Epochen-Kasten (`ww2`, `cold-war`, `modern`, auch als Liste `era=ww2,cold-war`). Aufgeklappt, wenn ein gewähltes Flugzeug aus einer dieser Epochen stammt oder keins gewählt ist |
@@ -110,9 +111,13 @@ Text …
 | `:::warn` … `:::` | Warnung, typischer Fehler |
 | `:::example` … `:::` | Merkkasten |
 | `:term[tally]` | Begriff im Fließtext (Brevity oder Standardwort): antippen zeigt die Bedeutung, mit Link ins Glossar. Muss in `glossary/brevity.yaml`, `prowords.yaml` oder `basics.yaml` stehen (Wort oder `aliases`). |
-| `[Text](/wissen/<id>)` | Verweis innerhalb der App, öffnet im selben Fenster (Zurück-Taste führt zur Lektion zurück). Erlaubt: `/wissen/<id>` (Themenseite), `/wissen`, `/lesson/<id>`, `/hangar`, `/glossary`, `/profile` (z. B. für Einstellungen wie die Phraseologie). Der Validator prüft das Ziel. |
+| `[Text](/wissen/<id>)` | Verweis innerhalb der App, öffnet im selben Fenster (Zurück-Taste führt zur Lektion zurück). Erlaubt: `/wissen/<id>` (Themenseite), `/wissen`, `/lesson/<id>`, `/hangar`, `/glossary`, `/fortschritt`, `/einstellungen/<bereich>` (`flugprofil`, `hoeren`, `sprechen`; z. B. für Einstellungen wie die Phraseologie). Der Validator prüft das Ziel. |
 
 Lektionen werden im Modul über `lessons: [m1-l1, m1-l2, …]` in `curriculum.yaml` eingehängt.
+IDs bestehender Lektionen nie ändern – der Fortschritt hängt daran. Eine neue Lektion in einem bestehenden Modul
+bekommt eine neue ID, auch wenn sie mittendrin steht (z. B. `m2-l10` an Position 9). Wer das Modul schon über alle
+Lektionen erledigt hatte, behält es erledigt (`progress.modulesDone`); die neue Lektion steht dann offen, sperrt aber
+nichts wieder.
 
 ## Hangar-Karten (`hangar/<id>.md`)
 
@@ -192,8 +197,9 @@ aus **Segmenten** mit Rolle und Erklärung:
 ```yaml
 - id: m1-startup-request
   title: Anlassfreigabe bei Ground
-  context: Wann und warum dieser Funkspruch fällt.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  context: Wann und warum dieser Funkspruch fällt.   # nur Leseseiten; in Übungen steht stattdessen deren Lage
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}" # Funk: Station · Frequenz (Rahmenleiste der Übungen)
+  place: "{airfield.name}"                            # Ort: Flugplatz oder kurz, wo du bist (Rahmenleiste)
   layer: core
   vars:
     airfield: { pool: airfields }
@@ -499,7 +505,9 @@ vars:
 
 **In Leseseiten:** `::chart{kind=approach}` zeigt eine Karte für einen gewürfelten Platz (Knopf
 „anderer Platz“). `::chart{kind=airport airfield=batumi freqs=real}` zeigt einen festen Platz mit den
-echten Frequenzen.
+echten Frequenzen. `::chart{kind=approach annotate}` macht die Karte erkundbar: Fährt man über einen Bereich
+(Funkblock, Bahnen, Kopf, Profil …), wird er hervorgehoben, und ein Kärtchen erklärt ihn mit den Werten genau
+dieser Karte. Die Texte stehen in `src/components/ChartBlock.tsx`.
 
 ### Zahlenarten (`number`)
 
@@ -525,6 +533,7 @@ echten Frequenzen.
 | `elevation` | 1250 → one two five zero (Line 4) | 0–9.000 ft, Schritt 5 |
 | `lasercode` | 1688 → one six eight eight | nur gültige Codes 1111–1788 (keine 0, keine 9) |
 | `nm` | 8.5 → eight point five (Line 3) | 5–15, Schritt 0.1 |
+| `distance` | 25 → twenty-five (Entfernung in Bullseye und BRAA); Feld `.digits` ziffernweise (two five) | 5–80 |
 | `meters` | 1200 → one thousand two hundred | 300–3.000, Schritt 100 |
 | `cardinal` | south → south, Feld `.opposite` (north) | 8er-Rose |
 | `mgrs` | NK 1234 5678 → November Kilo one two three four … (`digits: 6/8/10`) | gewürfeltes Quadrat |
@@ -536,7 +545,7 @@ echten Frequenzen.
 
 | Variable | Felder |
 |---|---|
-| Flugplatz (`pool: airfields`) | `name` (Funkname), `alias` (erster Alias, z. B. Kunsan), `icao`, `map`, `uhf`, `vhf`, `twr`, `gnd`, `app`, `dep` (je mit `.band`; Tower UHF, sonst VHF; Ground aus `freqs.ground`, sonst Tower; Approach/Departure aus `freqs`, sonst gewürfelt), `hf`, `vhfLow`, `runway`, `tacan`, `parking`, `taxi`, `arming`, `atis`, `ground`, `departure`, `approach`, `elevation`, `charts`, `real.tower` / `real.ground` / `real.atis` / `real.approach` / `real.departure` / `real.clearance`, `real.source`; Phraseologie (gesprochene Form nach Profil-Einstellung und Karte): `phraseology` („FAA“/„ICAO“, `.form` „US-Form (FAA)“/„ICAO-Form“, `.here` dieselbe Form mit Hinweis, wenn sie von der Karte abweicht, `.map` die Form der Karte mit `.map.form`), `faa`/`icao` („yes“ oder leer, für `when:`), `climb`, `descend` (mit `.ing`, `.other`, `.otherIng`) |
+| Flugplatz (`pool: airfields`) | `name` (Funkname), `alias` (erster Alias, z. B. Kunsan), `code` (ICAO-Kennung, z. B. UGKO), `map`, `uhf`, `vhf`, `twr`, `gnd`, `app`, `dep` (je mit `.band`; Tower UHF, sonst VHF; Ground aus `freqs.ground`, sonst Tower; Approach/Departure aus `freqs`, sonst gewürfelt), `hf`, `vhfLow`, `runway`, `tacan`, `parking`, `taxi`, `arming`, `atis`, `ground`, `departure`, `approach`, `elevation`, `charts`, `real.tower` / `real.ground` / `real.atis` / `real.approach` / `real.departure` / `real.clearance`, `real.source`; Phraseologie (gesprochene Form nach Profil-Einstellung und Karte): `phraseology` („FAA“/„ICAO“, `.form` „US-Form (FAA)“/„ICAO-Form“, `.here` dieselbe Form mit Hinweis, wenn sie von der Karte abweicht, `.map` die Form der Karte mit `.map.form`), `faa`/`icao` („yes“ oder leer, für `when:`), `climb`, `descend` (mit `.ing`, `.other`, `.otherIng`) |
 | Träger (`pool: carriers`) | `name`, `short`, `hull`, `class`, `tacan` (gewürfelt), `icls` (gewürfelt), `brc` (gewürfelt) |
 | Flugzeug (`pool: aircraft`) | `type`, `radio`, `id` |
 
@@ -621,7 +630,7 @@ Hinweis nennt die Form neutral („In der US-Form (FAA) heißt es …“, „In 
 Platzhalter (`{p} {p.unit}` → „1013 hPa“, `{wx.vis} {wx.vis.unit}` → „10 km“). Sätze über den Platz („in {af.name}
 gilt die …“, „der Lotse spricht die …“) nehmen `{af.phraseology.here}`, nie `.form` – sonst stünde bei „Immer US“ in
 Georgien, dort gelte die US-Form. Ein Test prüft das. Feste Texte in Lektionen nennen den Standard und die
-Einstellung („Mit der Einstellung „Kartenabhängig“ im [Profil](/profile) …“). Mitschreib-Felder heißen „Luftdruck
+Einstellung („Mit der Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) …“). Mitschreib-Felder heißen „Luftdruck
 ({wx.pressure.unit})“ und nehmen `{wx.pressure}` und `{wx.pressure|spoken}` an.
 
 **Bewusst noch überall US-Form** (für ICAO fehlt ein lokaler Beleg oder der Umbau wäre groß): Wolken in der ATIS
@@ -656,6 +665,47 @@ Antwort mit einem Stichwort beginnen, sagt der Prompt, *dass* eines verlangt wir
 Stichwort“), aber nicht welches. Ohne `placeholder` steht „Funkspruch eintippen …“. Ein Test
 (`src/core/placeholder.test.ts`) prüft, dass der Platzhalter nicht mit dem ersten Wort einer akzeptierten
 Antwort beginnt.
+
+### Rahmen, Lage und Auftrag (`call`, `build`, `cloze`)
+
+Übungen, in denen du selbst funkst, sind immer gleich aufgebaut – damit man nichts zusammensuchen muss:
+
+1. **Rahmenleiste:** Rufzeichen (automatisch), **Ort** und **Funk**. Ort und Funk kommen aus `place` und `freq` des
+   Funkspruchs; die Übung kann sie mit eigenem `place` bzw. `freq` ersetzen. Spielst du jemand anderes
+   (Rollentausch), setzt die Übung `self` (z. B. `"{jtac}"`) für das Rufzeichen im Rahmen.
+2. **Lage** (`situation`, Pflicht): die Fakten. Zustand des Flugzeugs (kalt, Triebwerke laufen, im Steigflug),
+   genaue Position (Vorfeld, Rollhalt Bahn {wx.runway}, 15 NM vor der Station), was du weißt (ATIS-Ausgabe,
+   Missionsnummer, Größe des Flights) und was gerade passiert ist. Ein bis drei Sätze, wichtige Werte **fett**.
+3. **Auftrag** (`prompt`): ein Satz, was du tun sollst, Verb vorn – „Bitte Ground um die Anlassfreigabe.“,
+   „Lies die Freigabe zurück.“, „Bau deine Anfrage an Ground.“ Die Station darf er nennen (Ground, Tower, AWACS).
+4. **Auf der Frequenz:** was vor deinem Zug gesendet wurde – kommt aus dem Funkspruch, ohne Titel und `context`.
+
+Was nicht hineingehört:
+
+- **Kein „Du bist {callsign}“** in Lage oder Auftrag: Das Rufzeichen steht in der Rahmenleiste. Auch die Position im
+  Flight ergibt sich daraus („…-2“ ist Two, „…-1“ führt den Flight) – also kein „Du fliegst als Two“ oder „Du führst
+  den Flight“. Die Größe des Flights („Dein Flight hat **4** Flugzeuge“) gehört dagegen in die Lage. Der Validator
+  meldet beides.
+- **Nichts doppelt:** Was im Rahmen steht (Flugplatz als Ort, Station und Frequenz), wiederholt die Lage nicht.
+- **Hilfen zur Form** („Den ATIS-Buchstaben sprichst du im Alphabet“, „Zahlen Ziffer für Ziffer“) gehören in `hint`
+  (bei `call`) oder `explain`, nicht in Lage oder Auftrag.
+- **Nichts verraten:** Lage und Auftrag nennen keine Wörter der Musterlösung, die man selbst finden soll. Testet eine
+  Übung, welche Station zuständig ist, nennt auch `freq` sie nicht (dann an der Übung `freq` ohne Station setzen).
+- Der `context` des Funkspruchs erscheint in Übungen nicht. Braucht die Übung etwas daraus, gehört es in die Lage.
+
+`place` am Funkspruch ist kurz (höchstens etwa vier Wörter): am Boden der Flugplatz (`"{airfield.name}"`), in der Luft
+z. B. „Unterwegs zur CAP“, „Auf Station“, „Im Anflug auf {airfield.name}“, „Am IP {cas.ip}“. Die genaue Position
+steht in der Lage. `freq` hat die Form „Station · Frequenz“ („Tower · {airfield.twr} {airfield.twr.band}“); ohne
+bekannte Frequenz „Station · Netz“ („{jtac} · VHF-FM“, „Flight · UHF“).
+
+```yaml
+- id: m1-l2-call-startup
+  type: call
+  call: m1-startup-request
+  situation: Du stehst kalt auf dem Vorfeld. Die ATIS-Ausgabe **{atis.letter}** hast du gehört.
+  prompt: Bitte Ground um die Anlassfreigabe.
+  hint: Adressat – Rufzeichen – ATIS-Kennung (im Alphabet) – Anfrage
+```
 
 **Vorschau:** Jede Übung lässt sich in der laufenden App unter `#/drill/<id>` einzeln ansehen und
 neu würfeln (z. B. `http://localhost:5173/#/drill/beispiel-atis-decoder`). Vollständige Beispiele
@@ -696,6 +746,12 @@ aller Formate stehen in `drills/beispiele-format.yaml`.
 # Freitext – Vergleich nach Normalisierung, z. B. "niner" = "nine" = "9", Groß-/Kleinschreibung egal, Bahn "21R" = "21 right" = "two one right".
 # Buchstabierwörter (NATO-Alphabet) verzeiht der Vergleich: Charley/Whisky/Viktor/"x ray" und ein Tippfehler
 # ("Siera") gelten als richtig, die Rückmeldung zeigt die Schreibung. Zahlen, Brevity- und Standardwörter nicht.
+# Zahlen: Getippt zählen Ziffern nur, wo die Antwort an dieser Stelle selbst Ziffern hat. Steht eine Zahl in accept
+# nur in Worten ("{f|spoken}"), ist die Funk-Form gefragt – "301.25" abtippen gilt nicht. Sollen Ziffern gelten
+# (Rechenaufgaben, Kanal), eine Variante mit Ziffern dazunehmen ("{f}"). Gesprochen gilt beides: Die Erkennung
+# schreibt Zahlen immer als Ziffern. Dieselbe Regel gilt für Segmente von Funksprüchen (text/alt/weak) und Lückentexte:
+# Ziffern-Varianten neben "{x|spoken}" nur in Modulen mit `typedDigits: true` (Spur C), sonst gar nicht (ein Test prüft
+# das). Jede Übung zeigt unter dem Feld, was getippt gilt: Zahlen in Worten oder auch als Ziffern.
 - id: m1-l3-input-heading
   type: input
   prompt: Sprich „Kurs 090“ im Funkformat.
@@ -720,7 +776,8 @@ aller Formate stehen in `drills/beispiele-format.yaml`.
   call: m1-startup-request
   transmission: 0
   blanks: [0, 2]              # Segment-Indizes, mindestens eins muss sichtbar bleiben
-  prompt: Du stehst in **{airfield.name}** und hast ATIS **{atis}** gehört …
+  situation: Du stehst kalt auf dem Vorfeld und hast ATIS **{atis}** gehört.
+  prompt: Füll die Lücken in deiner Anfrage an Ground.
 
 # Reihenfolge – Einträge (items) ODER Übertragungen eines Funkspruchs (call, optional transmissions)
 - id: beispiel-reihenfolge
@@ -819,8 +876,9 @@ Generatoren (`generator`):
 
 ## Szenarien (`scenarios/*.yaml`)
 
-Ein Szenario ist ein Funkablauf Schritt für Schritt – mit Stufenleiste, Funk-Log (mit Anatomie),
-Anzeige des aktiven Funkgeräts und optional einer schematischen Platzskizze. Alle Variablen werden
+Ein Szenario ist ein Funkablauf Schritt für Schritt – mit Stufenleiste, Rahmenleiste (Rufzeichen, Ort, aktives
+Funkgerät), Lage und Auftrag je Schritt, Funk-Log (mit Anatomie) und optional einer schematischen Platzskizze. Für
+Lage und Auftrag gelten dieselben Regeln wie bei den Übungen (siehe „Rahmen, Lage und Auftrag“). Alle Variablen werden
 **einmal pro Durchlauf** gewürfelt. Eine Datei = ein Szenario. Vollständiges Beispiel:
 `scenarios/beispiel-abflug.yaml`.
 
@@ -833,14 +891,17 @@ vars:
   wx: { weather: true, airfield: af, sky: vmc }
   cp: { commplan: true, airfield: af }
 as: lead                          # optional: eigene Station/Position
+place: "{af.name}"                # Ort zu Beginn (Rahmenleiste); Pflicht, hier oder am ersten Schritt
 sketch: { airfield: af, weather: wx }   # optional: Platzskizze mit aktiver Runway und Wind
 steps:
   - stage: Taxi                   # Name in der Stufenleiste (gleiche Namen hintereinander = eine Stufe)
     pos: taxi                     # Position in der Skizze: parking, taxi, holdshort, runway, airborne, pattern, final, landed
     tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
                                   # Funkgerät selbst einstellen (siehe unten); channel optional
-    freq: "Intercom · Crew Chief" # nur Anzeige ohne Einstellen (z. B. Intercom); bleibt bis zur nächsten
-    situation: Was gerade passiert (Markdown).
+    freq: "Crew Chief · Intercom" # nur Anzeige ohne Einstellen (z. B. Intercom); bleibt bis zur nächsten
+    place: Unterwegs zur CAP      # optional: neuer Ort ab diesem Schritt (gilt, bis ein Schritt einen neuen nennt)
+    situation: Lage – was gerade passiert und was du weißt (Markdown), ohne Rufzeichen.
+    task: Auftrag – ein Satz, was du tun sollst. Pflicht bei you; bei silence nicht verraten, dass Schweigen richtig ist.
     hear: [ … Übertragungen … ]   # was du vorher hörst
     you:                          # dein Zug (weglassen = nur zuhören)
       mode: type                  # type (tippen, Slot-Bewertung) | build (Baukasten) | choice (Auswahl)
@@ -919,7 +980,7 @@ auf mindestens zwei Lektionen verteilt. Die Lektion steht am Anfang der ID (`m3-
 Übungen, die in keiner Lektion eingebunden waren, tragen das Flag einfach in `<modul>.yaml`.
 
 ```yaml
-- id: m1-l7-x-calc-tower
+- id: m1-l7-x-two-aircraft
   type: input
   exam: true
   …

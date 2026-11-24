@@ -120,7 +120,8 @@
   type: build
   call: m3-atis
   transmission: 1
-  prompt: Du hast die ATIS gehört. Ruf Ground und bitte ums Anlassen.
+  situation: Du stehst kalt auf dem Vorfeld und hast eben die ATIS gehört.
+  prompt: Ruf Ground und bitte ums Anlassen.
   distractors: ["{airfield.name} Tower", request takeoff]
   explain: Ground ist für das Anlassen zuständig, nicht der Tower. Und vom Start bist du noch weit entfernt.
 
@@ -262,7 +263,10 @@
   call: m3-crew-chief-start
   transmission: 2
   layer: community
-  prompt: Deine Checks sind durch. Sag dem Crew Chief, dass du anlassen willst.
+  situation: >-
+    Du sitzt im Cockpit, das Triebwerk ist noch aus. Der Crew Chief steht vorn links am Flugzeug, deine Checks sind
+    durch.
+  prompt: Sag dem Crew Chief, dass du anlassen willst.
   distractors: [request taxi, "{airfield}"]
   vars:
     airfield: { oneOf: [Ground, Tower] }
@@ -334,11 +338,32 @@
   type: build
   call: m3-ifr-clearance
   transmission: 2
-  prompt: Clearance hat dir die IFR-Freigabe gegeben. Lies sie zurück.
+  situation: >-
+    Du stehst noch auf dem Vorfeld. Für den Flug nach Instrumentenflugregeln hast du die Streckenfreigabe angefragt,
+    Clearance hat sie dir eben gegeben.
+  prompt: Lies die Freigabe zurück.
   distractors: [request taxi, "hold short of runway {airfield.runway|spoken}"]
   explain: >-
     Die Freigabe kommt in fester Reihenfolge – Ziel, Route, Höhe, Abflugfrequenz, Squawk – und genau so
     liest du sie zurück, dein Rufzeichen am Ende. Rollen und Rollhalt kommen erst danach von Ground.
+
+- id: m3-l3-memory-clearance
+  type: memory
+  prompt: >-
+    Hör die Freigabe, merk sie dir oder schreib sie aufs Kneeboard, und lies sie dann zurück. Die IFR-Freigabe ist lang –
+    hier lohnt sich das Mitschreiben in der festen Reihenfolge.
+  few:
+    call: m1-taxi-request
+    heard: 1
+    situation: Du stehst angelassen auf dem Vorfeld und hast Ground ums Rollen gebeten.
+  many:
+    call: m3-ifr-clearance
+    heard: 1
+    situation: Du stehst kalt auf dem Vorfeld und hast die IFR-Freigabe angefordert.
+  explain: >-
+    Die IFR-Freigabe kommt immer in derselben Reihenfolge: Freigabegrenze (meist der Zielplatz), Route („as filed“),
+    Höhe, Abflugfrequenz, Squawk. Wer auf dem Kneeboard eine Zeile mit diesen fünf Feldern vorbereitet, muss beim
+    Zuhören nur noch ausfüllen.
 
 - id: m3-l3-clearance-items
   type: choice
@@ -376,6 +401,9 @@
   type: build
   call: m3-progressive-taxi
   transmission: 0
+  situation: >-
+    Du stehst angelassen auf dem Vorfeld und hast die ATIS-Ausgabe **{atis.letter}** gehört. Du bist zum ersten Mal
+    auf diesem Platz und kennst die Rollwege nicht.
   prompt: Bitte Ground um eine Führung über den Platz.
   distractors: [request startup, "{airfield.name} Tower"]
   explain: Adressat, Rufzeichen, ATIS, dann der Hinweis, dass du fremd bist, und die Bitte.
@@ -410,7 +438,8 @@
 - id: m3-l3-build-giveway
   type: build
   call: m3-give-way
-  prompt: Ground lässt dich warten. Bestätige, dass du dem anderen Flugzeug Vorfahrt gibst.
+  situation: Du rollst zur Startbahn. An der nächsten Kreuzung kommt ein anderes Flugzeug, Ground lässt dich warten.
+  prompt: Bestätige, dass du dem anderen Flugzeug Vorfahrt gibst.
   distractors: [roger, wilco]
   explain: >-
     Zurücklesen statt „roger“: Mit dem Flugzeugtyp zeigst du, dass du das richtige Flugzeug gefunden
@@ -547,7 +576,10 @@
   type: build
   call: m3-ready-departure
   transmission: 0
-  prompt: Dein Flight steht am Rollhalt. Melde euch beim Tower abflugbereit.
+  situation: >-
+    Dein Flight hat **{flightSize}** Flugzeuge. Ihr steht am Rollhalt von Bahn **{airfield.runway}**, alle Checks
+    sind durch.
+  prompt: Melde euch beim Tower abflugbereit.
   distractors: [ready for takeoff, "{airfield.name} Ground"]
   explain: >-
     „ready for departure“, nicht „ready for takeoff“ – das Wort „takeoff“ bleibt der Freigabe
@@ -556,7 +588,8 @@
 - id: m3-l5-build-takeoff-readback
   type: build
   call: m3-takeoff-clearance
-  prompt: Du stehst auf der Bahn, der Tower gibt dir die Startfreigabe. Lies sie zurück.
+  situation: Du stehst ausgerichtet auf der Bahn. Der Tower gibt dir die Startfreigabe.
+  prompt: Lies die Startfreigabe zurück.
   distractors: [roger, "wind {wx.wind|spoken}"]
   explain: Bahn und „cleared for takeoff“, dann dein Rufzeichen. Den Wind musst du nicht zurücklesen.
 
@@ -570,8 +603,6 @@
   accept:
     - "runway {airfield.runway|spoken} cleared for takeoff {callsign|spoken}"
     - "cleared for takeoff runway {airfield.runway|spoken} {callsign|spoken}"
-    - "runway {airfield.runway} cleared for takeoff {callsign|spoken}"
-    - "cleared for takeoff runway {airfield.runway} {callsign|spoken}"
     # Rufzeichen vorn lässt jeder Lotse gelten (E3-07); üblich ist es am Ende
     - "{callsign|spoken} runway {airfield.runway|spoken} cleared for takeoff"
     - "{callsign|spoken} cleared for takeoff runway {airfield.runway|spoken}"
@@ -649,7 +680,10 @@
   type: build
   call: m3-departure-checkin
   transmission: 0
-  prompt: Du steigst nach dem Start. Mach deinen Erstanruf bei Departure.
+  situation: >-
+    Du steigst nach dem Start durch **{altA}.000 ft** und bist auf **{altB}.000 ft** freigegeben. Der Tower hat dich
+    eben abgegeben.
+  prompt: Mach deinen Erstanruf bei Departure.
   distractors: ["{airfield.name} Tower", request startup]
   explain: Adressat, Rufzeichen, aktuelle Höhe, freigegebene Höhe. Den Tower hast du schon verlassen.
 
@@ -665,13 +699,14 @@
   explain: Ab „radar contact“ bist du unter Radarkontrolle. Vorher weiß der Lotse nur, dass du da sein solltest.
 
 - id: m3-l6-input-fl
-  # Als getippter Funkspruch (statt Freitext), damit Varianten wie „FL250“ zählen.
+  # Als Funkspruch (statt Freitext): Bewertung Teil für Teil.
   type: call
   call: m3-departure-checkin
   transmission: 2
-  prompt: Du steigst nach dem Start, Departure gibt dir eine neue Höhe. Lies sie zurück.
+  situation: Du steigst nach dem Start und hast dich bei Departure gemeldet. Der Lotse gibt dir eine neue Höhe.
+  prompt: Lies die neue Höhe zurück.
   hint: Anweisung mit Flight Level – Rufzeichen
-  explain: Die Höhe wörtlich, Rufzeichen am Ende. „FL{fl}0“ oder „flight level {fl|spoken} zero“ – beides geht.
+  explain: Die Höhe wörtlich, Rufzeichen am Ende – „flight level {fl|spoken} zero“. „FL{fl}0“ ist nur die Schreibweise auf dem Kneeboard.
 
 - id: m3-l6-flight-level
   type: choice

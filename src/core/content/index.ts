@@ -3,6 +3,7 @@
  * Wird im Browser (über import.meta.glob) und im Node-Validator (über fs) genutzt.
  */
 import { parse as parseYaml } from 'yaml'
+import { SAMPLE_DOCS } from '../docs/kinds'
 import type { z } from 'zod'
 import {
   achievementsSchema,
@@ -25,6 +26,7 @@ import {
   scenarioSchema,
   topicMetaSchema,
   SIMS,
+  SKETCHES,
   FLIGHT_STATIONS,
   ERAS,
   LAYERS,
@@ -123,7 +125,21 @@ function rel(path: string): string {
   return i >= 0 ? path.replace(/\\/g, '/').slice(i) : path
 }
 
+/**
+ * Was in Lage oder Auftrag doppelt wäre, weil es das Rufzeichen in der Rahmenleiste schon sagt: „Du bist **{callsign}**“
+ * und die Position im Flight („Du fliegst als Two“, „Du führst den Flight“).
+ */
+function frameDuplicate(text: string | undefined): string | null {
+  if (!text) return null
+  if (/\bDu bist\s+\**\{callsign\b/.test(text)) return '„Du bist {callsign}“ ist doppelt – das Rufzeichen steht in der Rahmenleiste'
+  if (/\bDu (fliegst als\s+\**(Lead|Two|Three|Four|Wingman|\{selfNum\})|führst (den|einen) Flight)/.test(text)) {
+    return '„Du fliegst als …“ bzw. „Du führst den Flight“ ist doppelt – die Position im Flight zeigt das Rufzeichen in der Rahmenleiste'
+  }
+  return null
+}
+
 /** Erstellt den Inhaltsindex und sammelt dabei alle Fehler (Schema und Querverweise). */
+
 export function buildContentIndex(rawFiles: Record<string, string>): BuildResult {
   const errors: ContentError[] = []
   const files = Object.fromEntries(Object.entries(rawFiles).map(([p, t]) => [rel(p), t]))
@@ -296,6 +312,12 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
       } else if (directive?.name === 'scenario') {
         steps.push({ kind: 'scenario', scenarioId: directive.attributes.id ?? '' })
       } else {
+        // Übung, Hangar-Karte und Szenario stehen allein auf ihrer Seite – mitten im Text würden sie nie angezeigt
+        for (const d of findDirectives(page)) {
+          if (d.name === 'drill' || d.name === 'hangar' || d.name === 'scenario') {
+            errors.push({ file, message: `::${d.name}{id=${d.attributes.id}} muss allein auf einer Seite stehen (--- davor und danach)` })
+          }
+        }
         steps.push({ kind: 'read', markdown: page })
       }
     }
@@ -475,8 +497,9 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
     if (more.length > 0) return 'unbekanntes Ziel'
     if (area === 'wissen') return rest === undefined || rest === '' || topics.has(rest) ? null : `Themenseite "${rest}" gibt es nicht`
     if (area === 'lesson') return rest && lessons.has(rest) ? null : `Lektion "${rest ?? ''}" gibt es nicht`
-    if (['hangar', 'glossary', 'profile'].includes(area) && rest === undefined) return null
-    return 'unbekanntes Ziel (erlaubt: /wissen/<id>, /lesson/<id>, /hangar, /glossary, /profile)'
+    if (['hangar', 'glossary', 'fortschritt'].includes(area) && rest === undefined) return null
+    if (area === 'einstellungen') return rest === undefined || ['flugprofil', 'hoeren', 'sprechen'].includes(rest) ? null : `Einstellungen "${rest}" gibt es nicht (flugprofil, hoeren, sprechen)`
+    return 'unbekanntes Ziel (erlaubt: /wissen/<id>, /lesson/<id>, /hangar, /glossary, /fortschritt, /einstellungen/<bereich>)'
   }
 
   function checkMarkdown(markdown: string, file: string, vars: Record<string, VarSpec> | undefined) {
@@ -526,6 +549,14 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
           if (d.attributes.freqs && !['sim', 'real'].includes(d.attributes.freqs)) errors.push({ file, message: `::chart: freqs muss sim oder real sein` })
           break
         }
+        case 'muster':
+          if (!SAMPLE_DOCS.includes(d.attributes.doc as never)) {
+            errors.push({ file, message: `::muster: doc muss eines von ${SAMPLE_DOCS.join(', ')} sein` })
+          }
+          break
+        case 'sketch':
+          if (!SKETCHES.includes(d.attributes.kind as never)) errors.push({ file, message: `::sketch: unbekannte Skizze "${d.attributes.kind}" (erlaubt: ${SKETCHES.join(', ')})` })
+          break
         case 'tip':
         case 'warn':
         case 'example':
@@ -635,14 +666,20 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
     checkVarSpecs(x.vars, file, where)
     checkAircraft(x.aircraft, file, where)
     checkCallsignPool(x.callsignPool, file, where)
-    const texts = [x.title, x.context ?? '', x.freq ?? '']
+    const texts = [x.title, x.context ?? '', x.freq ?? '', x.place ?? '']
     for (const t of x.transmissions) {
-      texts.push(t.speaker, t.note ?? '', whenText(t.when))
+      texts.push(t.speaker, t.note ?? '', whenText(t.when), typeof t.readability === 'string' ? t.readability : '')
       for (const s of t.segments) {
         texts.push(s.text, s.note ?? '', whenText(s.when))
         checkMore(s.more, file, `${where}, „${s.text}“`)
       }
       if (!roles.has(t.segments[0].role)) errors.push({ file, message: `${where}: Rolle fehlt in roles.yaml` })
+      if (t.mix) {
+        const self = x.transmissions.indexOf(t)
+        if (t.mix.some((m) => m === self || !x.transmissions[m] || x.transmissions[m].mix)) {
+          errors.push({ file, message: `${where}: mix [${t.mix.join(', ')}] muss auf zwei andere, normale Übertragungen zeigen` })
+        }
+      }
     }
     for (const t of texts) checkPlaceholders(t, x.vars, file, where)
     const stations = new Set(x.transmissions.map((t) => t.station).filter(Boolean))
@@ -665,13 +702,37 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
     const callId = 'call' in d ? d.call : undefined
     const x = callId ? exchanges.get(callId) : undefined
     if (callId && !x) errors.push({ file, message: `${where}: Funkspruch "${callId}" existiert nicht` })
-    const scope = { ...(x?.vars ?? {}), ...(d.vars ?? {}) }
+    // Merk-Übung: Variablen aller beteiligten Funksprüche (gehört und Readback)
+    const memoryCalls =
+      d.type === 'memory'
+        ? [d.few, d.many].flatMap((src) => [src.call, src.answerCall].filter((c): c is string => !!c)).map((c) => exchanges.get(c))
+        : []
+    const memoryVars: Record<string, VarSpec> = Object.assign({}, ...memoryCalls.map((m) => m?.vars ?? {}))
+    const scope: Record<string, VarSpec> = { ...memoryVars, ...(x?.vars ?? {}), ...(d.vars ?? {}) }
     const transmissionOf = (index: number | undefined) => {
       if (!x) return null
       const idx = index ?? Math.max(0, x.transmissions.findIndex((t) => t.you))
       const t = x.transmissions[idx]
       if (!t) errors.push({ file, message: `${where}: Übertragung ${index ?? '(you)'} existiert nicht in "${callId}"` })
       return t ? { t, idx } : null
+    }
+
+    // Hörprobe (choice, input): die Übertragung muss es geben
+    if ((d.type === 'choice' || d.type === 'input') && d.call) {
+      transmissionOf(d.transmission ?? 0)
+      texts.push(d.noAudio ?? '')
+    }
+
+    // Rahmen und Lage (call, build, cloze): oben Rufzeichen, Ort und Funk, darunter Lage (situation) und Auftrag (prompt)
+    if (d.type === 'call' || d.type === 'build' || d.type === 'cloze') {
+      texts.push(d.situation ?? '', d.place ?? '', d.freq ?? '')
+      if (!d.situation) errors.push({ file, message: `${where}: Lage fehlt (situation) – der Auftrag steht in prompt` })
+      if (x && !(d.place ?? x.place)) errors.push({ file, message: `${where}: Ort fehlt (place an der Übung oder am Funkspruch "${x.id}")` })
+      if (x && !(d.freq ?? x.freq)) errors.push({ file, message: `${where}: Funk fehlt (freq an der Übung oder am Funkspruch "${x.id}")` })
+      for (const t of [d.prompt, d.situation]) {
+        const dup = frameDuplicate(t)
+        if (dup) errors.push({ file, message: `${where}: ${dup}` })
+      }
     }
 
     switch (d.type) {
@@ -778,6 +839,32 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
         }
         break
       }
+      case 'memory': {
+        texts.push(d.situation ?? '', d.place ?? '', d.freq ?? '')
+        for (const [name, src] of [['few', d.few], ['many', d.many]] as const) {
+          const hx = exchanges.get(src.call)
+          const ax = src.answerCall ? exchanges.get(src.answerCall) : hx
+          if (!hx) errors.push({ file, message: `${where}: ${name}: Funkspruch "${src.call}" existiert nicht` })
+          if (src.answerCall && !ax) errors.push({ file, message: `${where}: ${name}: Funkspruch "${src.answerCall}" existiert nicht` })
+          if (!hx || !ax) continue
+          const heard = Array.isArray(src.heard) ? src.heard : [src.heard]
+          for (const h of heard) {
+            const t = hx.transmissions[h]
+            if (!t) errors.push({ file, message: `${where}: ${name}: Übertragung ${h} gibt es in "${hx.id}" nicht` })
+            else if (t.you) errors.push({ file, message: `${where}: ${name}: Übertragung ${h} ist deine eigene – gehört wird die Gegenstelle` })
+          }
+          const answer =
+            src.answer ?? (ax === hx ? hx.transmissions.findIndex((t, i) => i > Math.max(...heard) && t.you) : ax.transmissions.findIndex((t) => t.you))
+          if (answer < 0 || !ax.transmissions[answer]?.you) {
+            errors.push({ file, message: `${where}: ${name}: kein eigener Readback (you: true) in "${ax.id}"` })
+          }
+          texts.push(src.situation ?? '')
+        }
+        if (!d.situation && !(d.few.situation && d.many.situation)) {
+          errors.push({ file, message: `${where}: Lage fehlt (situation) – der Auftrag steht in prompt` })
+        }
+        break
+      }
       case 'generated':
         break
     }
@@ -798,8 +885,15 @@ export function buildContentIndex(rawFiles: Record<string, string>): BuildResult
         checkMore(seg.more, file, `${where}, „${seg.text}“`)
       }
     }
+    texts.push(sc.place ?? '')
+    if (!sc.place && !sc.steps[0]?.place) errors.push({ file, message: `${where}: Ort fehlt (place am Szenario oder am ersten Schritt)` })
     sc.steps.forEach((st, i) => {
-      texts.push(st.stage, st.situation ?? '', st.freq ?? '', st.explain ?? '')
+      texts.push(st.stage, st.situation ?? '', st.task ?? '', st.place ?? '', st.freq ?? '', st.explain ?? '')
+      if (st.you && !st.task) errors.push({ file, message: `${where}, Schritt ${i + 1}: Auftrag fehlt (task) – was sollst du funken?` })
+      for (const t of [st.situation, st.task]) {
+        const dup = frameDuplicate(t)
+        if (dup) errors.push({ file, message: `${where}, Schritt ${i + 1}: ${dup}` })
+      }
       st.hear.forEach(tr)
       st.reply.forEach(tr)
       if (st.you) {

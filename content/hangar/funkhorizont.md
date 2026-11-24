@@ -22,18 +22,21 @@ Für zwei Stationen addierst du die Reichweiten beider Antennen:
 
 > **1,23 · (√Höhe₁ + √Höhe₂)**
 
-Ein paar Beispiele für ein Flugzeug und eine Bodenantenne nahe am Boden:
+Daraus kommen die Merkwerte aus Modul 1, Lektion 5 (Flugzeug und Bodenantenne nahe am Boden, gerundet):
 
 | Flughöhe | Reichweite (etwa) |
 |---|---|
-| 100 ft | 12 NM |
-| 1.000 ft | 39 NM |
-| 10.000 ft | 123 NM |
-| 25.000 ft | 195 NM |
+| 100 ft | gut 10 NM |
+| 1.000 ft | 40 NM |
+| 5.000 ft | 90 NM |
+| 10.000 ft | 120 NM |
+| 30.000 ft | 210 NM |
 
-Zwei Flugzeuge auf je 25.000 ft können sich also auf fast 400 NM hören. Ein Hubschrauber im Tiefflug
-verliert dagegen schon nach wenigen Meilen den Kontakt. Deshalb fliegen AWACS so hoch – und deshalb
-gibt es **Relaisstationen**.
+Zwei Flugzeuge auf je 30.000 ft können sich also auf gut 400 NM hören. Ein Hubschrauber im Tiefflug
+verliert dagegen schon nach wenigen Meilen den Kontakt. Deshalb gibt es **Relaisstationen**.
+
+Dieselbe Physik nutzt der **AWACS**: Er fliegt hoch, damit sein **Radar** weit über den Horizont sieht, vor
+allem auf Tiefflieger. Nebenbei reicht so auch sein Funk weit. Mehr dazu auf der Karte „Wie ein Radar sieht“.
 
 **So sah es 1944 aus.** Das DCS-Handbuch der Spitfire IX nennt Reichweiten zu Bodenstellen: etwa
 30 Meilen auf 1.000 ft, 70 auf 3.000 ft, 80 auf 5.000 ft, 120 auf 10.000 ft, 150 auf 15.000 ft und

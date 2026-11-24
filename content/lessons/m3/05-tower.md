@@ -88,8 +88,6 @@ Muster und Einheiten regeln es im Briefing):
   Nachfolgenden ändern ihren Startlauf oder brechen ab. Fängt das Seil am Pistenende, heißt es „Cable,
   Cable, Cable“, beim Netz „Barrier, Barrier, Barrier“ (Abs. 7.4.1).
 
-::drill{id=m3-l5-interval}
-
 ---
 
 ::drill{id=m3-l5-abort-call}
@@ -110,8 +108,6 @@ benutzte Form von „line up and wait“: auf die Bahn rollen und warten.
 
 In den Sims ist das anders: **BMS- und DCS-ATC sprechen nur mit dem Lead**, Readbacks der anderen
 erwartet niemand. Wer in einem Verband mit Menschen fliegt, richtet sich nach dem Briefing.
-
-::drill{id=m3-l5-ack-clearance}
 
 ---
 

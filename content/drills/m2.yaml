@@ -129,7 +129,9 @@
   type: choice
   layer: sim
   aircraft: [bf109, fw190]
-  prompt: Bf 109 oder Fw 190 mit FuG 16ZY – auf welche Stellung schaltest du für den Lotsen am Platz?
+  prompt: >-
+    Bf 109 oder Fw 190 mit dem FuG 16ZY (Kasten „Bf 109 und Fw 190“ in Modul 2, Lektion 1) – auf welche Stellung schaltest
+    du für den Lotsen am Platz?
   options:
     - Δ – Nah-Flugsicherung
     - I – Y-Führung
@@ -164,8 +166,10 @@
 - id: m2-l1-build-fm-readback
   type: build
   call: m2-handoff-fm
-  prompt: >-
-    {awacs} schickt dich zum JTAC {jtac} auf FM. Lies Gerät und Frequenz zurück.
+  situation: >-
+    Der AWACS übergibt dich an den JTAC **{jtac}** am Boden. Der funkt, wie meist, mit einem Heeresfunkgerät auf
+    VHF-FM.
+  prompt: Lies Gerät und Frequenz zurück.
   distractors: [uniform, "{jtac}"]
   explain: Gerät, Frequenz, Rufzeichen. „uniform“ wäre das falsche Gerät – der JTAC funkt auf FM.
 
@@ -247,7 +251,8 @@
   type: build
   call: m2-push-button
   transmission: 0
-  prompt: Schick deinen Flight auf Kanal {ch}.
+  situation: Laut Missionsbriefing wechselt ihr an dieser Stelle auf Kanal **{ch}**.
+  prompt: Schick deinen Flight auf den neuen Kanal.
   distractors: [switch, over]
   explain: Flight-Name, „push“, Kanal. Mehr braucht es nicht.
 
@@ -260,8 +265,6 @@
     - "{flightName} push button {ch|spoken}"
     - "{flightName} push channel {ch|spoken}"
     - "{flightName} push {ch|spoken}"
-    - "{flightName} push button {ch}"
-    - "{flightName} push channel {ch}"
   explain: >-
     „{flightName}, push button {ch|spoken}.“ Statt „button“ geht auch „channel“. Die Ziffern wie
     immer einzeln.
@@ -441,9 +444,10 @@
 - id: m2-l3-build-mayday
   type: build
   call: m2-mayday
-  prompt: >-
-    Ernster Notfall, und du erreichst deine zuständige Stelle nicht – also Guard. Setze den Notruf
-    zusammen, in der Reihenfolge nach ICAO.
+  situation: >-
+    **{emerg}.** Du bist {dist} NM {dir} von {airfield.name}, sinkst gerade durch {altK}.000 ft und willst {intent}.
+    Approach hast du auf der zugewiesenen Frequenz zweimal gerufen – keine Antwort. Deshalb funkst du auf Guard.
+  prompt: Setze den Notruf zusammen, in der Reihenfolge nach ICAO.
   distractors: [pan pan, please help]
   explain: >-
     Mayday dreimal, wer, was ist los, was hast du vor, wo bist du, Höhe. Wenn Zeit bleibt, setzt du
@@ -518,9 +522,10 @@
 - id: m2-l4-build-repeat
   type: build
   call: m2-blocked
-  prompt: >-
-    Deine Anfrage „{req}“ an {airfield.name} Tower ging unter, der Tower meldet „blocked, say again“.
-    Wiederhole sie.
+  situation: >-
+    Du hast den Tower gerufen: „{req|spoken}“. Im selben Moment hat ein anderer Pilot gesendet, deine Anfrage ging unter. Du
+    hast kurz hineingehört, die Frequenz ist frei.
+  prompt: Wiederhole deine Anfrage.
   distractors: [sorry, as I was saying]
   explain: Vollständig und unverändert. Entschuldigungen und Füllwörter verlängern nur die Belegung der Frequenz.
 
@@ -653,21 +658,19 @@
   type: choice
   exam: true
   vars:
-    # text = Flughöhe, spoken = die Reichweite 1,23 · √Höhe, gerundet (die richtige Antwort)
+    # text = Flughöhe, spoken = Merkwert der Reichweite (Tabelle in Modul 1, Lektion 5)
     alt:
       oneOf:
-        - { text: "4.900", spoken: "86" }
-        - { text: "6.400", spoken: "98" }
-        - { text: "8.100", spoken: "111" }
-        - { text: "10.000", spoken: "123" }
-        - { text: "14.400", spoken: "148" }
-        - { text: "19.600", spoken: "172" }
-    # Falschantworten, die nie mit einer richtigen zusammenfallen
-    w1: { oneOf: ["12", "30", "250", "500"] }
-    w2: { oneOf: ["1.200", "2.500", "5.000"] }
+        - { text: "1.000", spoken: "40" }
+        - { text: "5.000", spoken: "90" }
+        - { text: "10.000", spoken: "120" }
+        - { text: "30.000", spoken: "210" }
+    # Falschantworten eine Größenordnung daneben, nie gleich einer richtigen
+    w1: { oneOf: ["3", "5"] }
+    w2: { oneOf: ["1.500", "3.000", "5.000"] }
   prompt: >-
     Du fliegst auf {alt} ft, die Bodenstation hat ihre Antenne nahe am Boden. Wie weit reicht der
-    Funk ungefähr (Faustformel 1,23 · √Höhe in ft)?
+    Funk ungefähr?
   options:
     - Rund {alt|spoken} NM
     - Rund {w1} NM
@@ -675,14 +678,14 @@
     - Unbegrenzt, solange das Funkgerät stark genug ist
   answer: 0
   explain: >-
-    1,23 · √{alt} ergibt etwa {alt|spoken} NM. VHF und UHF reichen kaum über den Horizont hinaus. Wer
-    tief fliegt oder hinter Bergen steckt, ist schnell außer Reichweite.
+    Auf {alt} ft sind es rund {alt|spoken} NM (Merktabelle in Modul 1, Lektion 5). VHF und UHF reichen kaum über den
+    Horizont hinaus. Wer tief fliegt oder hinter Bergen steckt, ist schnell außer Reichweite.
 
 - id: m2-l5-horizon-low
   type: choice
   prompt: >-
     Du rufst im Tiefflug auf 100 ft einen Tower, der 30 NM entfernt ist. Er antwortet nicht. Warum
-    vermutlich? (Faustformel Funkhorizont: 1,23 · √Höhe in ft, in NM)
+    vermutlich?
   options:
     - Du bist unter seinem Funkhorizont – steig, dann klappt es.
     - Der Tower ist um diese Uhrzeit nicht mehr besetzt und antwortet erst wieder morgen früh.
@@ -690,8 +693,9 @@
     - Im Tiefflug unter 500 ft ist Funkverkehr mit dem Tower grundsätzlich nicht erlaubt.
   answer: 0
   explain: >-
-    1,23 · √100 ≈ 12 NM. Selbst mit der Antennenhöhe des Towers kommst du nicht auf 30 NM. Ein paar
-    tausend Fuß mehr lösen das Problem. Auf SRS-Servern mit Sichtlinien-Simulation und in BMS
+    Auf 100 ft reicht dein Funk nur gut 10 NM (Merktabelle in Modul 1, Lektion 5). Selbst mit der Antennenhöhe des
+    Towers kommst du nicht auf 30 NM. Ein paar tausend Fuß mehr lösen das Problem: Auf 1.000 ft sind es schon rund
+    40 NM. Auf SRS-Servern mit Sichtlinien-Simulation und in BMS
     (Reichweite nach Sichtlinie) passiert genau das.
 
 # ------------------------------------------------------------ Lektion 6: Welche Frequenz wann?
@@ -832,9 +836,10 @@
   type: build
   call: m2-wrong-frequency
   transmission: 2
-  prompt: >-
-    Du hast dich am Rollhalt abflugbereit gemeldet – aber {airfield.name} Ground antwortet: „contact
-    tower {cp.tower.freq|spoken}“. Bestätige kurz, bevor du umschaltest.
+  situation: >-
+    Du stehst am Rollhalt von Bahn **{airfield.runway}** und hast dich abflugbereit gemeldet – aber eingestellt war
+    noch Ground statt Tower. Ground hat geantwortet und dir die Tower-Frequenz genannt.
+  prompt: Bestätige kurz, bevor du umschaltest.
   distractors: [ready for departure, roger wilco]
   explain: Frequenz und Rufzeichen genügen. Den eigentlichen Funkspruch wiederholst du dann beim Tower.
 
@@ -860,7 +865,7 @@
     cp: { commplan: true, airfield: airfield }
   prompt: Lies den Funkblock der Platzkarte.
   context: |
-    **{airfield.name} ({airfield.icao})** – Funkblock der Platzkarte
+    **{airfield.name} ({airfield.code})** – Funkblock der Platzkarte
 
     | ATIS | GND CON | TOWER | APP/DEP CON |
     |---|---|---|---|
@@ -981,7 +986,7 @@
     Karte der Sim vor der echten Karte. Im Zweifel antwortet dir die letzte Stelle mit der richtigen
     Frequenz.
 
-# ------------------------------------------------------------ Lektion 9: Platzinfos in deiner Sim
+# ------------------------------------------------------------ Lektion 10: Platzinfos in deiner Sim (m2-l9)
 - id: m2-l9-match-sources
   type: match
   exam: true
@@ -1130,45 +1135,19 @@
     Planungskarten sind nach geografisch Nord ausgerichtet, der Kompass nach magnetisch Nord. Die
     Differenz ist die Missweisung – je nach Gegend ein paar Grad bis über zehn Grad.
 
-- id: m2-l8-ruler-variation
-  type: choice
-  vars:
-    tru: { number: bearing }
-    mag: { derive: offset, from: tru, add: -6 }
-    magW: { derive: offset, from: tru, add: 6 }
-    rng: { int: [10, 60] }
-  prompt: >-
-    Auf der Planungskarte ziehst du das Lineal vom Bullseye zu einem Kontakt: **{tru}°** (rechtweisend),
-    **{rng} NM**. Die Missweisung im Gebiet beträgt laut Platzkarte **6° Ost**. Bullseye-Calls sind
-    magnetisch. Was sagst du im Funk?
-  options:
-    - "„bullseye {mag}/{rng}“"
-    - "„bullseye {tru}/{rng}“"
-    - "„bullseye {magW}/{rng}“"
-    - "„bullseye {rng}/{mag}“"
-  answer: 0
+- id: m2-l8-match-basics
+  type: match
+  prompt: Was haben die Karten in DCS, BMS und IL-2 gemeinsam – und wo unterscheiden sie sich? Ordne zu.
+  pairs:
+    - [Oben auf der Karte, Norden]
+    - [Entfernungen in DCS und BMS, Seemeilen (NM)]
+    - [Entfernungen in IL-2, Kilometer und Planquadrate]
+    - [Eigene Einheiten in DCS und BMS, blau]
+    - [Lineal oder Messwerkzeug, Kurs und Entfernung zwischen zwei Punkten]
   explain: >-
-    Bei östlicher Missweisung ist der magnetische Wert kleiner: {tru}° minus 6° ergibt {mag}°
-    („east is least, west is best“). Den Linealwert unverändert zu nehmen, wäre 6° daneben – auf 50 NM
-    sind das gut 5 NM. Peilung zuerst, dann Entfernung.
-
-- id: m2-l8-bullseye-call
-  type: choice
-  vars:
-    brg: { number: bearing }
-    rng: { int: [10, 60] }
-  prompt: >-
-    Die Bullseye-Anzeige im Cockpit zeigt für einen Kontakt **{brg}°** und **{rng} NM** – schon
-    magnetisch, so wie Bullseye-Calls gemeint sind. Was sagst du im Funk?
-  options:
-    - "„bullseye {brg}/{rng}“"
-    - "„bullseye {rng}/{brg}“"
-    - "„BRAA {brg}/{rng}“"
-    - "„{brg} for {rng} from my position“"
-  answer: 0
-  explain: >-
-    Bullseye-Angaben sind magnetische Peilung und Entfernung **vom Bullseye aus**, die Peilung zuerst.
-    BRAA (Bearing, Range, Altitude, Aspect) dagegen misst von dir aus. Mehr dazu in Modul 5, Lektion 3.
+    Nord ist oben, gemessen wird in Seemeilen – nur IL-2 rechnet in Kilometern und Planquadraten. Freunde sind blau,
+    Gegner rot. Mit dem Lineal misst du Kurs und Entfernung; wie du daraus eine Bullseye-Angabe für den Funk machst,
+    kommt in der nächsten Lektion.
 
 - id: m2-l8-dcs-mode
   type: choice
@@ -1300,3 +1279,155 @@
   explain: >-
     Eine Bahn hat zwei Richtungen (z. B. 13 und 31). ILS, Outer und Inner NDB und PRMG stehen je
     Richtung in einer eigenen Spalte. Oft hat nur eine Richtung ein ILS.
+
+# ------------------------------------------------------------ Lektion 9: Bullseye – Positionen im Funk (m2-l10)
+- id: m2-l10-plot-place
+  type: plot
+  vars:
+    pic: { geo: true, groups: 1 }
+  geo: pic
+  mode: place
+  prompt: Ein Kontakt wird im Bullseye-Format gemeldet. Setze ihn auf der Karte.
+  context: "Kontakt bei **bullseye {pic.g1.bulls}**"
+  explain: >-
+    Den Strahl legst du am Bullseye an: erst die Richtung {pic.g1.bulls.bearing}, dann {pic.g1.bulls.range} Meilen nach
+    außen. Wo du selbst fliegst (blaues Dreieck), spielt für die Angabe keine Rolle.
+
+- id: m2-l10-plot-read
+  type: plot
+  vars:
+    pic: { geo: true, groups: 1 }
+  geo: pic
+  mode: bullseye
+  prompt: Lies die Position des Kontakts im Bullseye-Format ab – Peilung vom Bullseye, dann Entfernung.
+  explain: >-
+    Richtig ist bullseye {pic.g1.bulls}. Die Ringe stehen alle 20 NM, die Strahlen alle 30°. Die Peilung liest du am
+    Bullseye ab, nicht an einem Flugzeug.
+
+- id: m2-l10-to-bulls
+  type: input
+  vars:
+    ob: { number: bearing }
+    orng: { int: [15, 60] }
+    back: { derive: reciprocal, from: ob }
+  prompt: >-
+    Deine Bullseye-Anzeige zeigt deine eigene Position: **bullseye {ob}/{orng}**. Welchen Kurs fliegst du, um direkt
+    zum Bullseye zu kommen (ohne Wind)?
+  accept: ["{back}", "{back|spoken}", "heading {back}"]
+  placeholder: dreistellig
+  explain: >-
+    Die Anzeige zeigt **vom** Bullseye **zu dir**. Zum Bullseye hin fliegst du den Gegenkurs: {ob} ± 180 = {back}.
+
+- id: m2-l10-which-magnetic
+  type: choice
+  prompt: Welche dieser Richtungsangaben beziehen sich auf magnetisch Nord? (Alles Zutreffende)
+  options:
+    - Die Peilung in einem Bullseye-Call
+    - Die Nummer einer Landebahn
+    - Ein Kurs, den dir ATC zuweist
+    - Das Koordinatengitter (Lat/Long) der Planungskarte
+  answer: [0, 1, 2]
+  explain: >-
+    Bullseye- und BRAA-Peilungen, Bahnnummern und Kurse von ATC beziehen sich auf magnetisch Nord, also auf den
+    Kompass. Das Gitter der Karte ist nach geografisch Nord ausgerichtet, und ihr Lineal misst in der Regel ebenso.
+
+- id: m2-l10-ruler-variation
+  type: choice
+  vars:
+    tru: { number: bearing }
+    mag: { derive: offset, from: tru, add: -6 }
+    magW: { derive: offset, from: tru, add: 6 }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Auf der Planungskarte ziehst du das Lineal vom Bullseye zu einem Kontakt: **{tru}°** (rechtweisend),
+    **{rng} NM**. Die Missweisung im Gebiet beträgt laut Platzkarte **6° Ost**. Bullseye-Calls sind
+    magnetisch. Was sagst du im Funk?
+  options:
+    - "„bullseye {mag}/{rng}“"
+    - "„bullseye {tru}/{rng}“"
+    - "„bullseye {magW}/{rng}“"
+    - "„bullseye {rng}/{mag}“"
+  answer: 0
+  explain: >-
+    Bei östlicher Missweisung ist der magnetische Wert kleiner: {tru}° minus 6° ergibt {mag}°
+    („east is least, west is best“). Den Linealwert unverändert zu nehmen, wäre 6° daneben – auf 50 NM
+    sind das gut 5 NM. Peilung zuerst, dann Entfernung.
+
+- id: m2-l10-input-west
+  type: input
+  vars:
+    tru: { number: bearing }
+    mag: { derive: offset, from: tru, add: 7 }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Das Lineal der Planungskarte zeigt vom Bullseye zu einem Kontakt **{tru}°** (rechtweisend) und **{rng} NM**. Die
+    Missweisung beträgt laut Platzkarte **7° West**. Welche Peilung nennst du im Funk?
+  accept: ["{mag}", "{mag|spoken}"]
+  placeholder: dreistellig
+  explain: >-
+    West addieren: {tru} + 7 = {mag} („west is best“). Die Entfernung bleibt {rng} NM – im Funk also
+    „bullseye {mag}/{rng}“.
+
+- id: m2-l10-error-size
+  type: choice
+  prompt: >-
+    Ein Kontakt steht 60 NM vom Bullseye entfernt. Du meldest ihn mit dem Linealwert und vergisst die Missweisung von
+    6°. Wie weit neben seiner echten Position liegt deine Meldung?
+  options:
+    - Etwa 6 NM
+    - Etwa 0,6 NM
+    - Etwa 36 NM
+    - Gar nicht – die Entfernung stimmt ja.
+  answer: 0
+  explain: >-
+    Faustregel: Auf 60 NM macht 1° etwa 1 NM aus. 6° auf 60 NM sind also rund 6 NM – genug, damit andere an der falschen
+    Stelle suchen. Die Entfernung stimmt zwar, die Richtung aber nicht, und damit auch der Punkt nicht.
+
+- id: m2-l10-call-format
+  type: choice
+  vars:
+    brg: { number: bearing }
+    rng: { int: [10, 60] }
+  prompt: >-
+    Die Bullseye-Anzeige im Cockpit zeigt für einen Kontakt **{brg}°** und **{rng} NM** – schon
+    magnetisch, so wie Bullseye-Calls gemeint sind. Was sagst du im Funk?
+  options:
+    - "„bullseye {brg}/{rng}“"
+    - "„bullseye {rng}/{brg}“"
+    - "„BRAA {brg}/{rng}“"
+    - "„{brg} for {rng} from my position“"
+  answer: 0
+  explain: >-
+    Bullseye-Angaben sind magnetische Peilung und Entfernung **vom Bullseye aus**, die Peilung zuerst.
+    BRAA (Bearing, Range, Altitude, Aspect) dagegen misst von einem bestimmten Flugzeug aus. Mehr dazu in Modul 5,
+    Lektion 3.
+
+- id: m2-l10-call-posit
+  type: call
+  call: m2-posit-bullseye
+  as: two
+  situation: >-
+    Getrennt vom Lead fliegst du auf **{a2}.000 Fuß**. Deine Bullseye-Anzeige zeigt für dich selbst
+    **{pos.own.bulls}** (magnetisch).
+  prompt: Beantworte die Frage des Leads nach deiner Position.
+  hint: Nummer – Position vom Bezugspunkt – Höhe im taktischen Format
+  explain: >-
+    „Two, bullseye {pos.own.bulls|spoken}, angels {a2|spoken}.“ Erst die Peilung vom Bullseye zu dir, dann die
+    Entfernung, dann die Höhe. Die Anzeige ist schon magnetisch, du rechnest nichts um.
+
+- id: m2-l10-input-east
+  type: input
+  vars:
+    tru: { number: bearing }
+    mag: { derive: offset, from: tru, add: -5 }
+    rng: { number: distance, range: [10, 60] }
+  prompt: >-
+    Du meldest einen Kontakt von der Planungskarte. Das Lineal zeigt vom Bullseye **{tru}°** (rechtweisend) und
+    **{rng} NM**, die Missweisung beträgt **5° Ost**. Sprich die Position so, wie sie in den Funk gehört:
+    Bezugspunkt, Peilung, Entfernung.
+  # Entfernung als ganze Zahl (ATP 3-52.4) oder ziffernweise – beide Formen, damit Tippen und Sprechen gelten
+  accept: ["bullseye {mag|spoken}, {rng|spoken}", "bullseye {mag|spoken}, {rng.digits|spoken}"]
+  placeholder: Position eintippen …
+  explain: >-
+    „bullseye {mag|spoken}, {rng|spoken}“ – Ost abziehen: {tru} − 5 = {mag}. Die Peilung sprichst du Ziffer für
+    Ziffer, die Entfernung als ganze Zahl oder ebenfalls ziffernweise.

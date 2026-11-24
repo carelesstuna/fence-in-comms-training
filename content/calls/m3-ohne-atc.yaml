@@ -8,7 +8,8 @@
   context: >-
     Heute gibt es keinen Tower. Alle Piloten sprechen auf derselben Platzfrequenz und sagen selbst an,
     was sie tun. Bevor du losrollst, sagst du dich an.
-  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  freq: "Platzfrequenz · {af.twr} {af.twr.band}"
+  place: "{af.name}"
   vars:
     af: { pool: airfields }
     wx: { weather: true, airfield: af }
@@ -42,7 +43,8 @@
   title: Selbstansage vor dem Start
   layer: community
   context: Du stehst am Rollhalt. Bevor du auf die Bahn rollst, sagst du an, dass du startest.
-  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  freq: "Platzfrequenz · {af.twr} {af.twr.band}"
+  place: "{af.name}"
   vars:
     af: { pool: airfields }
     wx: { weather: true, airfield: af }
@@ -68,7 +70,8 @@
   title: Ein anderer Flight im Anflug
   layer: community
   context: Ein anderer Flight sagt sich an. Er spricht nicht mit dir – er informiert alle.
-  freq: "Platzfrequenz {af.twr} {af.twr.band}"
+  freq: "Platzfrequenz · {af.twr} {af.twr.band}"
+  place: "{af.name}"
   vars:
     af: { pool: airfields }
     wx: { weather: true, airfield: af }

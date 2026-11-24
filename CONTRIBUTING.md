@@ -6,8 +6,10 @@ especially welcome.
 ## Reporting problems
 
 - Wrong phraseology, outdated frequencies, typos, bugs: please open an
-  [issue](https://github.com/carelesstuna/fence-in-comms-training/issues). Name the lesson or scenario (the title,
-  or the mission code shown in the app, e.g. "Mission #WA8H") and, for phraseology, a public source if you have one.
+  [issue](https://github.com/carelesstuna/fence-in-comms-training/issues). Paste the small reference line shown
+  below each exercise (e.g. `Ref m5-l1 · 4/12 · m5-awacs-checkin-fragged · #WA8H` – clicking it copies it): it
+  names the lesson, step and exercise, and the code at the end rebuilds the same random values. For phraseology,
+  add a public source if you have one.
 - Reporting an infringement: see [LEGAL.md](LEGAL.md).
 
 ## Changing content

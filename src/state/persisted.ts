@@ -30,7 +30,7 @@ export const STORE_KEY = 'fence-in-comms-training'
 /** Hier landen gespeicherte Daten, bevor sie beim Laden ersetzt oder repariert werden. */
 export const BACKUP_KEY = 'fence-in-comms-training-backup'
 /** Version des gespeicherten Formats (zustand persist). */
-export const STORE_VERSION = 4
+export const STORE_VERSION = 5
 
 /** Was im Browser gespeichert wird. */
 export interface PersistedState {
@@ -167,6 +167,9 @@ function profileSchema(def: Profile): z.ZodType<Profile> {
       model: z.string().min(1).max(120).catch(def.speech.model),
       desktopModel: z.string().min(1).max(60).catch(def.speech.desktopModel),
     }),
+    audio: shaped(def.audio, {
+      noise: z.enum(['realistic', 'clear']).catch(def.audio.noise),
+    }),
   })
 }
 
@@ -194,6 +197,8 @@ function progressSchema(def: ProgressState): z.ZodType<ProgressState> {
     daily: dailySchema(def.daily),
     hangarSeen: listOf(z.string(), def.hangarSeen),
     achievements: recordOf(achievementRecord),
+    memory: recordOf(z.number().int().min(1).max(8)),
+    modulesDone: listOf(z.string(), def.modulesDone),
     // stats und alle neuen Felder: nach dem Grundtyp des Standardwerts
   })
 }
@@ -262,6 +267,27 @@ const ADDED_IN_VERSION: Record<number, readonly (keyof ProgressState)[]> = {
   2: ['checkrides'],
   3: ['reviews', 'daily'],
   4: ['stats', 'achievements'],
+  5: ['memory', 'modulesDone'],
+}
+
+/**
+ * Lektionslisten bis v4 (0.2.0) von Modulen, die seither Lektionen dazubekommen haben. Wer so ein Modul damals
+ * über alle Lektionen erledigt hatte, behält es erledigt: v5 trägt es in `modulesDone` ein. Module ohne neue
+ * Lektionen trägt der Store beim Start selbst ein (`recordModulesDone`).
+ * - m2: m2-l10 (Bullseye) kam mit 0.3.0 dazu.
+ */
+const LESSONS_UNTIL_V4: Readonly<Record<string, readonly string[]>> = {
+  m2: ['m2-l1', 'm2-l2', 'm2-l3', 'm2-l4', 'm2-l5', 'm2-l6', 'm2-l7', 'm2-l8', 'm2-l9'],
+}
+
+/** v5: Module, die mit den Lektionen von v4 erledigt waren, zu `modulesDone` hinzufügen. */
+function keepModulesDone(progress: Record<string, unknown>): Record<string, unknown> {
+  const lessons = isRecord(progress.lessons) ? progress.lessons : {}
+  const have = Array.isArray(progress.modulesDone) ? progress.modulesDone : []
+  const done = Object.entries(LESSONS_UNTIL_V4)
+    .filter(([id, ids]) => !have.includes(id) && ids.every((l) => isRecord(lessons[l])))
+    .map(([id]) => id)
+  return done.length > 0 ? { ...progress, modulesDone: [...have, ...done] } : progress
 }
 
 /**
@@ -272,6 +298,8 @@ const ADDED_IN_VERSION: Record<number, readonly (keyof ProgressState)[]> = {
  * - v2: + progress.checkrides
  * - v3: + progress.reviews, progress.daily (Funk-Drill)
  * - v4: + progress.stats, progress.achievements, daily.days
+ * - v5: + progress.memory (Merk-Übungen), progress.modulesDone; Module, die mit den Lektionen von v4 erledigt
+ *   waren, bleiben erledigt (`LESSONS_UNTIL_V4`)
  */
 export function migratePersisted(
   state: unknown,
@@ -281,15 +309,14 @@ export function migratePersisted(
   if (!isRecord(state)) return state
   let s = state
   for (let v = fromVersion + 1; v <= STORE_VERSION; v++) {
+    if (!isRecord(s.progress)) continue
     const added = ADDED_IN_VERSION[v] ?? []
-    if (!isRecord(s.progress) || added.length === 0) continue
-    s = {
-      ...s,
-      progress: {
-        ...Object.fromEntries(added.map((k) => [k, defaults.progress[k]])),
-        ...s.progress,
-      },
+    let progress: Record<string, unknown> = {
+      ...Object.fromEntries(added.map((k) => [k, defaults.progress[k]])),
+      ...s.progress,
     }
+    if (v === 5) progress = keepModulesDone(progress)
+    s = { ...s, progress }
   }
   return s
 }

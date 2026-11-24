@@ -9,7 +9,7 @@ xp: 90
 sources:
   - title: "FAA Aeronautical Chart Users' Guide, 9 Jul 2026 – Terminal Procedures Publication (S. 100–103, 122–123)"
     url: https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/aero_guide/
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 99–121 – Karten lesen"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 99–121 – Karten lesen"
   - title: "DCS World, Kneeboard-Karten der Terrains Caucasus, Nevada, Kola, Syria (im DCS-Ordner Mods\\terrains)"
 ---
 
@@ -39,10 +39,15 @@ Was auf einer Platzkarte steht:
 - **Rollwege** mit ihren Buchstaben – genau die, die Ground dir in der Rollfreigabe nennt.
 - **:term[Fangseile]** (arresting gear) an Militärplätzen, Parkflächen, Tower, Navigationshilfen (:term[TACAN]).
 - **Hot Spots**: Kreuzungen, an denen es schon öfter Missverständnisse gab.
-- **Platzhöhe** und Missweisung (der Unterschied zwischen magnetischem und rechtweisendem Norden, mehr in Modul 2, Lektion 8).
+- **Platzhöhe** und Missweisung (der Unterschied zwischen magnetischem und rechtweisendem Norden, mehr dazu in Modul 2, Lektion 9).
+
+So sieht das an einem Platz aus deiner Sim aus. Fahr mit der Maus über die blauen Punkte – oder tippe sie an –,
+dann erklärt dir die Karte, was dort steht:
+
+::chart{kind=airport annotate}
 
 Mit der Platzkarte auf dem Knie verstehst du eine Rollfreigabe wie „taxi via Alfa, Charlie, hold short
-runway …“ auf Anhieb – und brauchst kein „progressive taxi“ (bei dem Ground dich Abschnitt für Abschnitt führt).
+runway …“ auf Anhieb – und brauchst kein :term[progressive taxi] (bei dem Ground dich Abschnitt für Abschnitt führt).
 
 ---
 
@@ -73,8 +78,11 @@ Eine Anflugkarte hat vier Teile, von oben nach unten:
    ob du weiterfliegst oder durchstartest, je nachdem, ob du die nötigen Sichtmerkmale hast) und die Sicht,
    je Flugzeugkategorie (eingeteilt nach Anfluggeschwindigkeit) – Kampfjets fallen in Kategorie D.
 
-Die Lernkarten in dieser App sind schematisch und kürzer: Die Frequenzen stehen dort im Kopf rechts
-untereinander, in derselben Reihenfolge.
+Die Lernkarten in dieser App sind schematisch und kürzer: Der Kopf ist in drei Spalten geteilt, und die
+Frequenzen stehen rechts untereinander, in derselben Reihenfolge. Geh die Karte einmal von oben nach unten
+durch – jeder blaue Punkt erklärt dir einen Teil mit den Werten genau dieses Anflugs:
+
+::chart{kind=approach annotate}
 
 ---
 
@@ -114,7 +122,8 @@ nur das Missionsbriefing – oder Karten aus der Community.
 :::
 
 :::sim{sim=bms}
-BMS erzeugt für alle Plätze in Korea vier eigene Karten (Ordner `Docs\03 KTO Charts`):
+BMS erzeugt für alle Plätze in Korea vier eigene Karten. Sie liegen im BMS-Installationsordner unter
+`Docs\03 KTO Charts` (standardmäßig `C:\Falcon BMS 4.38\Docs\03 KTO Charts`):
 - **AGC:** Platzkarte mit grünem Funkblock oben rechts, TACAN und Platzhöhe in der Fußzeile
 - **APC:** Parkplätze je Bahn
 - **LOC:** Umgebungskarte 50 × 50 NM mit MSA-Rose und einer kompletten Frequenztabelle – die beste

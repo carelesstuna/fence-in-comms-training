@@ -17,10 +17,12 @@ import { AirfieldSketch } from './AirfieldSketch'
 import { Kneeboard, WhereHint } from './Kneeboard'
 import { ScoreRing } from '../features/lesson/Stepper'
 import { scenarioScore } from '../ui/scoring'
-import { hintContextForScenario } from '../ui/speech'
+import { hintContextForScenario, typedDigitsFor } from '../ui/speech'
 import { useApp } from '../state/store'
 import { scenarioLog } from '../ui/scenarioLog'
 import { NineLineForm, NineLineResultList } from './NineLine'
+import { RefTag } from './RefTag'
+import { FrameBar, SituationTask } from './RadioFrame'
 import type { NineLineResult } from '../core/scoring/nineline'
 
 interface Radio {
@@ -148,11 +150,14 @@ export function ScenarioPlayer({
   onComplete,
   onCheckride,
   onRestart,
+  refParts = [],
 }: {
   scenario: ResolvedScenario
   seed: string
   /** Checkride: ohne Hilfen, alles wird getippt, bewertet erst im Debriefing. */
   checkride?: CheckrideMode
+  /** Was vor der Szenario-ID in der Referenz für Feedback steht (z. B. Lektion und Schritt). */
+  refParts?: string[]
   /** Im Lektionsplayer: wird mit dem Ergebnis (0–1) aufgerufen, wenn alles durch ist. */
   onComplete?: (score: number) => void
   /** Checkride: Ergebnis samt Urteil, sobald abgeschlossen. */
@@ -174,6 +179,7 @@ export function ScenarioPlayer({
   const [sel, setSel] = useState<[string, number] | null>(null)
   const st = scenario.steps[step]
   const hintContext = useMemo(() => hintContextForScenario(scenario), [scenario])
+  const typedDigits = typedDigitsFor({ scenarioId: scenario.id })
   const tuned = !st?.tune || tunes[step] !== undefined
   const interactive = !!st?.you || !!st?.silence || !!st?.decode
   const answered = tuned && (!interactive || results[step] !== undefined)
@@ -197,7 +203,7 @@ export function ScenarioPlayer({
   const stages = scenario.steps.reduce<string[]>((acc, s) => (acc[acc.length - 1] === s.stage ? acc : [...acc, s.stage]), [])
   const currentStage = stages.lastIndexOf(st?.stage ?? '')
   // Anzeige: feste Angabe des Schritts (z. B. Intercom) oder das, was du eingestellt hast
-  const display = st?.freq ?? (radio ? `${radio.freq} · ${radio.name}` : scenario.kneeboard ? 'nicht eingestellt' : '—')
+  const display = st?.freq ?? (radio ? `${radio.name} · ${radio.freq}` : scenario.kneeboard ? 'nicht eingestellt' : '—')
   const selected = sel ? log.find((e) => e.key === sel[0])?.t.segments[sel[1]] ?? null : null
   const record = (score: number) => setResults((r) => ({ ...r, [step]: score }))
   const recordCall = (c: CallResult) => {
@@ -248,12 +254,25 @@ export function ScenarioPlayer({
         <button onClick={() => setBriefed(true)} className="rounded-lg bg-phosphor px-5 py-2 font-semibold text-ink">
           {checkride ? 'Checkride starten →' : 'Los geht’s →'}
         </button>
+        <RefTag parts={[...refParts, scenario.id, 'Briefing']} seed={seed} />
       </div>
     )
   }
 
   if (finished && checkride && verdict) {
-    return <CheckrideDebrief scenario={scenario} seed={seed} mode={checkride} verdict={verdict} calls={calls} tuneResults={tuneResults} decodes={decodes} onRestart={onRestart} />
+    return (
+      <CheckrideDebrief
+        scenario={scenario}
+        seed={seed}
+        refParts={refParts}
+        mode={checkride}
+        verdict={verdict}
+        calls={calls}
+        tuneResults={tuneResults}
+        decodes={decodes}
+        onRestart={onRestart}
+      />
+    )
   }
 
   if (finished) {
@@ -261,6 +280,7 @@ export function ScenarioPlayer({
       <ScenarioDebrief
         scenario={scenario}
         seed={seed}
+        refParts={refParts}
         score={score}
         results={results}
         calls={calls}
@@ -320,19 +340,22 @@ export function ScenarioPlayer({
         </div>
       )}
 
+      {/* Rahmen: Rufzeichen, Ort und Funk – wie in den Funkspruch-Übungen immer an derselben Stelle */}
+      <FrameBar
+        self={`${scenario.self.name} ${scenario.self.flight}-${scenario.self.position}`}
+        place={st.place}
+        freq={display}
+        idle={!radio && !st.freq}
+      />
+
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_260px]">
         <div className="min-w-0 space-y-3">
-          {st.situation && (
-            <div className="rounded-lg border border-line bg-panel-2 px-4 py-3">
-              <InlineMarkdown text={st.situation} />
-            </div>
-          )}
+          <SituationTask situation={st.situation} task={st.task} />
 
           {/* Funk-Log */}
           <div className="scanlines overflow-hidden rounded-xl border border-line bg-panel">
             <div className="flex items-center justify-between gap-3 border-b border-line bg-panel-2 px-4 py-2">
               <span className="text-sm font-semibold">Funk-Log</span>
-              <span className={`font-mono text-xs ${radio || st.freq ? 'text-phosphor' : 'text-muted'}`}>◉ {display}</span>
             </div>
             <ExchangeAudio transmissions={logTransmissions} cast={castId} listen autoplay upcoming={upcoming}>
             <div ref={logRef} className="max-h-[360px] space-y-2.5 overflow-y-auto px-4 py-3">
@@ -380,13 +403,13 @@ export function ScenarioPlayer({
                 {st.you && (
                   <div>
                     <div className="mb-2 font-mono text-[11px] tracking-[0.2em] text-amber-hud uppercase">Du bist dran</div>
-                    <CallInput blind expected={st.you.transmission} expectSilence={false} hintContext={hintContext} onDone={recordCall} />
+                    <CallInput blind expected={st.you.transmission} expectSilence={false} hintContext={hintContext} typedDigits={typedDigits} onDone={recordCall} />
                   </div>
                 )}
                 {st.silence && (
                   <div>
                     <div className="mb-2 font-mono text-[11px] tracking-[0.2em] text-amber-hud uppercase">Und jetzt?</div>
-                    <CallInput blind expectSilence hintContext={hintContext} onDone={recordCall} />
+                    <CallInput blind expectSilence hintContext={hintContext} typedDigits={typedDigits} onDone={recordCall} />
                   </div>
                 )}
                 {st.decode && (
@@ -403,13 +426,13 @@ export function ScenarioPlayer({
                 {st.you?.mode === 'type' && (
                   <div>
                     <div className="mb-2 font-mono text-[11px] tracking-[0.2em] text-amber-hud uppercase">Du bist dran</div>
-                    <CallInput expected={st.you.transmission} expectSilence={false} hint={st.you.hint} explain={st.explain} hintContext={hintContext} onDone={recordCall} />
+                    <CallInput expected={st.you.transmission} expectSilence={false} hint={st.you.hint} explain={st.explain} hintContext={hintContext} typedDigits={typedDigits} onDone={recordCall} />
                   </div>
                 )}
                 {st.silence && (
                   <div>
                     <div className="mb-2 font-mono text-[11px] tracking-[0.2em] text-amber-hud uppercase">Und jetzt?</div>
-                    <CallInput expectSilence explain={st.explain} hintContext={hintContext} onDone={recordCall} />
+                    <CallInput expectSilence explain={st.explain} hintContext={hintContext} typedDigits={typedDigits} onDone={recordCall} />
                   </div>
                 )}
                 {st.decode && (
@@ -469,20 +492,20 @@ export function ScenarioPlayer({
         {scenario.sketch && (
           <aside className="space-y-2">
             <AirfieldSketch sketch={scenario.sketch} pos={st.pos ?? [...scenario.steps.slice(0, step)].reverse().find((s) => s.pos)?.pos} />
-            <div className="rounded-lg border border-line bg-panel px-3 py-2 font-mono text-xs text-muted">
-              <div>
-                Rufzeichen: <span className="text-amber-hud">{scenario.self.name} {scenario.self.flight}-{scenario.self.position}</span>
+            {(scenario.sketch.runway || scenario.sketch.wind) && (
+              <div className="rounded-lg border border-line bg-panel px-3 py-2 font-mono text-xs text-muted">
+                {scenario.sketch.runway && (
+                  <div>
+                    Runway: <span className="text-phosphor">{scenario.sketch.runway}</span>
+                  </div>
+                )}
+                {scenario.sketch.wind && <div>Wind: {scenario.sketch.wind.text}</div>}
               </div>
-              {scenario.sketch.runway && (
-                <div>
-                  Runway: <span className="text-phosphor">{scenario.sketch.runway}</span>
-                </div>
-              )}
-              {scenario.sketch.wind && <div>Wind: {scenario.sketch.wind.text}</div>}
-            </div>
+            )}
           </aside>
         )}
       </div>
+      <RefTag parts={[...refParts, scenario.id, `${step + 1}/${scenario.steps.length}`]} seed={seed} className="" />
     </div>
   )
 }
@@ -507,6 +530,7 @@ const spokenText = (t: ResolvedScenarioStep['you']) =>
 function ScenarioDebrief({
   scenario,
   seed,
+  refParts,
   score,
   results,
   calls,
@@ -517,6 +541,7 @@ function ScenarioDebrief({
 }: {
   scenario: ResolvedScenario
   seed: string
+  refParts: string[]
   score: number
   results: Record<number, number>
   calls: Record<number, CallResult>
@@ -543,6 +568,7 @@ function ScenarioDebrief({
             {perfect < steps.length && <p className="text-sm text-muted">Unten steht Schritt für Schritt, was gefragt war – Fehler zum Aufklappen.</p>}
           </div>
         </div>
+        <RefTag parts={[...refParts, scenario.id, 'Debriefing']} seed={seed} />
         {inLesson && <p className="mt-4 text-sm text-muted">Das Ergebnis zählt für die Lektion – weiter geht es unten.</p>}
         {onRestart && (
           <div className="mt-5 flex flex-wrap gap-2">
@@ -565,6 +591,11 @@ function ScenarioDebrief({
               <div className="mb-1 font-mono text-[11px] tracking-[0.2em] text-muted uppercase">
                 {i + 1}. {st.stage}
               </div>
+              {st.task && (
+                <p className="mb-1 text-muted">
+                  <InlineMarkdown text={st.task} />
+                </p>
+              )}
               {st.tune && (
                 <p className={tr?.correct ? 'text-emerald-300' : 'text-red-300'}>
                   {tr?.correct ? '✓' : '✗'} Funkgerät {st.tune.name}: {tr ? `eingestellt ${tr.tuned}` : 'nicht eingestellt'}
@@ -585,7 +616,7 @@ function ScenarioDebrief({
                     <>
                       <span className="text-muted">{value >= 0.999 ? 'Gefunkt: ' : 'Richtig wäre: '}</span>
                       <span lang="en" className="font-mono">
-                        „{value >= 0.999 && call && !call.silent ? call.text : spokenText(st.you)}“
+                        „{value >= 0.999 && call && !call.silent ? (call.shown ?? call.text) : spokenText(st.you)}“
                       </span>
                     </>
                   )}
@@ -639,6 +670,7 @@ function ScenarioDebrief({
 function CheckrideDebrief({
   scenario,
   seed,
+  refParts,
   mode,
   verdict,
   calls,
@@ -648,6 +680,7 @@ function CheckrideDebrief({
 }: {
   scenario: ResolvedScenario
   seed: string
+  refParts: string[]
   mode: CheckrideMode
   verdict: CheckrideResult
   calls: Record<number, CallResult>
@@ -677,6 +710,7 @@ function CheckrideDebrief({
             {!verdict.passed && tooLow && <p className="text-sm text-red-300">Das Ergebnis liegt unter der Grenze.</p>}
           </div>
         </div>
+        <RefTag parts={[...refParts, scenario.id, 'Debriefing']} seed={seed} />
         {verdict.critical.length > 0 && (
           <div className="mt-4 rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3">
             <div className="font-semibold text-red-300">
@@ -714,6 +748,11 @@ function CheckrideDebrief({
                 </span>
                 {st.critical && <span className="rounded border border-amber-hud/50 px-1.5 text-[11px] text-amber-hud">kritischer Schritt</span>}
               </div>
+              {st.task && (
+                <p className="mb-1 text-sm text-muted">
+                  <InlineMarkdown text={st.task} />
+                </p>
+              )}
               {st.tune && (
                 <p className={`text-sm ${tr?.correct ? 'text-emerald-300' : 'text-red-300'}`}>
                   {tr?.correct ? '✓' : '✗'} Funkgerät {st.tune.name}: {tr ? `eingestellt ${tr.tuned}` : 'nicht eingestellt'}

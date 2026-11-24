@@ -10,6 +10,7 @@ title: Alarmstart mit {gci}
 summary: Eine Leitstelle am Boden schickt dich los – Kurs, Höhe, Tempo, dann Bogey Dope, Tally und mit Pancake nach Hause.
 layer: community
 as: lead
+place: Am Boden in Bereitschaft
 sources:
   - title: "ATP 1-02.1 Multi-Service Brevity Codes (Mai 2020, Change 1 April 2021) – SCRAMBLE S. 54, VECTOR S. 68, PANCAKE S. 46, BUSTER, ANGELS, BOGEY DOPE, TALLY, PIGEONS"
   - title: "DCS P-51D Flight Manual – SCR-522-A: 100–156 MHz, vier Kanäle, A für Leitstelle, B für Tower (S. 94)"
@@ -43,8 +44,9 @@ steps:
   - stage: Alarm
     tune: { name: "{gci} (GCI)", freq: "{gf}", channel: "{gch}" }
     situation: >-
-      Du sitzt mit deinem Flight in Bereitschaft. Laut Missionsbriefing führt heute kein AWACS, sondern die
-      Leitstelle am Boden. Stell sie ein und hör zu.
+      Dein Flight wartet auf den Startbefehl. Laut Missionsbriefing führt heute kein AWACS, sondern die Leitstelle
+      am Boden.
+    task: Hör der Leitstelle zu und antworte ihr.
     hear:
       - speaker: "{gci}"
         segments:
@@ -65,7 +67,9 @@ steps:
       zurücklesen musst du es nicht.
 
   - stage: Steigflug
-    situation: Ein paar Minuten nach dem Start bist du auf Kurs und im Steigflug. Frag die Leitstelle, was vor dir ist.
+    place: Auf Abfangkurs
+    situation: Ein paar Minuten nach dem Start fliegst du den Vector der Leitstelle und steigst noch.
+    task: Frag die Leitstelle, was vor dir ist.
     you:
       mode: type
       transmission:
@@ -86,6 +90,7 @@ steps:
 
   - stage: Steigflug
     situation: Die Leitstelle hat geantwortet.
+    task: Antworte der Leitstelle.
     you:
       mode: type
       transmission:
@@ -98,7 +103,8 @@ steps:
       braucht die Leitstelle dafür nicht: Sie führt nur dich.
 
   - stage: Tally
-    situation: Vor dir tauchen Punkte am Himmel auf – das ist die Gruppe. Was meldest du der Leitstelle?
+    situation: Vor dir tauchen Punkte am Himmel auf – das ist die Gruppe.
+    task: Melde es der Leitstelle.
     you:
       mode: choice
       wrong:
@@ -115,9 +121,9 @@ steps:
       eigenes Flugzeug. Was im Luftkampf weiter passiert, übt die später geplante Spur Luftkampf.
 
   - stage: Heimweg
-    situation: >-
-      Der Kampf ist vorbei, dein Treibstoff wird knapp. Melde der Leitstelle, dass du landen willst, und lass
-      dir den Weg nach Hause geben.
+    place: Auf dem Heimweg
+    situation: Der Kampf ist vorbei, dein Treibstoff wird knapp.
+    task: Melde der Leitstelle, dass du landen willst, und lass dir den Weg nach Hause geben.
     you:
       mode: type
       hint: Adressat – Rufzeichen – pancake fuel – request pigeons
@@ -138,7 +144,8 @@ steps:
           - { text: "{pr|spoken}", role: value }
 
   - stage: Heimweg
-    situation: Du drehst auf den Kurs nach Hause.
+    situation: Die Leitstelle hat dir Kurs und Entfernung zum Platz gegeben. Du drehst auf den Kurs.
+    task: Antworte der Leitstelle.
     you:
       mode: type
       transmission:

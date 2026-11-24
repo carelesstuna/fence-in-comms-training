@@ -57,7 +57,8 @@ export function scenarioLog(scenario: ResolvedScenario, s: LogState): LogEntry[]
       if (s.blind) {
         if (call && !call.silent) entries.push({ t: said(own, call.text), key: `${i}y`, neutral: true })
       } else if (st.you.mode === 'type') {
-        if (call && !call.silent) entries.push({ t: said(own, call.text), key: `${i}y`, neutral: true })
+        // Gesprochen mit Zahlen in Worten (im Checkride-Flug oben bleibt das Transkript roh – die Schreibweise verriete sonst etwas)
+        if (call && !call.silent) entries.push({ t: said(own, call.shown ?? call.text), key: `${i}y`, neutral: true })
         entries.push(model)
       } else if ((s.results[i] ?? 0) >= 0.999) entries.push({ t: own, key: `${i}y` })
       else entries.push(model)

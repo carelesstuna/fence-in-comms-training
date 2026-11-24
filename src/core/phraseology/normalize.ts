@@ -49,6 +49,11 @@ const WORD_MAP: Record<string, string> = {
 }
 
 export function normalizeTokens(text: string): string[] {
+  return normalizeTokensWithDigits(text).tokens
+}
+
+/** Tokens wie `normalizeTokens`; `digits[i]`: Das Token stammt aus Ziffern („3“), nicht aus einem Zahlwort („three“). */
+export function normalizeTokensWithDigits(text: string): { tokens: string[]; digits: boolean[] } {
   const cleaned = text
     .toLowerCase()
     // Alphabet-Wörter, die man auseinander oder mit Bindestrich schreibt: "x ray", "x-ray", "fox trot"
@@ -70,22 +75,25 @@ export function normalizeTokens(text: string): string[] {
   const tokens: string[] = []
   // Ziffern, die einzeln dastanden („3“, „three“) – nicht aus einer mehrstelligen Zahl wie „3000“ zerlegt
   const single: boolean[] = []
+  const digits: boolean[] = []
   for (const raw of cleaned.split(/\s+/)) {
     if (!raw) continue
     if (/^\d+$/.test(raw)) {
       tokens.push(...raw.split(''))
       single.push(...raw.split('').map(() => raw.length === 1))
+      digits.push(...raw.split('').map(() => true))
       continue
     }
     tokens.push(WORD_MAP[raw] ?? raw)
     single.push(true)
+    digits.push(false)
   }
   // "three for zero" – zwischen zwei einzelnen Ziffern ist "for" ein vertipptes "four".
   // Nicht zwischen Zahlen: "passing 3000 for 6000" heißt „von 3000 auf 6000“.
   for (let i = 1; i < tokens.length - 1; i++) {
     if (tokens[i] === 'for' && /^\d$/.test(tokens[i - 1]) && /^\d$/.test(tokens[i + 1]) && single[i - 1] && single[i + 1]) tokens[i] = '4'
   }
-  return tokens
+  return { tokens, digits }
 }
 
 const TENS_DIGIT: Record<string, string> = { twenty: '2', thirty: '3', forty: '4', fifty: '5', sixty: '6', seventy: '7', eighty: '8', ninety: '9' }
@@ -304,6 +312,62 @@ export function matchAny(input: string, accepted: readonly string[]): SpellingFi
     if (fixes && (!best || fixes.length < best.length)) best = fixes
   }
   return best
+}
+
+/**
+ * Die Zahlen eines Textes der Reihe nach (Ziffernfolgen wie beim Vergleich, Dezimalpunkt eingeschlossen): jeweils `true`,
+ * wenn sie mit Ziffern geschrieben ist („261.8“, „13R“), `false` in Worten („two six one point eight“).
+ */
+function numberForms(text: string): boolean[] {
+  const { tokens, digits } = normalizeTokensWithDigits(text)
+  const forms: boolean[] = []
+  for (let i = 0; i < tokens.length; ) {
+    if (!/^\d$/.test(tokens[i])) {
+      i++
+      continue
+    }
+    let written = false
+    while (i < tokens.length && (/^\d$/.test(tokens[i]) || (tokens[i] === '.' && /^\d$/.test(tokens[i + 1] ?? '')))) {
+      if (digits[i]) written = true
+      i++
+    }
+    forms.push(written)
+  }
+  return forms
+}
+
+/** Erlaubt die Antwort getippte Ziffern für jede Zahl der Eingabe? Wo sie in Worten steht, müssen auch Worte stehen. */
+function digitsAllowed(input: string, answer: string): boolean {
+  const got = numberForms(input)
+  const want = numberForms(answer)
+  // Lassen sich die Zahlen nicht eins zu eins zuordnen, gilt: Ziffern nur, wenn die Antwort überhaupt welche hat
+  if (got.length !== want.length) return !got.some(Boolean) || want.some(Boolean)
+  return got.every((typed, k) => !typed || want[k])
+}
+
+/**
+ * Getippte Antwort einer Freitext-Übung: wie `matchAny`, aber Ziffern zählen nur, wo die akzeptierte Antwort an dieser
+ * Stelle selbst Ziffern hat. Steht eine Zahl dort in Worten, ist die Funk-Form gefragt – „301.25“ aus der Aufgabe
+ * abzutippen reicht nicht, „Colt 3-1“ statt „Colt three one“ auch nicht. Gesprochen gilt das nicht: Die Erkennung
+ * schreibt Zahlen immer als Ziffern, gesagt wurden die Wörter (`matchSpoken`).
+ */
+export function matchTyped(input: string, accepted: readonly string[]): SpellingFix[] | null {
+  return matchAny(input, accepted.filter((a) => digitsAllowed(input, a)))
+}
+
+/** Steht im Text eine Zahl – in Ziffern oder in Worten? */
+export function containsNumber(text: string): boolean {
+  return numberForms(text).length > 0
+}
+
+/** Steht im Text mindestens eine Zahl in Worten („Enfield one one“)? */
+export function hasNumberInWords(text: string): boolean {
+  return numberForms(text).some((written) => !written)
+}
+
+/** Verlangt die Übung beim Tippen Zahlen in Worten? (Jede akzeptierte Antwort hat mindestens eine Zahl in Worten.) */
+export function typedNeedsWords(accepted: readonly string[]): boolean {
+  return accepted.length > 0 && accepted.every(hasNumberInWords)
 }
 
 export function matchesAny(input: string, accepted: readonly string[]): boolean {

@@ -14,6 +14,7 @@ vars:
   cp: { commplan: true, airfield: af }
   twA: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel] }
   twB: { oneOf: [Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel], distinctFrom: [twA] }
+place: "{af.name}"
 sketch: { airfield: af, weather: wx }
 kneeboard:
   title: "Comm Card {af.name}"
@@ -34,11 +35,11 @@ sources:
 steps:
   - stage: Intercom
     pos: parking
-    freq: "Intercom · Crew Chief"
+    freq: "Crew Chief · Intercom"
     situation: >-
-      Du sitzt im kalten Cockpit auf dem Vorfeld von **{af.name}**, Batterie an – als Lead von **{flight}**,
-      einem Flight aus **{flightSize} Flugzeugen**. Der Crew Chief hat sein Headset per Kabel am Flugzeug
-      eingesteckt. Prüf zuerst die Verbindung.
+      Du sitzt im kalten Cockpit auf dem Vorfeld, Batterie an. Dein Flight hat **{flightSize} Flugzeuge**. Der Crew
+      Chief hat sein Headset per Kabel am Flugzeug eingesteckt.
+    task: Prüf zuerst die Verbindung zum Crew Chief.
     you:
       mode: build
       distractors: ["{af.name} Ground", radio check]
@@ -60,7 +61,8 @@ steps:
   - stage: ATIS
     pos: parking
     tune: { name: "{af.name} ATIS", freq: "{cp.atis.freq}", channel: "{cp.atis.channel}" }
-    situation: Während der Crew Chief außen prüft, hörst du auf dem zweiten Funkgerät die ATIS ab.
+    situation: Die Verbindung zum Crew Chief steht. Er geht jetzt außen um das Flugzeug und prüft es.
+    task: Stell auf dem zweiten Funkgerät die ATIS ein und hör sie ab.
     hear:
       - speaker: "{af.name} ATIS"
         segments:
@@ -78,7 +80,10 @@ steps:
   - stage: Ground
     pos: parking
     tune: { name: "{af.name} Ground", freq: "{cp.ground.freq}", channel: "{cp.ground.channel}" }
-    situation: Du bittest Ground ums Anlassen – als Lead für deinen ganzen Flight ({flightSize} Flugzeuge).
+    situation: >-
+      Du sitzt noch kalt auf dem Vorfeld, die ATIS hast du gehört. Du sprichst für deinen ganzen Flight aus
+      **{flightSize} Flugzeugen**.
+    task: Stell Ground ein und bitte um die Anlassfreigabe.
     you:
       mode: type
       hint: Adressat – Rufzeichen – ATIS – Anfrage
@@ -104,7 +109,8 @@ steps:
 
   - stage: Ground
     pos: parking
-    situation: Ground hat das Anlassen freigegeben und dir den Höhenmesser genannt. Lies zurück.
+    situation: Ground hat das Anlassen freigegeben und dir dabei den Höhenmesser genannt.
+    task: Lies die Freigabe zurück.
     you:
       mode: type
       hint: (Freigabe) – Luftdruck – Rufzeichen
@@ -112,7 +118,7 @@ steps:
         speaker: "{callsign}"
         segments:
           - { text: startup approved, role: instruction, optional: true }
-          - { text: "{wx.pressure.word} {wx.pressure|spoken}", role: value, critical: true, alt: ["{wx.pressure.word} {wx.pressure}"], weak: ["{wx.pressure.other} {wx.pressure|spoken}", "{wx.pressure.other} {wx.pressure}"], weakNote: "In der {af.phraseology.form} heißt der Luftdruck „{wx.pressure.word}“" }
+          - { text: "{wx.pressure.word} {wx.pressure|spoken}", role: value, critical: true, weak: ["{wx.pressure.other} {wx.pressure|spoken}"], weakNote: "In der {af.phraseology.form} heißt der Luftdruck „{wx.pressure.word}“" }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: >-
       Den Höhenmesser liest du immer zurück (Modul 1, Lektion 6) – mit einem Zahlendreher stimmt später jede
@@ -120,8 +126,9 @@ steps:
 
   - stage: Anlassen
     pos: parking
-    freq: "Intercom · Crew Chief"
-    situation: Zurück auf dem Intercom. Du bist mit den Checks durch und willst anlassen.
+    freq: "Crew Chief · Intercom"
+    situation: Die Anlassfreigabe von Ground hast du, deine Checks vor dem Anlassen sind durch.
+    task: Stimm das Anlassen mit dem Crew Chief ab.
     you:
       mode: choice
       wrong:
@@ -148,8 +155,11 @@ steps:
 
   - stage: Anlassen
     pos: parking
-    freq: "Intercom · Crew Chief"
-    situation: Triebwerk läuft, die Checks mit dem Crew Chief sind durch. Die Bremsklötze müssen weg.
+    freq: "Crew Chief · Intercom"
+    situation: >-
+      Das Triebwerk läuft, die Checks mit dem Crew Chief sind durch. Vor den Rädern liegen noch die
+      Bremsklötze.
+    task: Lass den Crew Chief die Bremsklötze wegnehmen.
     you:
       mode: type
       hint: Anrede – Bitte
@@ -168,10 +178,9 @@ steps:
 
   - stage: Anlassen
     pos: parking
-    freq: "Intercom · getrennt"
-    situation: >-
-      Das Kabel ist ab, der Crew Chief steht vor dem Flugzeug und salutiert. Willst du ihm noch etwas
-      sagen?
+    freq: "Crew Chief · Intercom getrennt"
+    situation: Das Kabel ist ab, der Crew Chief steht vor dem Flugzeug und salutiert.
+    task: Reagiere auf den Crew Chief.
     silence: true
     explain: >-
       Nichts sagen – ihr seid nicht mehr verbunden. Ab jetzt läuft alles per Handzeichen. Du erwiderst den
@@ -179,7 +188,8 @@ steps:
 
   - stage: Ground
     pos: parking
-    situation: Bitte Ground um die Rollfreigabe für deinen Flight ({flightSize} Flugzeuge).
+    situation: Die Bremsklötze sind weg, das Kabel ist ab. Alle **{flightSize} Flugzeuge** deines Flights laufen.
+    task: Bitte Ground um die Rollfreigabe.
     you:
       mode: type
       hint: Adressat – Rufzeichen – Anzahl – Anfrage
@@ -200,16 +210,17 @@ steps:
 
   - stage: Ground
     pos: parking
-    situation: Lies die Rollfreigabe zurück.
+    situation: Du stehst noch auf dem Vorfeld. Ground hat dir eben die Rollfreigabe gegeben.
+    task: Lies die Rollfreigabe zurück.
     you:
       mode: type
       hint: Runway – Rollweg – hold short – Rufzeichen
       transmission:
         speaker: "{callsign}"
         segments:
-          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true, alt: ["runway {wx.runway}"] }
+          - { text: "runway {wx.runway|spoken}", role: value, critical: true, free: true }
           - { text: "via {twA}, {twB}", role: instruction, alt: ["taxi via {twA}, {twB}"] }
-          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "hold short of runway {wx.runway}", "hold short runway {wx.runway}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}", "holding short of runway {wx.runway}", "holding short runway {wx.runway}"] }
+          - { text: "hold short of runway {wx.runway|spoken}", role: instruction, critical: true, alt: ["hold short runway {wx.runway|spoken}", "holding short of runway {wx.runway|spoken}", "holding short runway {wx.runway|spoken}"] }
           - { text: "{callsign|spoken}", role: callsign, critical: true }
     explain: >-
       „hold short“ liest du immer zurück, mit der Bahn – ein „hold short“ ohne Bahn reicht nicht. Den Rollweg

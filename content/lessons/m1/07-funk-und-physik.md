@@ -3,7 +3,7 @@ id: m1-l7
 module: m1
 order: 5
 title: Funk und Physik
-summary: Warum dich der Tower manchmal nicht hört – Sichtlinie, Funkhorizont, Berge, Bänder, AM und FM, Rauschen.
+summary: Warum dich der Tower manchmal nicht hört – Sichtlinie, Funkhorizont zum Merken, Berge, Bänder, AM und FM, Rauschen.
 minutes: 10
 xp: 90
 sources:
@@ -31,7 +31,7 @@ Lichtstrahl. Die Wellenlänge in Metern ist ungefähr 300 geteilt durch die Freq
 Die MHz-Bereiche, wer wo funkt und welche Brevity-Wörter dazugehören (uniform, victor, fox mike), stehen auf der
 Seite [Frequenzbänder, Modulation und Reichweite](/wissen/frequenzbaender-und-reichweite) und in Modul 2. Hier zählt:
 **Das, was du im Kampfjet sprichst, läuft geradeaus.** Die Grenze, bis zu der sich zwei Antennen „sehen“, heißt
-**Funkhorizont**. Wie weit er reicht, rechnest du gleich. Dazu kommt die **Modulation**: wie die Stimme auf die Welle
+**Funkhorizont**. Wie weit er reicht, steht gleich in einer kleinen Merktabelle. Dazu kommt die **Modulation**: wie die Stimme auf die Welle
 gelegt wird (AM oder FM). Mehr dazu am Ende der Lektion.
 
 ---
@@ -44,31 +44,42 @@ gelegt wird (AM oder FM). Mehr dazu am Ende der Lektion.
 
 „Geradeaus“ heißt: Die Erde ist rund und biegt sich unter der Sichtlinie weg. Zwei Antennen erreichen sich nur, solange
 sie sich „sehen“. Die Grenze ist der **Funkhorizont**. Er liegt etwas weiter als der Horizont fürs Auge, weil die Luft
-die Wellen leicht zur Erde hin krümmt. Für eine Antenne gilt die Faustformel:
+die Wellen leicht zur Erde hin krümmt.
 
-> **Reichweite in Seemeilen (NM) ≈ 1,23 · √(Höhe in Fuß)**
+Wie weit das reicht, hängt fast nur von der **Höhe** ab. Rechnen musst du dafür nicht. Diese fünf Werte für ein Flugzeug
+und eine Antenne am Boden reichen, um es abzuschätzen:
 
-Für zwei Stationen addierst du die Reichweiten beider Antennen: **1,23 · (√Höhe₁ + √Höhe₂)**.
+| Flughöhe | Funkhorizont etwa |
+|---|---|
+| 100 ft (Hubschrauber im Tiefflug) | gut 10 NM |
+| 1.000 ft | 40 NM |
+| 5.000 ft | 90 NM |
+| 10.000 ft | 120 NM |
+| 30.000 ft | 210 NM |
+
+Dazu zwei Merksätze:
+
+- **Vierfache Höhe, doppelte Reichweite.** Höhe zahlt sich nur langsam aus: Von 1.000 auf 4.000 ft wird aus 40 NM
+  nur rund 80 NM. Ein Hubschrauber im Tiefflug verliert deshalb schon nach wenigen Meilen den Kontakt.
+- **Zwei Antennen in der Luft: Reichweiten addieren.** Zwei Flugzeuge auf je 10.000 ft hören sich rund 240 NM weit,
+  doppelt so weit wie eines von ihnen eine Antenne am Boden.
 
 **Höhe** heißt hier: Höhe der Antenne über dem Gelände dazwischen. Der Höhenmesser zählt dagegen ab Meereshöhe.
-Fliegst du über einem Hochplateau, reicht dein Funk deshalb weniger weit, als die Anzeige vermuten lässt.
+Fliegst du über einem Hochplateau, reicht dein Funk deshalb weniger weit, als die Anzeige vermuten lässt. Und mehr
+Sendeleistung hilft nicht: Sie verschiebt den Horizont nicht.
 
-**Beispiel:** Du fliegst auf 10.000 ft, der Tower hat seine Antenne auf rund 100 ft.
-√10.000 ft = 100 und √100 ft = 10, also 1,23 · (100 + 10) ≈ **135 NM**. Weiter weg hört dich der Tower nicht, auch bei
-voller Sendeleistung: Mehr Leistung verschiebt den Horizont nicht.
-
-Weil die Höhe unter der Wurzel steht, zahlt sich Höhe nur langsam aus: **Die vierfache Höhe verdoppelt die
-Reichweite.** Ein Hubschrauber im Tiefflug verliert deshalb nach wenigen Meilen den Kontakt, ein AWACS auf großer Höhe
-hört weit. Auf 35.000 ft, der Reiseflughöhe eines Airliners, ergibt die Formel rechnerisch rund 230 NM zu einer
-Bodenantenne.
+:::tip
+Für Neugierige: Die Tabelle stammt aus der Faustformel **Reichweite (NM) ≈ 1,23 · √(Höhe in ft)**, für zwei Antennen
+1,23 · (√Höhe₁ + √Höhe₂). Die Wurzel erklärt den ersten Merksatz: √4 = 2. Im Funk rechnet damit niemand im Kopf.
+:::
 
 ---
 
-::drill{id=m1-l7-calc-one}
+::drill{id=m1-l7-horizon-match}
 
 ---
 
-::drill{id=m1-l7-calc-two}
+::drill{id=m1-l7-horizon-order}
 
 ---
 
@@ -126,7 +137,8 @@ warum Flugfunk bei AM geblieben ist, steht auf der Hangar-Karte „Warum Flugfun
 ## Merke
 
 :::example
-**VHF und UHF laufen geradeaus.** Reichweite ≈ 1,23 · (√Höhe₁ + √Höhe₂) in NM, Höhen in Fuß über dem Gelände.
-Berge schatten ab, gegen den Funkschatten hilft Höhe. Rauschen heißt meist: Das Signal ist zu schwach. Prüf erst
+**VHF und UHF laufen geradeaus.** 1.000 ft ≈ 40 NM, 10.000 ft ≈ 120 NM; vierfache Höhe, doppelte Reichweite; zwei
+Flugzeuge addieren ihre Reichweiten. Gezählt wird die Höhe über dem Gelände. Berge schatten ab, gegen den Funkschatten
+hilft Höhe. Rauschen heißt meist: Das Signal ist zu schwach. Prüf erst
 Entfernung, Höhe und Gelände, dann das Gerät. Gleiche Frequenz, aber AM gegen FM, heißt kein Kontakt.
 :::

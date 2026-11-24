@@ -7,7 +7,7 @@ runways: ["06L/24R", "06R/24L"]
 atc: { uhf: 236.6, vhf: 118.7 }
 tacan: 27X
 freqs: { atis: 128.85, ground: 275.85, departure: 265.75, approach: 265.75 }
-# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Installationsordner)
 charts:
   - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_AGC.pdf" }
   - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_LOC.pdf" }

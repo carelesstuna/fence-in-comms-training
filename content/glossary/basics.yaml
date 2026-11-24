@@ -257,6 +257,16 @@
   meaning: Militärische Funknavigation – zeigt Richtung und Entfernung zu einer Station, z. B. „TACAN 67X“.
 - word: ILS
   meaning: Instrumentenlandesystem – führt seitlich und in der Höhe auf die Landebahn, auch ohne Sicht.
+- word: Missweisung
+  meaning: >-
+    Winkel zwischen geografisch Nord (danach sind Karten ausgerichtet) und magnetisch Nord (dahin zeigt der Kompass).
+    Bei Ost-Missweisung ist eine Richtung magnetisch kleiner als rechtweisend, bei West größer.
+  aliases: [magnetic variation, variation, Deklination, Ortsmissweisung]
+  note: >-
+    Bullseye- und BRAA-Peilungen, Bahnnummern und Kurse von ATC sind magnetisch, Planungskarten und ihre Lineale
+    messen meist rechtweisend. Vom Lineal zum Funk: Ost abziehen, West addieren („east is least, west is best“). Den
+    Wert findest du auf der Platzkarte. Mehr in Modul 2, Lektion 9.
+  see: [BULLSEYE, BRAA]
 - word: IFR
   meaning: Instrument Flight Rules – Instrumentenflugregeln. Du fliegst nach Instrumenten auf einer freigegebenen Route und Höhe, die Flugsicherung hält dich auf Abstand zu anderem Verkehr – auch ohne Sicht.
   note: Vor dem Start holst du dafür die IFR-Freigabe (clearance) ein.
@@ -283,9 +293,22 @@
   aliases: [FL, Flugfläche]
   see: [QNH, Übergangshöhe]
 - word: ATO
-  meaning: Air Tasking Order – der Einsatzbefehl für alle Flüge eines Tages. Der Teil für deinen Flight heißt „Frag“.
-  aliases: [frag]
-  see: [AS FRAGGED]
+  meaning: Air Tasking Order – der Einsatzbefehl für alle Flüge eines Tages, mit einer Zeile für jede Mission.
+  note: >-
+    Den Ausschnitt, der deinen Flight betrifft, nennen Piloten „Frag“ (siehe dort). Falcon BMS zeigt die ATO auf einer
+    eigenen Seite der Kampagne (User Manual 4.38, Abs. 9.3.5.1).
+  see: [Frag, AS FRAGGED, SPINS]
+- word: Frag
+  meaning: >-
+    Der Ausschnitt aus dem Einsatzbefehl (ATO), der deinen Flight betrifft – von „fragmentary order“ (Teilbefehl).
+    Darin stehen Missionsnummer, Rufzeichen, Anzahl und Muster der Flugzeuge, Auftrag und Ziel mit Zielzeit,
+    Startzeit, Tanker, Führungsstelle und IFF-Codes.
+  aliases: [Frag Order, fragmentary order, fragged]
+  note: >-
+    „Fragged“ heißt „laut Einsatzbefehl eingeteilt“ (die „fragged“ Startzeit), „as fragged“ „genau wie geplant“. Falcon
+    BMS zeigt die Frag-Zeilen auf der ATO-Seite der Kampagne („FRAG ORDER“). DOD Dictionary: fragmentary order;
+    ATP 3-52.4 (2021), S. 8 (Check-in „as fragged“).
+  see: [ATO, AS FRAGGED]
 - word: SPINS
   meaning: Special Instructions – besondere Anweisungen zu einem Einsatz oder Event, etwa Funkverfahren, Frequenzen, Luftraum und Ablauf. Wird zusammen mit dem Einsatzbefehl (ATO) herausgegeben.
   aliases: [Special Instructions]
@@ -326,7 +349,7 @@
   see: [Intercom, LAST CHANCE]
 - word: Overhead
   meaning: Militärisches Einflugverfahren in die Platzrunde. Du fliegst zuerst eine gerade Strecke auf die Bahn zu (Initial), beginnst am festgelegten Break-Punkt eine erste Kurve von etwa 180 Grad zum Gegenanflug (Break) und landest nach einer zweiten 180-Grad-Kurve.
-  aliases: [Overhead Break, Overhead Maneuver]
+  aliases: [Overhead Break, Overhead Maneuver, Initial]
   note: >-
     Die FAA nennt es „overhead maneuver“ – festgelegte Manöver, oft im Verband, für den Einflug in die Platzrunde. Üblich
     sind ein Initial von 3 bis 5 Meilen, zwei 180-Grad-Kurven und eine Höhe von mindestens 500 ft über der normalen
@@ -386,6 +409,24 @@
     Steuerkurs ab. Im Funk heißt „fly heading“ deshalb nur: Nase auf diese Zahl. Im Lagebild meint TRACK die
     Flugrichtung einer Gruppe. ICAO Doc 4444, Kap. 1 (Begriffe Heading und Track).
   see: [TRACK, VECTOR, CHECK]
+- word: closed traffic
+  meaning: >-
+    In der Platzrunde bleiben: Nach dem Aufsetzen oder einem Tiefanflug startest du durch und fliegst die nächste
+    Runde, statt den Platz zu verlassen. „request closed traffic“ ist die Bitte darum an den Tower.
+  aliases: [closed pattern]
+  note: >-
+    FAA Pilot/Controller Glossary (CLOSED TRAFFIC). Der Tower antwortet z. B. „left closed traffic approved, report
+    downwind“ oder „unable closed traffic“ (FAA JO 7110.65, 3-10-11). Üblich zum Üben von Landungen.
+  see: [Platzrunde]
+- word: progressive taxi
+  meaning: >-
+    Rollführung Schritt für Schritt: Ground gibt dir die Rollanweisung abschnittsweise, jeweils bis zur nächsten
+    Kreuzung, weil du den Platz nicht kennst. Du bittest mit „request progressive taxi“ darum.
+  aliases: [progressive taxi instructions]
+  note: >-
+    FAA Pilot/Controller Glossary (PROGRESSIVE TAXI) und AIM 4-3-18. ATC bietet sie auch von sich aus an, etwa bei
+    Baustellen oder schlechter Sicht (JO 7110.65, 3-7-2). Mehr in Modul 3, Lektion 3.
+  see: [Ground]
 - word: Platzrunde
   meaning: >-
     Das festgelegte Rechteck um die Bahn, auf dem du zur Landung anfliegst: Steigflug in Startrichtung (upwind),

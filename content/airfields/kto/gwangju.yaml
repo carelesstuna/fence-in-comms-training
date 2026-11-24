@@ -7,7 +7,7 @@ runways: ["04L/22R", "04R/22L"]
 atc: { uhf: 254.6, vhf: 126.2 }
 ils: "ILS 04/22: 111.10"
 freqs: { atis: 128.875, ground: 275.8, departure: 268.0, approach: 268.0 }
-# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Installationsordner)
 charts:
   - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_AGC.pdf" }
   - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_LOC.pdf" }

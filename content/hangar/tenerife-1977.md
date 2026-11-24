@@ -12,6 +12,10 @@ sources:
     url: https://www.faa.gov/sites/faa.gov/files/2022-11/Spanish_Findings_0.pdf
   - title: "PBS NOVA: The Final Eight Minutes"
     url: https://www.pbs.org/wgbh/nova/article/final-eight-minutes
+  - title: "PBS NOVA: Funk- und Cockpitabschrift der letzten Minuten (nach dem spanischen Bericht)"
+    url: https://www.pbs.org/wgbh/nova/planecrash/minutes.html
+  - title: "Wikipedia: Tenerife airport disaster (Abschrift nach dem niederländischen Bericht)"
+    url: https://en.wikipedia.org/wiki/Tenerife_airport_disaster
 ---
 
 **27. März 1977**, Flughafen Los Rodeos auf Teneriffa. Wegen einer Bombenexplosion am Flughafen von
@@ -27,11 +31,27 @@ Dann geschieht in wenigen Sekunden das Entscheidende:
    das „wir stehen bereit“ oder „wir rollen schon“?
 2. Der Tower antwortet mit „OK“ und will hinzufügen, die KLM solle **auf die Startfreigabe warten**.
 3. Genau in diesem Moment funkt die Pan Am-Crew, dass sie **noch auf der Bahn rollt**.
-4. Beide Sendungen überlagern sich. Im KLM-Cockpit ist nur ein etwa drei Sekunden langes **Pfeifen**
+4. Beide Sendungen überlagern sich. Im KLM-Cockpit ist nur ein drei bis vier Sekunden langes **Pfeifen**
    zu hören. Übrig bleibt das „OK“.
 
 Die KLM beschleunigte ohne Startfreigabe und kollidierte im Nebel mit der Pan Am. **583 Menschen**
 starben. Es ist bis heute das Unglück mit den meisten Todesopfern in der Geschichte der Luftfahrt.
+
+### So klang es – nachgestellt
+
+Schon vorher war die Pan Am angewiesen worden, die Bahn an der **dritten** Abfahrt nach links zu verlassen. Im Cockpit
+war man sich nicht sicher, ob „third“ oder „first“ gemeint war, und fragte nach. Die dritte Abfahrt (C3) hätte eine
+scharfe Doppelkurve verlangt, die eine 747 kaum fahren konnte. Die Pan Am rollte deshalb weiter auf der Bahn.
+
+Hier die letzten Funksprüche, gesprochen von synthetischen Stimmen. Der Wortlaut folgt den Untersuchungsberichten;
+die Quellen hören einzelne Stellen etwas verschieden (z. B. „we're now at takeoff“ oder „we're now, uh, taking off“).
+Tippe einen Teil an, um zu sehen, was er bedeutete und was schiefging. Mit „Alle abspielen“ läuft alles nacheinander.
+
+::call{id=tenerife-1977-funk}
+
+Im KLM-Cockpit hatte einer den Funk richtig verstanden. Kurz nach dem letzten Funkspruch fragte der **Bordingenieur**
+auf Niederländisch, ob die Pan Am denn nicht von der Bahn sei. Der Kapitän verneinte nachdrücklich und setzte den
+Start fort.
 
 ### Was sich danach änderte
 

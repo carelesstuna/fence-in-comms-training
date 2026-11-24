@@ -109,9 +109,22 @@ function moduleMap(index: ContentIndex): ModuleMap {
 }
 
 /** Modul eines Funkspruchs oder Szenarios; undefined, wenn es in keiner Lektion vorkommt. */
-export function moduleOf(index: ContentIndex, ref: { exchangeId?: string; scenarioId?: string }): string | undefined {
+export function moduleOf(index: ContentIndex, ref: { exchangeId?: string; scenarioId?: string; drillId?: string }): string | undefined {
   const m = moduleMap(index)
-  return (ref.exchangeId && m.exchange.get(ref.exchangeId)) || (ref.scenarioId && m.scenario.get(ref.scenarioId)) || undefined
+  return (ref.exchangeId && m.exchange.get(ref.exchangeId)) || (ref.scenarioId && m.scenario.get(ref.scenarioId)) || (ref.drillId && drillModule(index, ref.drillId)) || undefined
+}
+
+/**
+ * Modul einer Übung: die Lektion, in der sie steht – sonst die Lektion, mit deren ID ihre ID beginnt (so heißen
+ * die Fragen der Modulprüfung, z. B. „m1-l7-x-calc-tower“).
+ */
+function drillModule(index: ContentIndex, drillId: string): string | undefined {
+  let prefix: { len: number; module: string } | undefined
+  for (const lesson of index.lessons.values()) {
+    if (lesson.steps.some((s) => s.kind === 'drill' && s.drillId === drillId)) return lesson.module
+    if (drillId.startsWith(`${lesson.id}-`) && lesson.id.length > (prefix?.len ?? 0)) prefix = { len: lesson.id.length, module: lesson.module }
+  }
+  return prefix?.module
 }
 
 /** Stationsnamen ohne Zahlen: „Viper 1-1“ → „Viper“, „Batumi Ground“ bleibt. Doppelte fallen weg. */

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Fence In Comms Training",
   "mainBinaryName": "fence-in-comms-training",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "identifier": "io.github.carelesstuna.fence-in-comms-training",
   "build": {
     "beforeDevCommand": "npm run dev -- --port 5185 --strictPort",

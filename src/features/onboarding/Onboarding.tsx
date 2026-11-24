@@ -58,7 +58,7 @@ export function Onboarding() {
                 <span className="text-phosphor">▸</span> Gilt für alle Sims – Details zu DCS, BMS, IL-2 und SRS bekommst du dort, wo sie wichtig sind.
               </li>
             </ul>
-            <p className="text-xs text-muted">{LEGAL_SHORT} Mehr dazu unter Profil → Lizenzen und rechtliche Hinweise.</p>
+            <p className="text-xs text-muted">{LEGAL_SHORT} Mehr dazu unter Einstellungen → Lizenzen und rechtliche Hinweise.</p>
           </div>
         )}
         {step === 1 && (
@@ -70,7 +70,7 @@ export function Onboarding() {
         {step === 2 && (
           <div>
             <h2 className="mb-1 text-xl font-semibold text-white">Dein Rufzeichen</h2>
-            <p className="mb-4 text-sm text-muted">Das kannst du später im Profil jederzeit ändern.</p>
+            <p className="mb-4 text-sm text-muted">Das kannst du später unter Einstellungen → Flugprofil jederzeit ändern.</p>
             <CallsignFields />
           </div>
         )}
@@ -104,11 +104,11 @@ export function Onboarding() {
               {placeable.length === 0 && <p className="text-muted">Noch keine Einstufungstests verfügbar.</p>}
             </div>
             <p className="mt-3 text-sm text-muted">
-              Nichts markiert? Dann startest du ganz vorne – auch gut. Jeder Einstufungstest lässt sich später jederzeit im Ausbildungsweg oder im
-              Profil machen und wiederholen.
+              Nichts markiert? Dann startest du ganz vorne – auch gut. Jeder Einstufungstest lässt sich später jederzeit im Ausbildungsweg oder unter
+              Fortschritt machen und wiederholen.
             </p>
             <h3 className="mt-5 mb-2 font-semibold">Lieber kurz und praktisch?</h3>
-            <CompactField note="Lässt sich im Profil jederzeit wieder ausschalten." />
+            <CompactField note="Lässt sich unter Fortschritt jederzeit wieder ausschalten." />
           </div>
         )}
       </div>

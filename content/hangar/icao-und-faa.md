@@ -30,7 +30,7 @@ wo du fliegst.
 | monitor – auch in der Luft | monitor – nur am Boden | auf eine Frequenz wechseln und zuhören |
 
 Diese App spricht standardmäßig überall die **US-Form**, so wie in den meisten Sim-Staffeln auch auf Karten außerhalb
-der USA gefunkt wird. Mit der Einstellung „Kartenabhängig“ im [Profil](/profile) richtet sie sich nach dem Platz: In
+der USA gefunkt wird. Mit der Einstellung „Kartenabhängig“ in den [Einstellungen](/einstellungen/flugprofil) richtet sie sich nach dem Platz: In
 Nevada, auf Guam und in Korea sprechen die Lotsen die US-Form, in Georgien und am Golf die **ICAO-Form**. Das gilt für
 den Luftdruck, für Steig- und Sinkfreigaben und für die Sicht in der ATIS. Liest du die Form des anderen Dialekts
 zurück, zählt das, aber nicht voll. Die übrigen Wendungen aus der Tabelle (Rollfreigabe, „radar contact“, Erstanruf) übt die App überall in der US-Form, weil die Sims vor allem

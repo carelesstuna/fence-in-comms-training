@@ -6,7 +6,7 @@ elevationFt: 120
 runways: ["13L/31R", "13R/31L"]
 atc: { uhf: 365.0, vhf: 126.2 }
 freqs: { atis: 127.65, ground: 275.8, departure: 346.3, approach: 346.3 }
-# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Ordner)
+# BMS-eigene KTO-Karten (Pfad relativ zum BMS-Installationsordner)
 charts:
   - { sim: bms, name: "Airport Ground Chart (AGC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_AGC.pdf" }
   - { sim: bms, name: "Umgebungskarte mit Frequenztabelle (LOC)", path: "Docs/03 KTO Charts/01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_LOC.pdf" }

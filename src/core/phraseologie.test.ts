@@ -84,6 +84,8 @@ describe('Karten haben eine Phraseologie', () => {
       expect(f.phraseology.fields!.map.fields!.form.text).toBe(FORM_NAME[p])
       expect(f.faa.text).toBe(p === 'faa' ? 'yes' : '')
       expect(f.icao.text).toBe(p === 'icao' ? 'yes' : '')
+      // Die ICAO-Kennung steht in {af.code}, nicht in {af.icao} (das ist der Schalter oben)
+      expect(f.code.text, a.id).toBe(a.icao ?? '—')
       // für Segmente, die es nur in einer Form gibt: when: af.icao / when: af.faa
       const fill = (t: string) =>
         fillTemplate(t, { af: { text: a.name, spoken: a.name, fields: f } })

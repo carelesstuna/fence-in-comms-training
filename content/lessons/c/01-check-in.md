@@ -118,7 +118,7 @@ das Spiel selbst ein. Dann nennt er die Control Type, du wählst „Ready to cop
 :::
 
 :::sim{sim=bms}
-In BMS gibt es seit Version 4.36 einen JTAC auf dem Tactical-Netz (UHF-Preset 6). Der Ablauf: Check-in, Echo Point,
+In BMS gibt es einen JTAC auf dem Tactical-Netz (UHF-Preset 6). Der Ablauf: Check-in, Echo Point,
 9-Line, „IP Inbound“, „Cleared Hot“, Check-out mit BDA.
 :::
 

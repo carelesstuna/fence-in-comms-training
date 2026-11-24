@@ -24,9 +24,22 @@ npm run fetch-asr -- --list  # was geladen wird, mit Größen und Lizenzen
 
 ## Sprechen in der App
 
-- An jeder Stelle, an der man einen Funkspruch eingibt (Übungen, Szenarien, Checkride), lässt sich
-  zwischen „Tippen“ und „Sprechen“ umschalten. Die Wahl gilt dann überall. Tippen bleibt auch im
-  Sprechmodus möglich.
+- An jeder Stelle, an der man einen Funkspruch eingibt (Funkspruch- und Freitext-Übungen, Modulprüfung,
+  Szenarien, Checkride), lässt sich zwischen „Tippen“ und „Sprechen“ umschalten. Die Wahl gilt dann
+  überall. Tippen bleibt auch im Sprechmodus möglich.
+- **Freitext** („Sprich die Frequenz …“, „Buchstabiere …“): Das Transkript wird mit den festen Antworten
+  verglichen, nach denselben Regeln wie ein gesprochener Funkspruch (`matchSpoken`: Verhörer bei Zahlen,
+  getrennt/zusammen geschriebene Wörter, Verzögerungslaute). Die Erkennung bekommt das Modul der Lektion
+  als Hinweis, nie die Lösung.
+- **Zahlen getippt und gesprochen:** Whisper schreibt Zahlen immer als Ziffern, auch „three hundred fifty
+  point five“ wird „350.5“ (gemessen am 24.11.2026). Gesprochen zählt deshalb die Ziffern-Form; ob jede
+  Ziffer einzeln kam, lässt sich nicht prüfen. Getippt dagegen zählen Ziffern nur, wo die Antwort selbst
+  Ziffern hat – steht sie in Worten, muss man die Funk-Form tippen. Das gilt für Freitext (`matchTyped`),
+  Lückentexte und Funksprüche (`scoreCall(…, { numbersInWords: true })`: „Enfield 1-1“ ist fast richtig,
+  halbe Punkte für den Teil). Ausnahme: Module mit `typedDigits` (Spur C – Grids, Höhen, Laser-Codes) und
+  Freitext-Aufgaben, deren Antwort selbst Ziffern hat (rechnen, einstellen). Unter jedem Eingabefeld steht,
+  was getippt gilt (`TypedNumbersNote`). Ziffern ausgeschrieben
+  zu erzwingen (`+digits`) wäre möglich, hat aber die Erkennung verschlechtert (Messreihe 21.11.).
 - **Sprechtaste:** Leertaste halten oder den PTT-Knopf mit der Maus halten. Umschaltmodus und andere
   Taste stehen im Profil unter „Sprechen“. Steht der Cursor im Textfeld, tippt die Leertaste.
 - **Ablauf:** sendet → erkennt → Transkript. Ist das Transkript laut Bewertung richtig, wird sofort
@@ -36,6 +49,23 @@ npm run fetch-asr -- --list  # was geladen wird, mit Größen und Lizenzen
   rot falsch, durchgestrichen zusätzlich. Der Tooltip nennt das zugehörige Segment.
 - Im Profil: Mikrofon, Browser-Filter (meist besser aus), Modell, Grafikkarte (WebGPU, experimentell),
   Squelch-Klick und ein Mikrofontest mit Pegel und Transkript.
+
+## Bekannte Grenzen
+
+- **Zahlen-Aussprache lässt sich beim Sprechen nicht prüfen.** Whisper schreibt Zahlen immer als Ziffern:
+  „three five zero decimal five“, „three hundred fifty point five“ und „three fifty decimal five“ werden alle
+  „350.5“ (gemessen am 24.11.2026 mit large-v3-turbo). Die Bewertung sieht nur den Wert, ob Ziffer für Ziffer
+  gesprochen wurde, weiß sie nicht – beides zählt als richtig. Die App sagt das beim Einrichten (Onboarding,
+  Profil) und unter jedem gesprochenen Funkspruch, dessen Zahlen sie anzeigt.
+- **Warum nicht Whisper Wörter schreiben lassen?** Mit unterdrückten Ziffern (`--suppress-regex`, Ziffernreihe im
+  Prompt) schreibt Whisper, was gesagt wurde, und falsche Formen fielen auf. Die Messreihe vom 21.11. (`+digits`)
+  hat aber für ganze Funksprüche schlechter erkannt; deshalb bleibt es aus.
+- **Trennzeichen sind Whispers Sache:** „five one“ kommt als „5.1“, „5-1“, „51“, „5,1“ oder „5/1“. Die Bewertung
+  deutet diese Schreibweisen als „five one“, wenn so die erwartete Zahl herauskommt (`prepareSpoken`).
+- **Anzeige:** Erkannte Zahlen zeigt die App in Worten, im Wortlaut der Musterlösung, wenn der Wert stimmt, sonst
+  Ziffer für Ziffer (`src/core/speech/display.ts`). Gewertet wird das Transkript selbst. Im Checkride-Flug bleibt
+  das Transkript roh, damit die Schreibweise nicht verrät, ob eine Zahl stimmt; die Auswertung danach zeigt Worte.
+- **Getippt** gilt das nicht: Dort zählen Zahlen nur in Worten (außer Spur C und Rechen-/Einstell-Aufgaben).
 
 ## Messreihe
 
@@ -73,11 +103,11 @@ npm run asr-bench -- --rescore                       # letzte Ergebnisse mit der
 | Ort | Inhalt |
 |---|---|
 | `src/core/speech/` | PCM/WAV, Hinweise (`hints.ts`), Transkript, Hörfehler, Ablauf (`flow.ts`), Varianten der Messreihe |
-| `src/core/scoring/score.ts` | `scoreCall(…, { source: 'spoken' })`, `heard` ordnet Wörter den Segmenten zu |
+| `src/core/scoring/score.ts` | `scoreCall(…, { source: 'spoken' })`, `heard` ordnet Wörter den Segmenten zu; `matchSpoken` für Freitext |
 | `src/platform/` | Aufnahme (AudioWorklet), Sprechtaste, `Recognizer`, transformers.js im Worker, whisper.cpp über Tauri (`whisper-recognizer.ts`), Provider |
 | `src-tauri/src/asr.rs` | `whisper-cli` aufrufen, Modelle finden, Status, Modell-Ordner |
 | `scripts/stage-asr.ts` | whisper.cpp, small.en und Lizenzangaben fürs Desktop-Paket |
-| `src/components/speech/` | Sprech-Bereich in `CallInput`, PTT-Knopf, Pegelanzeige |
+| `src/components/speech/` | Sprech-Bereich (`SpeakPanel`) und Umschalter Tippen/Sprechen für `CallInput` und Freitext, PTT-Knopf, Pegelanzeige |
 | `src/features/dev/RecordingPage.tsx` | Aufnahme-Seite der Messreihe |
 | `scripts/fetch-asr.ts`, `scripts/asr-bench.ts` | Downloads mit Prüfsummen, Messreihe |
 | `scripts/vite-dev-plugins.ts` | Speichern der Aufnahmen, `/models/` (nur Dev-Server) |
@@ -122,7 +152,8 @@ wegen der Erkennung:
   „Chevy II“, „3000 for 6000“ (lief vorher zu einer Zahl zusammen).
 - **Verhörer bei Zahlen** (`prepareSpoken` in `score.ts`): „Rage for one“, „Raven forward“, „Ghost 901“
   und „9R1“ (niner), „nine a thousand“, „for 0.8“, „411“ für „Ford one one“, „Enfield 1.1“ für „Enfield one
-  one“ (Spieltest 22.11.2026: Der Punkt kam aus der Erkennung, gesprochen war „one one“). Jede Umschreibung gilt nur,
+  one“ (Spieltest 22.11.2026: Der Punkt kam aus der Erkennung, gesprochen war „one one“), seit 24.11. auch
+  „Enfield 1,1“ und „1/1“. Jede Umschreibung gilt nur,
   wenn dabei die erwartete Zahl herauskommt – ein falsch gesprochener Wert wird so nie richtig.
 - **Namen** (Rufzeichen, Stationen) und Buchstabierwörter dürfen ab 4 Buchstaben einen Fehler haben
   („cold“ für Colt, „gulf“ für Golf). Unter den Rufzeichen-Namen der Inhalte liegen keine zwei so nah

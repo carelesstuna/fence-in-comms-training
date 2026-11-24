@@ -4,7 +4,8 @@
 - id: beispiel-flight-checkin
   title: Check-in im Flight
   context: Neue Frequenz. Der Lead prüft, ob alle da sind.
-  freq: "{ch} · Flight"
+  freq: "Flight · {ch}"
+  place: In der Luft
   # Du spielst zufällig Two, Three oder Four. Im 2-ship entfallen Three und Four automatisch.
   perspective: [two, three, four]
   vars:
@@ -31,6 +32,8 @@
 - id: beispiel-push
   title: Frequenzwechsel im Flight
   context: Der Lead schickt den Flight auf eine neue Frequenz.
+  freq: Flight · UHF
+  place: In der Luft
   perspective: [two]
   vars:
     btn: { number: channel }
@@ -44,7 +47,8 @@
 - id: beispiel-bogey-dope
   title: Bogey Dope
   context: Du willst wissen, wo die nächste Gruppe steht.
-  freq: "AWACS"
+  freq: "{awacs} · AWACS"
+  place: Auf Station
   vars:
     awacs: { pool: callsigns.awacs }
     pic: { geo: true, groups: 2 }

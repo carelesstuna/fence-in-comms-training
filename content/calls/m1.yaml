@@ -5,7 +5,8 @@
 - id: m1-radio-check
   title: Radio Check beim Tower
   context: Du sitzt startbereit im Cockpit und willst prüfen, ob dein Funkgerät richtig sendet und empfängt.
-  freq: "{airfield.twr} {airfield.twr.band}"
+  freq: "Tower · {airfield.twr} {airfield.twr.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
   transmissions:
@@ -42,7 +43,8 @@
 - id: m1-startup-request
   title: Anlassfreigabe bei Ground
   context: Du stehst kalt auf dem Vorfeld, hast die ATIS gehört und willst die Triebwerke anlassen.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     atis: { letter: true }
@@ -85,7 +87,8 @@
   context: >-
     Du hast angelassen und willst mit deinem Flight zur Startbahn rollen. Buchstaben tauchen hier
     gleich zweimal auf: in der ATIS-Kennung und in den Namen der Rollwege.
-  freq: "{airfield.gnd} {airfield.gnd.band}"
+  freq: "Ground · {airfield.gnd} {airfield.gnd.band}"
+  place: "{airfield.name}"
   vars:
     airfield: { pool: airfields }
     atis: { letter: true }
@@ -164,7 +167,8 @@
     Du kommst zurück zum Platz. Der Approach-Lotse gibt dir Luftdruck, Kurs und Höhe – drei
     Zahlen in einem Atemzug, die du alle zurücklesen musst. {airfield.name} liegt auf der Karte {airfield.map}; der
     Lotse spricht die {airfield.phraseology.here}.
-  freq: "{airfield.app} {airfield.app.band}"
+  freq: "Approach · {airfield.app} {airfield.app.band}"
+  place: "Im Anflug auf {airfield.name}"
   vars:
     airfield: { pool: airfields }
     # Luftdruck in der Form des Platzes: „altimeter“ in inHg (FAA) oder „QNH“ in hPa (ICAO)
@@ -190,7 +194,7 @@
         - text: "{airfield.descend} {alt|spoken}"
           role: instruction
           note: >-
-            Höhen in ganzen Tausend Fuß – die Tausender als Ziffern, dann „thousand“. „Descend and
+            Höhen in ganzen Tausend Fuß – die Tausender Ziffer für Ziffer, dann „thousand“. „Descend and
             maintain“ ist die US-Formulierung (FAA), nach ICAO heißt es „descend to …“.
     - speaker: "{callsign}"
       you: true
@@ -249,6 +253,8 @@
   context: >-
     Du meldest dich beim AWACS an, der fliegenden Radar-Leitstelle. Taktische Stellen sprechen Höhen
     nicht in Fuß, sondern in „angels“: Tausend Fuß.
+  freq: "{awacs} · AWACS"
+  place: In der Luft
   vars:
     awacs: { pool: callsigns.awacs }
     ang: { number: angels }
@@ -343,6 +349,8 @@
   context: >-
     Nach jedem Frequenzwechsel prüft der Lead, ob alle mitgekommen sind. Die Antworten sind die
     kürzesten Funksprüche überhaupt.
+  freq: Flight · UHF
+  place: In der Luft
   transmissions:
     - speaker: "{callsign}"
       you: true
@@ -414,18 +422,23 @@
   freq: "{airfield.twr} {airfield.twr.band}"
   vars:
     airfield: { pool: airfields }
-    rep: { oneOf: [report initial, report five mile final, report base] }
+    # text = was der Auftrag heißt (Erklärung), spoken = was der Tower sagt
+    rep:
+      oneOf:
+        - { text: "Hier: Melde dich auf dem Initial, der geraden Anflugstrecke auf die Bahn vor dem militärischen Overhead.", spoken: report initial }
+        - { text: "Hier: Melde dich im Endanflug (final), fünf Meilen vor der Bahn.", spoken: report five mile final }
+        - { text: "Hier: Melde dich im Queranflug (base), dem Stück der Platzrunde direkt vor dem Endanflug.", spoken: report base }
   transmissions:
     - speaker: "{airfield.name} Tower"
       segments:
         - text: "{callsign|spoken}"
           role: addressee
           note: Der Tower ruft dich.
-        - text: "{rep}"
+        - text: "{rep|spoken}"
           role: instruction
           note: >-
             Ein Auftrag, dich später zu melden. Hier gibt es keine Zahl zurückzulesen – du bestätigst
-            nur, dass du es tun wirst.
+            nur, dass du es tun wirst. {rep}
     - speaker: "{callsign}"
       you: true
       segments:
@@ -492,6 +505,8 @@
 - id: m1-correction
   title: Versprochen – correction
   context: Du meldest dem AWACS deine Höhe und merkst mitten im Satz, dass die Zahl falsch war.
+  freq: "{awacs} · AWACS"
+  place: In der Luft
   vars:
     awacs: { pool: callsigns.awacs }
     a1: { number: angels, range: [15, 30] }
@@ -559,3 +574,95 @@
             Die Lesbarkeit nach ICAO: 5 = einwandfrei, 4 = gut lesbar, 3 = nur mit Mühe, 2 = zeitweise,
             1 = unlesbar. Bei 3 oder schlechter lohnt sich ein anderes Funkgerät oder eine andere
             Frequenz.
+
+- id: m1-radio-check-incoming
+  title: Radio Check von der Bodenstelle
+  context: >-
+    Eine Bodenstelle prüft ihr Funkgerät mit dir. Du antwortest mit der Stufe, in der du sie hörst – ehrlich, auch
+    wenn es schlecht klingt.
+  vars:
+    airfield: { pool: airfields }
+    unit: { oneOf: [Approach] }
+    # text = wie gut du die Stelle verstehst (Beschreibung), spoken = Stufe als Funkwort („read you …“)
+    rd: { oneOf: [{ text: nur mit Mühe, spoken: three }] }
+  transmissions:
+    - speaker: "{airfield.name} {unit}"
+      readability: "{rd|spoken}"
+      segments:
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Die Bodenstelle ruft dich.
+        - text: "{airfield.name} {unit}"
+          role: callsign
+          note: Wer prüft.
+        - text: radio check
+          role: request
+          note: „Wie hörst du mich?“ So klingt der Ruf bei dir – danach richtet sich deine Antwort.
+    - speaker: "{callsign}"
+      you: true
+      segments:
+        - text: "{airfield.name} {unit}"
+          role: addressee
+          note: Die Stelle, die prüft.
+        - text: "{callsign|spoken}"
+          role: callsign
+          note: Wer antwortet.
+        - text: "read you {rd|spoken}"
+          role: info
+          note: >-
+            Die Stufe, in der du sie hörst: 5 = einwandfrei, 4 = gut lesbar, 3 = nur mit Mühe, 2 = zeitweise, 1 = unlesbar.
+
+- id: m1-readability-samples
+  title: Lesbarkeit 5 bis 1 zum Anhören
+  context: >-
+    Fünfmal derselbe Funkspruch, von einwandfrei bis unlesbar. Zum Schluss nur Rauschen: Jemand sendet, aber
+    verstehen kannst du nichts.
+  vars:
+    airfield: { pool: airfields }
+    hdg: { number: heading }
+    alt: { number: altitude, range: [3000, 9000], step: 1000 }
+  transmissions:
+    - speaker: "{airfield.name} Approach"
+      readability: 5
+      interference: none
+      note: Stufe 5 – einwandfrei lesbar. Kein Wort geht verloren, das Rauschen liegt leise darunter.
+      segments: &sample
+        - text: "{callsign|spoken}"
+          role: addressee
+          note: Approach ruft dich.
+        - text: "{airfield.name} Approach"
+          role: callsign
+          note: Approach nennt sich selbst.
+        - text: "turn left heading {hdg|spoken}"
+          role: instruction
+          note: Ein Kurs – Zahlen sind das Erste, was im Rauschen untergeht.
+        - text: "descend and maintain {alt|spoken}"
+          role: instruction
+          note: Eine Höhe zum Sinken.
+    - speaker: "{airfield.name} Approach"
+      readability: 4
+      interference: none
+      note: Stufe 4 – gut lesbar. Mehr Rauschen, aber alles zu verstehen.
+      segments: *sample
+    - speaker: "{airfield.name} Approach"
+      readability: 3
+      interference: light
+      note: Stufe 3 – lesbar, aber nur mit Mühe. Knacken und Schwund, du musst genau hinhören.
+      segments: *sample
+    - speaker: "{airfield.name} Approach"
+      readability: 2
+      interference: heavy
+      note: Stufe 2 – zeitweise lesbar. Ganze Wörter fallen weg; den Kurs würdest du hier nicht sicher kennen.
+      segments: *sample
+    - speaker: "{airfield.name} Approach"
+      readability: 1
+      interference: heavy
+      note: Stufe 1 – unlesbar. Da spricht jemand, aber verstehen kannst du nichts.
+      segments: *sample
+    - speaker: "{airfield.name} Approach"
+      readability: 1
+      note: Nur Rauschen – kein Wort, nur der Träger. Eine Stufe 0 gibt es auf der Skala nicht.
+      segments:
+        - text: "[nur Rauschen]"
+          role: info
+          note: Die Rauschsperre öffnet, jemand drückt die Taste, aber kein Wort kommt an.

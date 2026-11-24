@@ -41,8 +41,8 @@ ICAO und FAA sprechen dieselbe Sprache mit kleinen, festen Unterschieden: „aff
 „point“, „QNH“ und „altimeter“. Die Tabelle steht in der Hangar-Karte „Zwei Dialekte der Flugsicherung“. Die App zeigt
 die **US-Form**, weil die Sims vor allem US-Militär abbilden. Deshalb stehen dort „three“, „five“ und „niner“. Die
 strenge ICAO-Form (tree, fife) nimmt die App in deinen Antworten an. Beim Luftdruck, bei Steig- und Sinkfreigaben und
-bei der Sicht in der ATIS bleibt es standardmäßig ebenfalls bei der US-Form. Mit der Einstellung „Kartenabhängig“ im
-[Profil](/profile) richtet sich die App dort nach dem Platz: US-Form in Nevada, auf Guam und in Korea, ICAO-Form in
+bei der Sicht in der ATIS bleibt es standardmäßig ebenfalls bei der US-Form. Mit der Einstellung „Kartenabhängig“ in den
+[Einstellungen](/einstellungen/flugprofil) richtet sich die App dort nach dem Platz: US-Form in Nevada, auf Guam und in Korea, ICAO-Form in
 Georgien und am Golf (Modul 1, Lektion 3).
 
 ## IFR und VFR

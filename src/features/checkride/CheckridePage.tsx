@@ -107,6 +107,7 @@ function CheckrideRun({ rankId }: { rankId: string }) {
         scenario={resolved}
         seed={seed}
         checkride={{ label: rank.name, rule: rank.checkride }}
+        refParts={[`Checkride ${rank.id}`]}
         onCheckride={onCheckride}
         onRestart={() => {
           setPromoted(null)

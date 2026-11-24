@@ -295,7 +295,7 @@ describe('Perspektive, call, plot und Szenarien', () => {
         const r = resolveScenario(sc, run(`${sc.id}${i}`))
         const texts = [r.title, r.summary]
         for (const st of r.steps) {
-          texts.push(st.stage, st.situation ?? '', st.freq ?? '', st.explain ?? '', ...st.hear.flatMap((t) => t.segments.map((s) => s.text)))
+          texts.push(st.stage, st.situation ?? '', st.task ?? '', st.place ?? '', st.freq ?? '', st.explain ?? '', ...st.hear.flatMap((t) => t.segments.map((s) => s.text)))
           if (st.you) texts.push(...st.you.transmission.segments.map((s) => s.text), ...st.you.options, ...st.you.tiles.map((t) => t.text))
         }
         for (const t of texts) expect(findPlaceholders(t), `${sc.id}: ${t}`).toEqual([])

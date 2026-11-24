@@ -18,7 +18,7 @@ import {
 } from './drills/resolve'
 import type { BuildDrill, ResolvedDrill } from './drills/types'
 import { matchAny, matchesAny, normalizeTokens, sameCall } from './phraseology/normalize'
-import { scoreCall, type ScoreSegment } from './scoring/score'
+import { scoreCall, toItems, type ScoreSegment } from './scoring/score'
 
 const index = contentResult.index!
 const env = (seed: string) => {
@@ -173,16 +173,21 @@ describe('„for“ zwischen Höhen (E3-06, P2-04)', () => {
     expect(r.score).toBe(1)
   })
 
-  it('mit dem Funkspruch aus Modul 3 (Varianten „passing …000“, „for …000“)', () => {
+  it('mit dem Funkspruch aus Modul 3: „passing … for …“ getippt in Worten, gesprochen auch in Ziffern', () => {
     for (let i = 0; i < 10; i++) {
       const x = resolveExchange(index.exchanges.get('m3-departure-checkin')!, env(`for-${i}`))
       const segs = x.transmissions[0].segments
-      const passing = segs.flatMap((s) => s.alt ?? []).find((a) => /^passing \d+$/.test(a))
-      const forAlt = segs.flatMap((s) => s.alt ?? []).find((a) => /^for \d+$/.test(a))
+      const passing = segs.flatMap((s) => s.alt ?? []).find((a) => /^passing /.test(a))
+      const forAlt = segs.flatMap((s) => s.alt ?? []).find((a) => /^for /.test(a))
       expect(passing && forAlt).toBeTruthy()
       const input = `${segs[0].text}, ${segs[1].text}, ${passing} ${forAlt}`
-      const r = scoreCall(input, segs)
+      const r = scoreCall(input, segs, undefined, { source: 'typed', numbersInWords: true })
       expect(r.correct, `${input} → ${r.issues.join(' | ')}`).toBe(true)
+      // Ziffern (wie die Erkennung schreibt): gesprochen richtig, getippt nicht (24.11.2026: Zahlen in Worten)
+      const [from, to] = segs.filter((s) => s.role === 'value').map((s) => toItems(s.text).flatMap((it) => (it.kind === 'num' ? [it.n] : []))[0])
+      const digits = `${segs[0].text}, ${segs[1].text}, passing ${from} for ${to}`
+      expect(scoreCall(digits, segs, undefined, { source: 'spoken' }).correct, digits).toBe(true)
+      expect(scoreCall(digits, segs, undefined, { source: 'typed', numbersInWords: true }).correct, digits).toBe(false)
     }
   })
 })

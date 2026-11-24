@@ -14,8 +14,8 @@ sources:
     url: https://codex.uoaf.net/index.php/Communications_and_brevity
   - title: "132nd Virtual Wing – Standing SPINS (Beispiel für einen Comm Plan)"
     url: https://132nd-vwing.github.io/OPAC-Brief/MISSION%20INFORMATION/OPAC%20STANDING%20SPINS.pdf
-  - title: "Falcon BMS 4.38 Comms & Nav Book (im BMS-Ordner Docs), S. 9, 31, 45 – Comm Plan und Presets"
-  - title: "Falcon BMS 4.38 User Manual (im BMS-Ordner Docs), S. 59 (DTC, Reiter COMMS), S. 146 und 183 (Comm Ladder im Briefing)"
+  - title: "Falcon BMS 4.38 Comms & Nav Book (liegt BMS bei, im Installationsordner unter Docs), S. 9, 31, 45 – Comm Plan und Presets"
+  - title: "Falcon BMS 4.38 User Manual (liegt BMS bei, im Installationsordner unter Docs), S. 59 (DTC, Reiter COMMS), S. 146 und 183 (Comm Ladder im Briefing)"
   - title: "DCS P-51D und P-47D Flight Manuals – SCR-522A, Kanäle A–D; DCS Bf 109 K-4 und Fw 190 Flight Manuals – FuG 16ZY"
 ---
 
@@ -51,11 +51,15 @@ mehreren Flights mit gemeinsamer Mission), **Package**, **Tanker**, **AWACS**. S
 „:term[push] Strike“ sagen, und der Flight wechselt zum Strike-Netz. Wer seine Comm Card kennt, weiß,
 welcher Kanal gemeint ist.
 
+So kann deine Comm Card aussehen (gewürfelt):
+
+::muster{doc=commcard}
+
 :::sim{sim=bms}
 In BMS ist das die **:term[Comm Ladder]**: ein Abschnitt im Briefing mit allen Frequenzen und Presets deines
 Flugs. Der :term[DTC] (Data Transfer Cartridge, der Datenträger mit den Einstellungen deiner Mission)
 übernimmt sie standardmäßig als Presets ins Cockpit (Reiter COMMS, Knopf COMM PLAN stellt sie wieder her).
-Mit PRINT landet die Liste als Textdatei im Ordner `User\Briefings` – gut zum
+Mit PRINT landet die Liste als Textdatei im Unterordner `User\Briefings` deiner BMS-Installation – gut zum
 Ausdrucken fürs Kneeboard.
 :::
 
@@ -173,7 +177,8 @@ die UHF des Packages, und deren Preset 6 kann von deiner eigenen UHF abweichen.
 
 :::sim{sim=bms}
 **Welche KTO-Karte zeigt was?** Die BMS-eigenen Karten (Aufdruck „generated from Falcon BMS data“) liegen
-im Ordner `Docs\03 KTO Charts`:
+BMS bei: im Unterordner `Docs\03 KTO Charts` des Ordners, in den du Falcon BMS installiert hast (standardmäßig
+`C:\Falcon BMS 4.38\Docs\03 KTO Charts`). Im selben `Docs`-Ordner stehen auch die Handbücher von BMS.
 
 - **AGC** (Airport Ground Chart): Funkblock oben rechts (ATIS, Ground, Tower UHF/VHF, Approach/Departure),
   dazu Rollwege, :term[TACAN] (Navigationshilfe: Richtung und Entfernung zur Station) und Platzhöhe.

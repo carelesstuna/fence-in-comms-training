@@ -30,6 +30,7 @@ vars:
   # mit Sprechform, sonst stünde die Ziffer roh im Funkspruch
   ms: { oneOf: [{ text: "0", spoken: zero }, { text: "0", spoken: zero }, { text: "1", spoken: one }] }
   mi: { int: [1, 2] }
+place: "Abflug von {af.name}"
 kneeboard:
   title: "Line-up-Card {flight}"
   commplan: cp
@@ -48,12 +49,12 @@ steps:
   - stage: Abflug
     freq: "{cp.departure.name}"
     situation: >-
-      Du führst **{flight}**, gerade in **{af.name}** gestartet. Laut Missionsbriefing meldet sich der
-      Flight zuerst beim AWACS. Schick deinen Flight auf dessen Netz – mit dem Netznamen von der
-      Line-up-Card.
+      Dein Flight ist eben gestartet und steigt in Formation. Laut Missionsbriefing meldet sich der Flight
+      zuerst beim AWACS.
+    task: Schick deinen Flight auf das Netz des AWACS.
     you:
       mode: type
-      hint: Adressat – push – Netz
+      hint: Adressat – push – Netz (Name von der Line-up-Card)
       transmission:
         speaker: "{callsign}"
         segments:
@@ -67,7 +68,8 @@ steps:
 
   - stage: AWACS
     tune: { name: "{awacs} ({cp.awacs.name})", freq: "{cp.awacs.freq}", channel: "{cp.awacs.channel}" }
-    situation: Stell selbst um. Dann prüf, ob alle mitgekommen sind.
+    situation: Deine Wingmen wechseln gerade auf das Netz des AWACS.
+    task: Stell das Netz selbst ein und prüf, ob alle mitgekommen sind.
     you:
       mode: type
       transmission:
@@ -91,7 +93,9 @@ steps:
     explain: Alle da. Erst jetzt meldest du den Flight beim AWACS an.
 
   - stage: AWACS
-    situation: Melde deinen Flight beim AWACS an. Ihr fliegt wie geplant (laut Einsatzbefehl), auf **angels {ang}**.
+    place: Unterwegs zum Push Point
+    situation: Alle sind auf dem Netz. Ihr fliegt wie im Einsatzbefehl geplant, auf **{ang}.000 Fuß**.
+    task: Melde deinen Flight beim AWACS an.
     you:
       mode: type
       hint: Adressat – Flight-Rufzeichen – as fragged
@@ -116,7 +120,9 @@ steps:
       müssen aber nicht (ATP 3-52.4 (2021), S. 7–9). Mehr dazu in Modul 5.
 
   - stage: Push Point
-    situation: Kurz vor dem Einsatzgebiet. Lass den Flight die Schalter setzen.
+    place: Am Push Point
+    situation: Das Einsatzgebiet liegt direkt vor euch.
+    task: Lass den Flight die Schalter für den Einsatz setzen.
     you:
       mode: type
       transmission:
@@ -139,7 +145,8 @@ steps:
           - { text: Four, role: callsign }
 
   - stage: Push Point
-    situation: Es ist **{push}Z** – die Push-Zeit von der Line-up-Card. Melde dem AWACS, dass ihr aufbrecht.
+    situation: Es ist **{push}Z** – die Push-Zeit von der Line-up-Card.
+    task: Melde dem AWACS, dass ihr aufbrecht.
     you:
       mode: type
       transmission:
@@ -151,7 +158,9 @@ steps:
     explain: pushing – nicht push. Du verlässt den Punkt, die Frequenz bleibt.
 
   - stage: Im Gebiet
-    situation: Zeit für einen Ops Check. Merk dir die Antworten gut.
+    place: Im Einsatzgebiet
+    situation: Seit dem Push sind einige Minuten vergangen.
+    task: Lass deinen Flight Zustand und Treibstoff melden – und merk dir die Antworten gut.
     you:
       mode: type
       transmission:
@@ -179,7 +188,8 @@ steps:
   - stage: Im Gebiet
     situation: >-
       Dein eigener Treibstoff: **{f1}**. Raketen im Flight laut Ops Check: aktiv {ma}, halbaktiv {ms}, IR {mi},
-      Kanonen mit Munition. Laut Missionsbriefing meldest du dem AWACS für den ganzen Flight. Er ruft dich.
+      Kanonen mit Munition. Laut Missionsbriefing meldest du dem AWACS für den ganzen Flight.
+    task: Beantworte die Frage des AWACS für deinen Flight.
     hear:
       - speaker: "{awacs}"
         segments:
@@ -198,14 +208,15 @@ steps:
           - { text: "{ms|spoken}", role: value }
           - { text: "{mi|spoken}", role: value }
           - { text: by, role: info, optional: true }
-          - { text: "{f2|spoken}", role: value, critical: true, alt: ["{f2}"] }
+          - { text: "{f2|spoken}", role: value, critical: true }
     explain: >-
       Format nach ATP 1-02.1: Raketen (aktiv, halbaktiv, IR), dann „by“ und der Treibstoff – „{ma}-{ms}-{mi} by
       {f2}“. Der niedrigste Stand im Flight war Twos **{f2}**, nicht dein eigener {f1}. Der Flight bleibt
       zusammen, also zählt laut Briefing der Schwächste.
 
   - stage: Treibstoff
-    situation: Two meldet sich.
+    situation: Ihr seid mitten im Einsatz. Two meldet sich.
+    task: Reagiere auf die Meldung von Two.
     hear:
       - speaker: "{two}"
         station: two
@@ -228,6 +239,7 @@ steps:
 
   - stage: Treibstoff
     situation: Ihr habt euch vom Gefecht gelöst und fliegt aus dem Gebiet. Da meldet sich Two noch einmal.
+    task: Reagiere auf die Meldung von Two.
     hear:
       - speaker: "{two}"
         station: two
@@ -258,7 +270,9 @@ steps:
     explain: Einer hat Bingo – der ganze Flight fliegt nach Hause.
 
   - stage: Rückflug
-    situation: Der Flight hat das Einsatzgebiet verlassen. Schalter zurück.
+    place: "Rückflug nach {af.name}"
+    situation: Der Flight hat das Einsatzgebiet eben verlassen.
+    task: Lass den Flight die Schalter zurücksetzen.
     you:
       mode: type
       transmission:
@@ -281,7 +295,8 @@ steps:
           - { text: Four, role: callsign }
 
   - stage: Rückflug
-    situation: Jetzt schaut jeder beim anderen nach Schäden.
+    situation: Ihr fliegt in Formation, das Einsatzgebiet liegt hinter euch.
+    task: Lass jeden im Flight beim anderen nach Schäden schauen.
     you:
       mode: type
       transmission:
@@ -298,6 +313,7 @@ steps:
 
   - stage: Rückflug
     situation: Du hast dir Two von außen angeschaut – alles in Ordnung.
+    task: Sag Two, was du gesehen hast.
     you:
       mode: type
       hint: Adressat – Brevity
@@ -319,7 +335,8 @@ steps:
           - { text: you're clean, role: brevity }
 
   - stage: Heimweg
-    situation: Kurz vor dem Heimatplatz. Schick den Flight zu Approach.
+    situation: Ihr seid kurz vor dem Heimatplatz.
+    task: Schick den Flight zu Approach.
     you:
       mode: type
       transmission:
@@ -331,7 +348,8 @@ steps:
 
   - stage: Heimweg
     tune: { name: "{af.name} {cp.approach.name}", freq: "{cp.approach.freq}", channel: "{cp.approach.channel}" }
-    situation: Stell Approach ein und prüf den Flight.
+    situation: Deine Wingmen wechseln gerade zu Approach.
+    task: Stell Approach ein und prüf, ob alle mitgekommen sind.
     you:
       mode: type
       transmission:

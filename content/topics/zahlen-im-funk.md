@@ -71,4 +71,5 @@ Deine eigenen Kurse, Frequenzen und Codes sprichst du weiter Ziffer für Ziffer.
 - [Readback und Radio Check](/lesson/m1-l6) (Modul 1): Zahlen werden zurückgelesen.
 - [ATIS – das Wetter vorweg](/lesson/m3-l1) (Modul 3): Wind, Sicht, Altimeter, Zulu-Zeit.
 - [Departure](/lesson/m3-l6) (Modul 3): Flight Levels und Squawk.
+- [Bullseye – Positionen im Funk](/lesson/m2-l10) (Modul 2): Peilung dreistellig, Entfernung als ganze Zahl.
 - [Bullseye – ein Punkt für alle](/lesson/m5-l2) (Modul 5): Entfernungen und Höhen in Gruppenform beim AWACS.

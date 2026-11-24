@@ -42,9 +42,8 @@
   type: call
   exam: true
   call: m1-radio-check
-  prompt: >-
-    Du bist **{callsign}** und sitzt startbereit in {airfield.name}. Dein Funkgerät steht auf der Tower-Frequenz
-    **{airfield.twr}**. Prüfe beim Tower, ob man dich hört, und nenn die Frequenz am Ende.
+  situation: Du sitzt startbereit im Cockpit.
+  prompt: Prüfe beim Tower, ob man dich hört, und nenn die Frequenz am Ende.
   explain: >-
     „{airfield.name} Tower, {callsign|spoken}, radio check, {airfield.twr|spoken}.“ Adressat, Rufzeichen, Anliegen. Die
     Frequenz am Ende hilft dem Tower, wenn du mehrere Funkgeräte hast.
@@ -62,9 +61,10 @@
   exam: true
   call: m1-taxi-request
   transmission: 0
-  prompt: >-
-    Du führst einen Flight aus zwei Flugzeugen, dein Rufzeichen ist **{callsign}**. Ihr steht angelassen in
-    **{airfield.name}**, die ATIS-Ausgabe ist **{atis.letter}**. Bitte Ground ums Rollen.
+  situation: >-
+    Dein Flight hat **zwei** Flugzeuge. Ihr steht angelassen auf dem Vorfeld, die ATIS-Ausgabe ist
+    **{atis.letter}**.
+  prompt: Bitte Ground ums Rollen.
   explain: >-
     „{airfield.name} Ground, {callsign|spoken}, flight of two, information {atis}, request taxi.“ Als Lead sprichst du
     für beide: mit deinem eigenen Rufzeichen und der Zahl der Flugzeuge. Dein Wingman hört mit und schweigt.
@@ -77,8 +77,8 @@
     # text = Ausgangshöhe, spoken = die vierfache Höhe
     h: { oneOf: [{ text: "400", spoken: "1.600" }, { text: "900", spoken: "3.600" }, { text: "2.500", spoken: "10.000" }] }
   prompt: >-
-    Ein Flugzeug steigt von {h} ft auf {h|spoken} ft, also auf die vierfache Höhe. Wie ändert sich nach der Faustformel
-    1,23 · √Höhe der Funkhorizont zu einer Bodenstation?
+    Ein Flugzeug steigt von {h} ft auf {h|spoken} ft, also auf die vierfache Höhe. Wie ändert sich ungefähr der
+    Funkhorizont zu einer Bodenstation?
   options:
     - Er verdoppelt sich ungefähr.
     - Er vervierfacht sich.
@@ -86,8 +86,8 @@
     - Er bleibt gleich, denn nur die Sendeleistung zählt.
   answer: 0
   explain: >-
-    Die Höhe steht unter der Wurzel: √4 = 2. Vierfache Höhe heißt doppelte Reichweite. Die Sendeleistung verschiebt den
-    Horizont nicht.
+    Der Merksatz: vierfache Höhe, doppelte Reichweite (in der Faustformel steht die Höhe unter einer Wurzel, √4 = 2).
+    Die Sendeleistung verschiebt den Horizont nicht.
 
 - id: m1-l7-x-bands
   type: choice
@@ -136,33 +136,24 @@
     Ohne Rauschsperre hörst du dauernd Rauschen. Sie lässt den Empfänger schweigen, bis ein Signal ankommt. Schwache Signale
     macht sie nicht besser. Ist sie zu hoch eingestellt, schneidet sie schwache Stationen sogar ganz weg.
 
-- id: m1-l7-x-calc-tower
-  type: input
+- id: m1-l7-x-two-aircraft
+  type: choice
   exam: true
   vars:
-    # text = Reichweite 1,23 · (√Höhe + √100 ft), gerundet (die Antwort); spoken = Flughöhe in Fuß (nur Anzeige).
-    # lo/hi: ±1 NM, weil Zwischenrundungen bei einer Faustformel um eins danebenliegen dürfen.
-    nm:
-      oneOf:
-        - { text: "37", spoken: "400" }
-        - { text: "49", spoken: "900" }
-        - { text: "74", spoken: "2.500" }
-        - { text: "86", spoken: "3.600" }
-        - { text: "98", spoken: "4.900" }
-        - { text: "111", spoken: "6.400" }
-        - { text: "123", spoken: "8.100" }
-        - { text: "135", spoken: "10.000" }
-        - { text: "160", spoken: "14.400" }
-    lo: { derive: offset, from: nm, add: -1 }
-    hi: { derive: offset, from: nm, add: 1 }
+    # text = Flughöhe, spoken = Merkwert zu einer Antenne am Boden (Tabelle in Modul 1, Lektion 5)
+    alt: { oneOf: [{ text: "1.000", spoken: "40" }, { text: "5.000", spoken: "90" }, { text: "10.000", spoken: "120" }] }
   prompt: >-
-    Du fliegst auf **{nm|spoken} ft**, die Antenne des Towers steht auf 100 ft. Wie weit kann dich der Tower nach der
-    Faustformel 1,23 · (√Höhe₁ + √Höhe₂) höchstens hören? Antworte in Seemeilen, auf ganze NM gerundet.
-  accept: ["{nm}", "{nm} NM", "{lo}", "{lo} NM", "{hi}", "{hi} NM"]
-  placeholder: Zahl eintippen …
+    Ein Flugzeug auf {alt} ft erreicht eine Antenne am Boden etwa {alt|spoken} NM weit. Wie weit können sich zwei
+    Flugzeuge hören, die beide auf {alt} ft fliegen?
+  options:
+    - "Etwa doppelt so weit – die Reichweiten beider Antennen zählen zusammen."
+    - "Genauso weit wie zu einer Antenne am Boden, also etwa {alt|spoken} NM."
+    - "Nur etwa halb so weit, weil sich zwei Sender in der Luft gegenseitig stören."
+    - "Beliebig weit, denn zwischen zwei Flugzeugen gibt es keinen Horizont."
+  answer: 0
   explain: >-
-    1,23 · (√{nm|spoken} + √100) ≈ {nm} NM. Beide Wurzeln werden addiert, die Antenne am Boden zählt mit. Eine Seemeile
-    mehr oder weniger zählt auch, das kommt vom Runden.
+    Jede Antenne bringt ihren eigenen Horizont mit, und die Strecken addieren sich: zweimal {alt|spoken} NM. Zwei
+    Flugzeuge in der Luft hören sich deshalb deutlich weiter als eines eine Bodenstation.
 
 # ------------------------------------------------------------ Lektion 7 (ID m1-l6): Readback und Radio Check
 # Produktion: Readbacks tippen, Radio Check mit Lesbarkeit beantworten
@@ -171,8 +162,8 @@
   exam: true
   call: m1-approach-numbers
   transmission: 1
-  prompt: >-
-    Du bist **{callsign}** und kommst zurück nach {airfield.name}. Approach gibt dir eine Anweisung. Lies sie zurück.
+  situation: Du kommst zurück zum Platz. Approach gibt dir eine Anweisung.
+  prompt: Lies sie zurück.
   explain: >-
     „{altim.word} {altim|spoken}, left heading {hdg|spoken}, {airfield.descend} {alt|spoken}, {callsign|spoken}.“ Alle
     drei Zahlen, beim Kurs die Drehrichtung, dein Rufzeichen am Ende. „roger“ oder „wilco“ allein wären zu wenig. In
@@ -183,9 +174,8 @@
   exam: true
   call: m1-taxi-request
   transmission: 2
-  prompt: >-
-    Du bist **{callsign}** und hast in {airfield.name} um die Rollfreigabe gebeten. Ground antwortet dir. Lies die
-    Freigabe zurück.
+  situation: Du stehst angelassen auf dem Vorfeld und hast Ground um die Rollfreigabe gebeten.
+  prompt: Lies die Freigabe zurück.
   explain: >-
     „runway {airfield.runway|spoken}, via {twA}, {twB}, hold short of runway {airfield.runway|spoken},
     {callsign|spoken}.“ Die Runway, der Rollweg in derselben Reihenfolge, „hold short“ wörtlich und dein Rufzeichen
@@ -194,16 +184,19 @@
 - id: m1-l6-x-input-readability
   type: input
   exam: true
+  # Hörprobe: Der Tower klingt so, wie die Aufgabe sagt
+  call: m1-radio-check-incoming
   vars:
     airfield: { pool: airfields }
+    unit: { oneOf: [Tower] }
     # text = wie gut du den Tower verstehst (Anzeige), spoken = Stufe der Lesbarkeitsskala (Antwort)
-    r: { oneOf: [{ text: "einwandfrei", spoken: five }, { text: "gut", spoken: four }, { text: "nur mit Mühe", spoken: three }] }
+    rd: { oneOf: [{ text: "einwandfrei", spoken: five }, { text: "gut", spoken: four }, { text: "nur mit Mühe", spoken: three }] }
   prompt: >-
     {airfield.name} Tower hat ein neues Funkgerät und prüft es mit dir: „{callsign|spoken}, {airfield.name} Tower,
-    radio check.“ Du verstehst ihn **{r}**. Antworte mit Adressat, Rufzeichen und der Stufe der Lesbarkeitsskala.
+    radio check.“ Du verstehst ihn **{rd}**. Antworte mit Adressat, Rufzeichen und der Stufe der Lesbarkeitsskala.
   accept:
-    - "{airfield.name} tower {callsign|spoken} read you {r|spoken}"
-    - "{airfield.name} tower {callsign|spoken} reading you {r|spoken}"
+    - "{airfield.name} tower {callsign|spoken} read you {rd|spoken}"
+    - "{airfield.name} tower {callsign|spoken} reading you {rd|spoken}"
   explain: >-
-    „{airfield.name} Tower, {callsign|spoken}, read you {r|spoken}.“ Die Skala: 5 einwandfrei, 4 gut lesbar, 3 nur mit
+    „{airfield.name} Tower, {callsign|spoken}, read you {rd|spoken}.“ Die Skala: 5 einwandfrei, 4 gut lesbar, 3 nur mit
     Mühe, 2 zeitweise, 1 unlesbar. Militärisch hörst du bei 5 auch „loud and clear“.

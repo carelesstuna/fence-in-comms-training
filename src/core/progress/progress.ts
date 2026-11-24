@@ -68,6 +68,13 @@ export interface ProgressState {
    * offen, gelten aber nicht als erledigt – auch nicht für Checkride-Voraussetzungen.
    */
   unlocked: string[]
+  /** Merk-Übungen: höchste geschaffte Stufe (1–8) je Übungs-ID. */
+  memory: Record<string, number>
+  /**
+   * Module, deren Lektionen einmal alle erledigt waren. Kommen später Lektionen dazu, bleibt das Modul erledigt –
+   * die neuen Lektionen stehen offen, sperren aber nichts wieder (`recordModulesDone`).
+   */
+  modulesDone: string[]
 }
 
 export const EMPTY_PROGRESS: ProgressState = {
@@ -82,16 +89,34 @@ export const EMPTY_PROGRESS: ProgressState = {
   stats: { correctCalls: 0, cleanCalls: 0, silences: 0, tunes: 0, perfectScenarios: 0 },
   achievements: {},
   unlocked: [],
+  memory: {},
+  modulesDone: [],
 }
 
 export type ModuleState = 'planned' | 'locked' | 'available' | 'done'
 export type LessonState = 'locked' | 'available' | 'done'
 
+const allLessonsDone = (m: Module, p: ProgressState) => m.lessons.length > 0 && m.lessons.every((id) => p.lessons[id])
+
 export function isModuleDone(m: Module, p: ProgressState): boolean {
   if (m.status !== 'available') return false
   if (p.placements?.[m.id]?.passed) return true
   if (p.exams?.[m.id]?.passed) return true
-  return m.lessons.length > 0 && m.lessons.every((id) => p.lessons[id])
+  if ((p.modulesDone ?? []).includes(m.id)) return true
+  return allLessonsDone(m, p)
+}
+
+/**
+ * Module, deren Lektionen gerade alle erledigt sind, in `modulesDone` eintragen – so bleiben sie erledigt, wenn
+ * später Lektionen dazukommen (z. B. m2-l10 Bullseye in 0.3.0). Der Store ruft das bei jeder Änderung des
+ * Fortschritts und beim Start auf. Gibt es nichts Neues, kommt derselbe Stand zurück.
+ */
+export function recordModulesDone(index: ContentIndex, p: ProgressState): ProgressState {
+  const have = p.modulesDone ?? []
+  const added = index.curriculum.modules
+    .filter((m) => m.status === 'available' && !have.includes(m.id) && allLessonsDone(m, p))
+    .map((m) => m.id)
+  return added.length > 0 ? { ...p, modulesDone: [...have, ...added] } : p
 }
 
 /**

@@ -32,4 +32,4 @@ Darum gilt die Faustregel:
 
 Ein Detail für Sim-Piloten: Peilungen im Brevity-Funk sind **missweisend** (magnetisch). Auf Karten mit
 deutlicher Missweisung weicht die rechtweisende Richtung spürbar ab – mehr dazu auf der Karte
-„Zwei Norden“ (Modul 2, Lektion 8).
+„Zwei Norden“ (Modul 2, Lektion 8). Wie du richtig umrechnest, steht in Modul 2, Lektion 9.

@@ -33,6 +33,10 @@ const AUSNAHMEN: { muster: RegExp; grund: string }[] = [
     grund: 'historisches Zitat (Hangar-Karte „Ein Kanal für ein Geschwader“)',
   },
   {
+    muster: /flight level nine zero/g,
+    grund: 'historisches Zitat (Teneriffa 1977, Wortlaut der Untersuchungsberichte; Hangar-Karte „Teneriffa 1977“)',
+  },
+  {
     muster: /nine-line/gi,
     grund: 'Name des CAS-Briefings (9-Line), kein Zahlenwert – „advise when ready for nine-line“',
   },

@@ -39,7 +39,7 @@ export function RankBar({ compact = false }: { compact?: boolean }) {
             {xp} XP{next && !checkrideDue && <span> / {next.xp}</span>}
           </div>
           {content.achievements.length > 0 && (
-            <Link to="/profile" className="text-xs hover:text-amber-hud" title="Abzeichen ansehen">
+            <Link to="/fortschritt#abzeichen" className="text-xs hover:text-amber-hud" title="Abzeichen ansehen">
               🏅 {Object.keys(p.achievements ?? {}).filter((id) => content.achievements.some((a) => a.id === id)).length}/
               {content.achievements.length}
             </Link>
@@ -100,8 +100,12 @@ export function Layout({ children }: { children: ReactNode }) {
             <NavLink to="/glossary" className={nav}>
               Glossar
             </NavLink>
-            <NavLink to="/profile" className={nav}>
-              Profil
+            <NavLink to="/fortschritt" className={nav}>
+              Fortschritt
+            </NavLink>
+            <NavLink to="/einstellungen" className={nav} title="Einstellungen">
+              <span aria-hidden="true">⚙</span>
+              <span className="sr-only sm:not-sr-only sm:ml-1">Einstellungen</span>
             </NavLink>
           </nav>
           <div className="ml-auto">

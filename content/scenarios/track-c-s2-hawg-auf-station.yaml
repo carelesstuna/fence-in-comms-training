@@ -10,6 +10,7 @@ summary: Eine ganze CAS-Station – vom AWACS zum JTAC, 9-Line, Laser, Angriff, 
 layer: core
 as: lead
 callsignPool: attack
+place: Unterwegs ins Einsatzgebiet
 sources:
   - title: "DCS A-10C Flight Manual, S. 784–788 (JTAC-Ablauf, Laser On, Spot, In, cleared hot, Off)"
   - title: "DCS JFO/JTAC Pilot Guide (Community, 562nd Tactical School)"
@@ -50,8 +51,9 @@ kneeboard:
     srs: "SRS zeigt nur, was am Funkgerät eingestellt ist – die Frequenz steht im Briefing oder in der Serverinfo."
 steps:
   - stage: Übergabe
-    freq: "{aw} · {awacs}"
+    freq: "{awacs} · {aw}"
     situation: Dein Flight ({flightSize}× A-10C) erreicht das Einsatzgebiet. Der AWACS meldet sich.
+    task: Antworte dem AWACS.
     hear:
       - speaker: "{awacs}"
         radio: uhf
@@ -72,7 +74,9 @@ steps:
   - stage: Check-in
     critical: true
     tune: { name: "{jtac} (JTAC, VHF-FM)", freq: "{fm}" }
-    situation: Du bist am IP {cas.ip} auf angels {cas.hold}. Melde dich beim JTAC an.
+    place: Am IP {cas.ip}
+    situation: Dein Flight kreist am IP auf **{cas.hold}.000 Fuß**.
+    task: Melde dich beim JTAC an.
     you:
       mode: type
       transmission:
@@ -98,7 +102,8 @@ steps:
           - { text: ready to copy situation update?, role: request }
 
   - stage: Lage
-    situation: Der JTAC will dir die Lage geben.
+    situation: Der JTAC hat deinen Check-in aufgenommen und will dir die Lage geben.
+    task: Antworte dem JTAC.
     you:
       mode: type
       transmission:
@@ -126,7 +131,8 @@ steps:
           - { text: advise when ready for nine-line, role: request }
 
   - stage: 9-Line
-    situation: Lage und Game Plan sind durch. Hol das Kneeboard raus.
+    situation: Lage und Game Plan sind durch, dein Kneeboard liegt bereit.
+    task: Antworte dem JTAC.
     you:
       mode: type
       transmission:
@@ -157,7 +163,8 @@ steps:
           - { text: advise when ready for remarks, role: request }
 
   - stage: 9-Line
-    situation: Jetzt die Remarks.
+    situation: Der 9-Line ist durch, jetzt kommen die Remarks.
+    task: Antworte dem JTAC.
     you:
       mode: type
       transmission:
@@ -177,12 +184,14 @@ steps:
           - { text: "time on target {cas.tot|spoken}", role: instruction }
 
   - stage: Mitschrift
-    situation: Trag den 9-Line und die Remarks ein.
+    situation: 9-Line und Remarks sind durch. Alles steht im Funk-Log.
+    task: Schreib den 9-Line und die Remarks mit.
     decode: { area: cas }
 
   - stage: Readback
     critical: true
-    situation: Lies zurück, was Pflicht ist.
+    situation: 9-Line und Remarks stehen auf deinem Kneeboard.
+    task: Lies dem JTAC zurück, was Pflicht ist.
     you:
       mode: type
       transmission:
@@ -219,7 +228,8 @@ steps:
     explain: Pflicht sind Line 4, Line 6 und das Final Attack Heading.
 
   - stage: Anflug
-    situation: Code {cas.code} ist im Zielbehälter. Du verlässt den IP {cas.ip} Richtung Ziel.
+    situation: Code **{cas.code}** ist im Zielbehälter eingestellt. Du verlässt jetzt den IP Richtung Ziel.
+    task: Melde es dem JTAC.
     you:
       mode: type
       transmission:
@@ -230,7 +240,9 @@ steps:
           - { text: IP inbound, role: intent, critical: true }
 
   - stage: Laser
-    situation: In etwa zehn Sekunden brauchst du den Laserfleck. Sag es dem JTAC.
+    place: Im Anflug aufs Ziel
+    situation: In etwa zehn Sekunden brauchst du den Laserfleck auf dem Ziel.
+    task: Sag es dem JTAC.
     you:
       mode: type
       transmission:
@@ -241,7 +253,8 @@ steps:
           - { text: ten seconds, role: brevity, critical: true }
 
   - stage: Laser
-    situation: Jetzt.
+    situation: Die zehn Sekunden sind um – jetzt brauchst du den Fleck auf dem Ziel.
+    task: Sag es dem JTAC.
     you:
       mode: type
       transmission:
@@ -259,6 +272,7 @@ steps:
 
   - stage: Laser
     situation: Dein Zielbehälter zeigt den Laserfleck.
+    task: Melde es dem JTAC.
     you:
       mode: type
       transmission:
@@ -270,7 +284,8 @@ steps:
 
   - stage: Angriff
     critical: true
-    situation: Du drehst mit Kurs {cas.hdg} auf das Ziel ein und beginnst den Angriff.
+    situation: Du drehst mit Kurs **{cas.hdg}** auf das Ziel ein und beginnst den Angriff.
+    task: Melde es dem JTAC.
     you:
       mode: type
       transmission:
@@ -289,6 +304,7 @@ steps:
 
   - stage: Angriff
     situation: Die Waffe ({cas.weapon}) ist ausgelöst.
+    task: Melde es dem JTAC.
     you:
       mode: type
       transmission:
@@ -299,7 +315,9 @@ steps:
           - { text: "{cas.weapon.call}", role: info, critical: true }
 
   - stage: Angriff
-    situation: Du drehst ab, wie in Line 9 vorgegeben.
+    place: Abflug vom Ziel
+    situation: Du drehst vom Ziel ab, wie in Line 9 vorgegeben.
+    task: Melde es dem JTAC.
     you:
       mode: type
       transmission:
@@ -311,6 +329,7 @@ steps:
 
   - stage: Angriff
     situation: Einschlag. Der Laser wird nicht mehr gebraucht.
+    task: Sag es dem JTAC.
     you:
       mode: type
       transmission:
@@ -323,6 +342,7 @@ steps:
   - stage: Two
     critical: true
     situation: Der JTAC führt deinen Wingman auf das nächste Ziel. Du hörst mit.
+    task: Was funkst du jetzt?
     hear:
       - speaker: "{jtac}"
         radio: fm
@@ -369,7 +389,8 @@ steps:
     explain: MAGNUM – eine eigene HARM fliegt auf das {samType}. Für dich heißt das nur, dass das Radar dort gleich schweigen soll.
 
   - stage: Check-out
-    situation: Der JTAC meldet das Ergebnis. Dein Flight hat keine Munition mehr – melde dich ab.
+    situation: Der JTAC meldet das Ergebnis. Dein Flight hat keine Munition mehr.
+    task: Melde dich beim JTAC ab.
     hear:
       - speaker: "{jtac}"
         radio: fm

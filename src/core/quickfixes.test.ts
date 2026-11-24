@@ -21,7 +21,7 @@ describe('Glossar', () => {
     expect(lookupTerm(g, 'as fragged')?.kind).toBe('brevity')
     expect(lookupTerm(g, 'wingman')?.kind).toBe('basic')
     expect(lookupTerm(g, 'over')?.kind).toBe('proword')
-    expect(lookupTerm(g, 'frag')?.word).toBe('ATO')
+    expect(lookupTerm(g, 'frag')?.word).toBe('Frag')
     // Brevity geht vor: „push“ ist Brevity, auch wenn ein Grundbegriff es erwähnt
     expect(lookupTerm(g, 'push')?.kind).toBe('brevity')
   })

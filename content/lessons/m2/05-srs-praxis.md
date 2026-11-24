@@ -20,8 +20,8 @@ sources:
   - title: "ATIS Telecom Glossary: Radio horizon range"
     url: https://glossary.atis.org/glossary/radio-horizon-range-rhr/
   - title: "Heatblur F-14 Manual (liegt DCS bei), S. 307–309, 537–541; Heatblur F-4E Manual, S. 404–405, 817 – ICS"
-  - title: "Falcon BMS 4.38 Technical Manual (im BMS-Ordner Docs), S. 51 (Reichweite, falsche Frequenz), S. 56–57 (zwei Funkgeräte), S. 61 (IVC)"
-  - title: "Falcon BMS 4.38 User Manual (im BMS-Ordner Docs), S. 82 – IVC-Check mit F1/F2"
+  - title: "Falcon BMS 4.38 Technical Manual (liegt BMS bei, im Installationsordner unter Docs), S. 51 (Reichweite, falsche Frequenz), S. 56–57 (zwei Funkgeräte), S. 61 (IVC)"
+  - title: "Falcon BMS 4.38 User Manual (liegt BMS bei, im Installationsordner unter Docs), S. 82 – IVC-Check mit F1/F2"
   - title: "IL-2-Forum: SRS for IL-2 Community Edition – Multiplayer Radio for Korea & Great Battles"
     url: https://forum.il2-series.com/topic/4981-srs-for-il-2-community-edition-%E2%80%93-multiplayer-radio-for-korea-great-battles/
   - title: "IL-2-Forum: CB Radio with SRS on Combat Box"
@@ -58,7 +58,7 @@ genauso:
 :::sim{sim=il2}
 IL-2 hat kein Funkgerät zum Einstellen. Für **Great Battles und IL-2 Korea** gibt es deshalb eine
 eigene Community-Fassung von SRS. Sie bringt **zwei Funkgeräte und ein :term[Intercom]** (Bordsprechanlage) mit, statt
-Frequenzen aber **Kanäle**, die der Server benennt. Ein Beispiel (Stand 2026): Auf dem Server Combat Box
+Frequenzen aber **Kanäle**, die der Server benennt. Ein Beispiel (Serverregeln ändern sich, maßgeblich ist die Serverinfo): Auf dem Server Combat Box
 verbindet sich SRS beim Beitritt selbst; Kanal 1 ist das Kommando der eigenen Seite, Kanal 2 der
 Platzverkehr. Welche Kanäle gelten, steht in der Serverinfo oder im Missionsbriefing.
 :::
@@ -100,14 +100,13 @@ dass die Liste veraltet sein kann. Hornet, Viper und A-10C stehen nicht darin �
 ::call{id=m2-flight-radio-check}
 
 :::sim{sim=bms}
-In BMS gibt es **keinen Radio Check** mit den KI-Wingmen („radio checks are not possible“, Technical Manual
-4.38.1). Frag stattdessen etwas, das sie beantworten, etwa nach dem Treibstoff. Bleibt die Antwort aus,
+In BMS gibt es **keinen Radio Check** mit den KI-Wingmen („radio checks are not possible“, BMS Technical Manual). Frag stattdessen etwas, das sie beantworten, etwa nach dem Treibstoff. Bleibt die Antwort aus,
 bist du vermutlich nicht auf der VHF-Frequenz deines Flights. Auf VHF bleiben die KI-Wingmen immer auf ihrer
 Flight-Frequenz (Preset 15–19). Deinen UHF-Wechseln (ATC, Tactical, Tanker) folgen sie dagegen.
 
 Ist dein VHF- oder UHF-Gerät ausgefallen, kannst du sie über das **Backup-UHF** befehligen: C&I-Knopf
 auf BACKUP, Backup-Preset gleich deinem VHF-Preset (z. B. 15), Modus PRESET, dann der Befehl **„Switch
-Flight Uniform“** (Comms & Nav Book 4.38.2).
+Flight Uniform“** (BMS Comms & Nav Book).
 :::
 
 ---
@@ -173,8 +172,8 @@ FM-Sendungen sich gegenseitig verdrängen, ob es zusätzliche **Erweiterungsfunk
 Flugzeuge mit zu wenigen Geräten) und ob Controller über einen **externen AWACS-Modus** ohne eigenes
 Flugzeug mitfunken.
 
-Wie weit dein Funk bei eingeschalteter Sichtlinie reicht, rechnest du mit der Faustformel aus Modul 1, Lektion 5
-(Funk und Physik): 1,23 · √(Höhe in ft) ergibt Seemeilen.
+Wie weit dein Funk bei eingeschalteter Sichtlinie reicht, schätzt du mit der Merktabelle aus Modul 1, Lektion 5
+(Funk und Physik): 1.000 ft etwa 40 NM, 10.000 ft etwa 120 NM, vierfache Höhe doppelte Reichweite.
 
 ---
 

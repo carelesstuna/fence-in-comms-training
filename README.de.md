@@ -25,7 +25,7 @@ der Schritt davor – damit du auf einem Server voller echter Menschen klingst, 
   AM-, FM- und Intercom-Klang) laufen auf Wunsch komplett auf deinem eigenen Rechner.
 - **Für alle Sims.** Erst die offizielle Phraseologie, dann die Praxis der Community, dann die Besonderheiten der
   einzelnen Sims (DCS, BMS, IL-2, SRS) – gefiltert nach den Sims und Flugzeugen in deinem Profil.
-- **Hangar und Glossar.** 59 Hintergrundkarten zu Geschichte, Technik und Physik, dazu über 200 Brevity-Codes,
+- **Hangar und Glossar.** 60 Hintergrundkarten zu Geschichte, Technik und Physik, dazu über 200 Brevity-Codes,
   Standardwörter und das Funkalphabet.
 
 <p>
@@ -38,7 +38,7 @@ der Schritt davor – damit du auf einem Server voller echter Menschen klingst, 
 | | Themen | Stand |
 |---|---|---|
 | Modul 1 – Grundausbildung | Aufbau eines Funkspruchs, Alphabet, Zahlen, Rufzeichen, Funk und Physik, Standardwörter, Readback | verfügbar |
-| Modul 2 – Funkgeräte & Comm Plan | UHF/VHF/FM, Presets, „push“, Guard, Funkdisziplin, SRS, Karten und Frequenzquellen | verfügbar |
+| Modul 2 – Funkgeräte & Comm Plan | UHF/VHF/FM, Presets, „push“, Guard, Funkdisziplin, SRS, Karten und Frequenzquellen, Bullseye und Missweisung | verfügbar |
 | Modul 3 – Am Boden & Bodencrew | Crew Chief, ATIS, Startup, Taxi, Arming, Tower, Departure | verfügbar |
 | Modul 4 – Im Verband | Lead und Wingman, Fence in/out, Ops Check, Joker/Bingo, lost wingman, NORDO | verfügbar |
 | Modul 5 – AWACS-Grundlagen | Check-in, Bullseye, BRAA und Bogey Dope, Picture, Declare, CAP-Station | verfügbar |
@@ -57,7 +57,7 @@ der Schritt davor – damit du auf einem Server voller echter Menschen klingst, 
    ist nicht signiert; warnt Windows SmartScreen, „Weitere Informationen → Trotzdem ausführen“.
 
 **Voraussetzungen:** Windows 10 oder 11, 64 Bit. Fehlt WebView2, installiert der Installer es nach. Optional lädt
-die App auf Klick nach (angeboten beim ersten Start, später im Profil): ein Spracherkennungsmodell (small.en,
+die App auf Klick nach (angeboten beim ersten Start, später unter Einstellungen): ein Spracherkennungsmodell (small.en,
 rund 190 MB; andere Größen wählbar) und die Funkstimmen (rund 340 MB). Mit einer Vulkan-fähigen Grafikkarte
 erkennt die App einen Funkspruch in etwa einer Sekunde, auf der CPU dauert es einige Sekunden.
 
@@ -68,7 +68,7 @@ kannst ihn exportieren und importieren.
 ## Mit KI gebaut – auf den Schultern von Tausenden
 
 Gleich vorweg: Fast alles in diesem Repository hat eine KI geschrieben (Claude von Anthropic) – der Code, die
-47 Lektionen, die gut 500 Übungen, das Glossar, die Hangar-Geschichten, die Tests und, ja, auch dieses README.
+48 Lektionen, die gut 500 Übungen, das Glossar, die Hangar-Geschichten, die Tests und, ja, auch dieses README.
 Mein eigener Anteil: der Bedarf („Ich will auf SRS nicht mehr klingen wie ein Tourist“), viel Lenken und
 Gegensteuern („Nein, so redet kein Wingman“), Testen – und deutlich öfter die Sprechtaste drücken als jeder echte
 Pilot. Ich bin hier also weniger Autor als ein Flight Lead, dessen Wortschatz vor allem aus „push two“,
@@ -86,10 +86,19 @@ sich dann ausführlich (das kann sie wirklich gut) und korrigiert es.
 
 ## Stand und Rückmeldung
 
-Version 0.2 – eine frühe öffentliche Fassung. Fehler, falsche Phraseologie, Ideen: bitte ein
+Version 0.3 – eine frühe öffentliche Fassung. Fehler, falsche Phraseologie, Ideen: bitte ein
 [Issue](https://github.com/carelesstuna/fence-in-comms-training/issues) aufmachen. Korrekturen von echten
 Pilotinnen und Piloten, Lotsen, JTACs und erfahrenen Simmern sind besonders willkommen. Wie du beitragen kannst:
 [CONTRIBUTING.md](CONTRIBUTING.md) (auf Englisch).
+
+### Bekannte Einschränkungen
+
+- **Gesprochene Zahlen: „Ziffer für Ziffer“ lässt sich nicht prüfen.** Die Spracherkennung (Whisper) schreibt Zahlen
+  immer als Ziffern – „three five zero decimal five“ und „three hundred fifty point five“ werden beide „350.5“. Die
+  App kann nur den Wert prüfen, beides zählt als richtig. Sprich Zahlen trotzdem Ziffer für Ziffer, wie im Funk. Getippt
+  müssen Zahlen in Worten stehen (außer in Spur C und bei Rechenaufgaben) – dort wird die Form geprüft.
+- „five one“ schreibt Whisper als „5.1“, „5-1“, „51“ und anders; die App liest das als „five one“, wenn so die
+  erwartete Zahl herauskommt, und zeigt erkannte Zahlen in Worten.
 
 ## Entwicklung
 
@@ -113,7 +122,7 @@ laufen deshalb ins Leere.
 - Lerninhalte in `content/`: CC BY-SA 4.0, siehe [LICENSE-CONTENT.md](LICENSE-CONTENT.md) (dort auch die
   Namensnennung für Material aus Wikipedia)
 - Bausteine Dritter: unter ihren eigenen Lizenzen. Die vollständige Liste mit allen Lizenztexten entsteht beim
-  Build (`LICENSES.txt`, in der App unter Profil → Lizenzen). Texte für Pakete ohne eigene Lizenzdatei liegen in
+  Build (`LICENSES.txt`, in der App unter Einstellungen → Lizenzen). Texte für Pakete ohne eigene Lizenzdatei liegen in
   [third-party-licenses/](third-party-licenses/).
 
 ## Rechtliches
